@@ -12,7 +12,8 @@ title: Project Template
 # **Safe Plus - Smart Safety Helmet**
 
 ---
-![Logo](./images/logo.webp)
+
+<img src="./images/logo.webp"  width="200" height="200">
 
 ## Team
 -  e20346, Samarakoon S.M.P.H. [email](mailto:e20346@eng.pdn.ac.lk)
