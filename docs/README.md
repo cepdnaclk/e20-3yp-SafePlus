@@ -12,7 +12,7 @@ title: Project Template
 # **Safe Plus - Smart Safety Helmet**
 
 ---
-![Logo](./images/logo.png)
+![Logo](./images/logo.webp)
 
 ## Team
 -  e20346, Samarakoon S.M.P.H. [email](mailto:e20346@eng.pdn.ac.lk)
@@ -29,11 +29,12 @@ title: Project Template
 #### Table of Contents
 1. [Introduction](#introduction)
 2. [Solution Architecture](#solution-architecture )
-3. [Hardware & Software Designs](#hardware-and-software-designs)
-4. [Testing](#testing)
-5. [Detailed budget](#detailed-budget)
-6. [Conclusion](#conclusion)
-7. [Links](#links)
+3. [Data Flow](#data-flow)
+4. [Detailed budget](#detailed-budget)
+5. [Hardware & Software Designs](#hardware-and-software-designs)
+6. [Testing](#testing)
+7. [Conclusion](#conclusion)
+8. [Links](#links)
 
 ## Introduction
 
@@ -45,7 +46,17 @@ The impact of Safe Plus is much more than preventing accidents. It helps compani
 
 ## Solution Architecture
 
-High level diagram + description
+![Architecture](./images/architecture.png)
+
+## Data Flow
+
+![dataflow](./images/datafow.jpg)
+
+## Detailed budget
+
+All items and costs
+
+![budget](./images/budget.jpg)
 
 ## Hardware and Software Designs
 
@@ -55,13 +66,6 @@ Detailed designs with many sub-sections
 
 Testing done on hardware and software, detailed + summarized results
 
-## Detailed budget
-
-All items and costs
-
-| Item          | Quantity  | Unit Cost  | Total  |
-| ------------- |:---------:|:----------:|-------:|
-| Sample item   | 5         | 10 LKR     | 50 LKR |
 
 ## Conclusion
 
