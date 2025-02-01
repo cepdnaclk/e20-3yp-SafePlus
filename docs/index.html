@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Safe Plus - Smart Safety Helmet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         /* Custom Styles */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
             line-height: 1.8;
             margin: 0;
             padding: 0;
@@ -17,8 +18,8 @@
         }
         h1, h2, h3 {
             color: #f1c40f;
+            font-weight: 600;
         }
-        
         a {
             color: #f1c40f;
             text-decoration: none;
@@ -99,6 +100,69 @@
         .container {
             padding-top: 100px; /* Adjusted padding to prevent hiding behind navbar */
         }
+        /* Section Titles */
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .section-title .line {
+            width: 60px;
+            height: 4px;
+            background: #f1c40f;
+            margin: 0 auto 20px;
+            border-radius: 2px;
+        }
+        /* Introduction Text */
+        .intro-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            text-align: justify;
+            margin: 0 auto;
+            max-width: 800px;
+        }
+        /* Team Members */
+        .team-member {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #333;
+            border-radius: 8px;
+            display: inline-block;
+            width: 45%;
+            margin: 10px;
+        }
+        .team-member a {
+            color: #f1c40f;
+        }
+        /* Links */
+        .links {
+            list-style: none;
+            padding: 0;
+        }
+        .links li {
+            margin-bottom: 10px;
+        }
+        .links li a {
+            display: inline-block;
+            padding: 10px 15px;
+            background: #f1c40f;
+            color: #121212;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        .links li a:hover {
+            background: #c29d0b;
+        }
+        /* Fix Navigation Offset */
+        :target::before {
+            content: "";
+            display: block;
+            height: 100px; /* Height of the navbar */
+            margin: -100px 0 0; /* Negative margin to offset */
+        }
     </style>
 </head>
 <body>
@@ -130,45 +194,54 @@
             <div class="line"></div>
         </div>
 
+        <!-- Introduction -->
         <div class="section-title">
             <h2 id="introduction">Introduction</h2>
             <div class="line"></div>
         </div>
-        <h5>Industrial workplaces, such as construction sites, factories, and mining zones, show significant safety risks to workers due to environmental hazards, heavy machinery, and unpredictable conditions. Every year, thousands of accidents occur due to falls, exposure to toxic gases, and collisions with moving equipment. 
-            These incidents not only lead to injuries and fatalities but also result in financial losses for companies due to medical costs, downtime, and legal repercussions.</h5>
-        <h5>
+        <div class="intro-text">
+            Industrial workplaces, such as construction sites, factories, and mining zones, show significant safety risks to workers due to environmental hazards, heavy machinery, and unpredictable conditions. Every year, thousands of accidents occur due to falls, exposure to toxic gases, and collisions with moving equipment. 
+            These incidents not only lead to injuries and fatalities but also result in financial losses for companies due to medical costs, downtime, and legal repercussions.
+            <br><br>
             To address these challenges, Safe Plus introduces an advanced smart safety helmet that integrates real-time monitoring, impact detection, and emergency alert systems. By providing cutting-edge sensor technology and wireless communication, Safe Plus ensures worker safety through immediate hazard detection, automated alerts, and connectivity with supervisors.
-        </h5>
+        </div>
 
+        <!-- Solution Architecture -->
         <div class="section-title">
             <h2 id="solution-architecture">Solution Architecture</h2>
             <div class="line"></div>
         </div>
         <img src="./images/architecture.png" alt="Solution Architecture">
 
+        <!-- Data Flow -->
         <div class="section-title">
             <h2 id="data-flow">Data Flow</h2>
             <div class="line"></div>
         </div>
-        <img src="./images/datafow.jpg" alt=Data Flow">
+        <img src="./images/datafow.jpg" alt="Data Flow">
 
+        <!-- Detailed Budget -->
         <div class="section-title">
             <h2 id="detailed-budget">Detailed Budget</h2>
             <div class="line"></div>
         </div>
         <img src="./images/budget.jpg" alt="Detailed Budget">
 
-        <h2 id ="team">Team</h2>
+        <!-- Team -->
+        <div class="section-title">
+            <h2 id="team">Team</h2>
+            <div class="line"></div>
+        </div>
         <div class="team-member"><strong>e20346</strong>: Samarakoon S.M.P.H. <a href="mailto:e20346@eng.pdn.ac.lk">[email]</a></div>
         <div class="team-member"><strong>e20378</strong>: Siriwardane I.A.U. <a href="mailto:e20378@eng.pdn.ac.lk">[email]</a></div>
         <div class="team-member"><strong>e20419</strong>: Wakkumbura M.M.S.S. <a href="mailto:e20419@eng.pdn.ac.lk">[email]</a></div>
         <div class="team-member"><strong>e20439</strong>: Wickramasinghe J.M.W.G.R.L. <a href="mailto:e20439@eng.pdn.ac.lk">[email]</a></div>
 
+        <!-- Links -->
         <div class="section-title">
             <h2 id="links">Links</h2>
             <div class="line"></div>
         </div>
-        
         <ul class="links">
             <li><a href="https://github.com/cepdnaclk/{{ page.repository-name }}" target="_blank">Project Repository</a></li>
             <li><a href="https://cepdnaclk.github.io/{{ page.repository-name }}" target="_blank">Project Page</a></li>
