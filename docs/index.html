@@ -52,9 +52,10 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 3rem;
+            font-size: 4rem;
             font-weight: bold;
-            color: #f1c40f;
+            color: black;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
         }
         /* Sticky Top Navigation Bar */
         .navbar {
@@ -64,13 +65,20 @@
             padding: 15px 0;
             z-index: 1000;
             box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .navbar img {
+            height: 40px;
+            margin-right: 10px;
         }
         .navbar ul {
             list-style: none;
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
             gap: 20px;
         }
         .navbar ul li {
@@ -87,11 +95,15 @@
             background: #f1c40f;
             color: #121212;
         }
+        .section-title {
+            padding-top: 100px; /* Adjusted padding to prevent hiding behind navbar */
+        }
     </style>
 </head>
 <body>
     <!-- Sticky Top Navigation Bar -->
     <nav class="navbar">
+        <img src="./images/logo.webp" alt="Safe Plus Logo">
         <ul>
             <li><a href="#introduction">Introduction</a></li>
             <li><a href="#solution-architecture">Solution Architecture</a></li>
@@ -116,19 +128,15 @@
             <div class="line"></div>
         </div>
 
-        <img src="./images/logo.webp" alt="Project Logo" width="200" height="200">
-
-        <h2>Team</h2>
-        <div class="team-member"><strong>e20346</strong>: Samarakoon S.M.P.H. <a href="mailto:e20346@eng.pdn.ac.lk">[email]</a></div>
-        <div class="team-member"><strong>e20378</strong>: Siriwardane I.A.U. <a href="mailto:e20378@eng.pdn.ac.lk">[email]</a></div>
-        <div class="team-member"><strong>e20419</strong>: Wakkumbura M.M.S.S. <a href="mailto:e20419@eng.pdn.ac.lk">[email]</a></div>
-        <div class="team-member"><strong>e20439</strong>: Wickramasinghe J.M.W.G.R.L. <a href="mailto:e20439@eng.pdn.ac.lk">[email]</a></div>
-
         <div class="section-title">
             <h2 id="introduction">Introduction</h2>
             <div class="line"></div>
         </div>
-        <p>Industrial workplaces pose significant safety risks...</p>
+        <p>Industrial workplaces, such as construction sites, factories, and mining zones, show significant safety risks to workers due to environmental hazards, heavy machinery, and unpredictable conditions. Every year, thousands of accidents occur due to falls, exposure to toxic gases, and collisions with moving equipment. 
+            These incidents not only lead to injuries and fatalities but also result in financial losses for companies due to medical costs, downtime, and legal repercussions.</p>
+        <p>
+            To address these challenges, Safe Plus introduces an advanced smart safety helmet that integrates real-time monitoring, impact detection, and emergency alert systems. By providing cutting-edge sensor technology and wireless communication, Safe Plus ensures worker safety through immediate hazard detection, automated alerts, and connectivity with supervisors.
+        </p>
 
         <div class="section-title">
             <h2 id="solution-architecture">Solution Architecture</h2>
@@ -137,9 +145,28 @@
         <img src="./images/architecture.png" alt="Solution Architecture">
 
         <div class="section-title">
+            <h2 id="data-flow">Data Flow</h2>
+            <div class="line"></div>
+        </div>
+        <img src="./images/datafow.jpg" alt=Data Flow">
+
+        <div class="section-title">
+            <h2 id="detailed-budget">Detailed Budget</h2>
+            <div class="line"></div>
+        </div>
+        <img src="./images/budget.jpg" alt="Detailed Budget">
+
+        <h2>Team</h2>
+        <div class="team-member"><strong>e20346</strong>: Samarakoon S.M.P.H. <a href="mailto:e20346@eng.pdn.ac.lk">[email]</a></div>
+        <div class="team-member"><strong>e20378</strong>: Siriwardane I.A.U. <a href="mailto:e20378@eng.pdn.ac.lk">[email]</a></div>
+        <div class="team-member"><strong>e20419</strong>: Wakkumbura M.M.S.S. <a href="mailto:e20419@eng.pdn.ac.lk">[email]</a></div>
+        <div class="team-member"><strong>e20439</strong>: Wickramasinghe J.M.W.G.R.L. <a href="mailto:e20439@eng.pdn.ac.lk">[email]</a></div>
+
+        <div class="section-title">
             <h2 id="links">Links</h2>
             <div class="line"></div>
         </div>
+        
         <ul class="links">
             <li><a href="https://github.com/cepdnaclk/{{ page.repository-name }}" target="_blank">Project Repository</a></li>
             <li><a href="https://cepdnaclk.github.io/{{ page.repository-name }}" target="_blank">Project Page</a></li>
