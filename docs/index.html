@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }} - {{ page.repository-name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #0056b3;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .team-member {
+            margin-bottom: 10px;
+        }
+        .team-member a {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Project Title -->
+        <h1>{{ page.title }}</h1>
+
+        <!-- Logo -->
+        <img src="./images/logo.webp" alt="Project Logo" width="200" height="200">
+
+        <!-- Team Members -->
+        <h2>Team</h2>
+        <div class="team-member">
+            <strong>e20346</strong>: Samarakoon S.M.P.H. <a href="mailto:e20346@eng.pdn.ac.lk">[email]</a>
+        </div>
+        <div class="team-member">
+            <strong>e20378</strong>: Siriwardane I.A.U. <a href="mailto:e20378@eng.pdn.ac.lk">[email]</a>
+        </div>
+        <div class="team-member">
+            <strong>e20419</strong>: Wakkumbura M.M.S.S. <a href="mailto:e20419@eng.pdn.ac.lk">[email]</a>
+        </div>
+        <div class="team-member">
+            <strong>e20439</strong>: Wickramasinghe J.M.W.G.R.L. <a href="mailto:e20439@eng.pdn.ac.lk">[email]</a>
+        </div>
+
+        <!-- Table of Contents -->
+        <h2>Table of Contents</h2>
+        <ol>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#solution-architecture">Solution Architecture</a></li>
+            <li><a href="#data-flow">Data Flow</a></li>
+            <li><a href="#detailed-budget">Detailed Budget</a></li>
+            <li><a href="#hardware-and-software-designs">Hardware & Software Designs</a></li>
+            <li><a href="#testing">Testing</a></li>
+            <li><a href="#conclusion">Conclusion</a></li>
+            <li><a href="#links">Links</a></li>
+        </ol>
+
+        <!-- Introduction -->
+        <h2 id="introduction">Introduction</h2>
+        <p>
+            Industrial workplaces, such as construction sites, factories, and mining zones, show significant safety risks to workers due to environmental hazards, heavy machinery, and unpredictable conditions. Every year, thousands of accidents occur due to falls, exposure to toxic gases, and collisions with moving equipment. These incidents not only lead to injuries and fatalities but also result in financial losses for companies due to medical costs, downtime, and legal repercussions.
+        </p>
+        <p>
+            To address these challenges, Safe Plus introduces an advanced smart safety helmet that integrates real-time monitoring, impact detection, and emergency alert systems. By providing cutting-edge sensor technology and wireless communication, Safe Plus ensures worker safety through immediate hazard detection, automated alerts, and connectivity with supervisors.
+        </p>
+
+        <!-- Solution Architecture -->
+        <h2 id="solution-architecture">Solution Architecture</h2>
+        <img src="./images/architecture.png" alt="Solution Architecture">
+
+        <!-- Data Flow -->
+        <h2 id="data-flow">Data Flow</h2>
+        <img src="./images/dataflow.jpg" alt="Data Flow">
+
+        <!-- Detailed Budget -->
+        <h2 id="detailed-budget">Detailed Budget</h2>
+        <img src="./images/budget.jpg" alt="Detailed Budget">
+
+        <!-- Hardware and Software Designs -->
+        <h2 id="hardware-and-software-designs">Hardware & Software Designs</h2>
+        <p>
+            Detailed designs with many sub-sections.
+        </p>
+
+        <!-- Testing -->
+        <h2 id="testing">Testing</h2>
+        <p>
+            Testing done on hardware and software, detailed + summarized results.
+        </p>
+
+        <!-- Conclusion -->
+        <h2 id="conclusion">Conclusion</h2>
+        <p>
+            What was achieved, future developments, commercialization plans.
+        </p>
+
+        <!-- Links -->
+        <h2 id="links">Links</h2>
+        <ul>
+            <li><a href="https://github.com/cepdnaclk/{{ page.repository-name }}" target="_blank">Project Repository</a></li>
+            <li><a href="https://cepdnaclk.github.io/{{ page.repository-name }}" target="_blank">Project Page</a></li>
+            <li><a href="http://www.ce.pdn.ac.lk/" target="_blank">Department of Computer Engineering</a></li>
+            <li><a href="https://eng.pdn.ac.lk/" target="_blank">University of Peradeniya</a></li>
+        </ul>
+    </div>
+</body>
+</html>
