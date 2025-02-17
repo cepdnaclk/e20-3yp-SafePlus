@@ -3,11 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@chakra-ui/icons": "^2.2.4",
+    "@chakra-ui/react": "^2.10.5",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.15",
     "cra-template": "1.2.0",
+    "framer-motion": "^12.4.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1",
+    "sass": "^1.85.0",
     "source-map-loader": "^5.0.0"
   },
   "scripts": {
