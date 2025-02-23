@@ -2,7 +2,7 @@ require("dotenv").config();
 const awsIot = require("aws-iot-device-sdk");
 const WebSocket = require("ws");
 
-const wss = new WebSocket.Server({ port: 8084 }); // WebSocket server running on port 8080
+const wss = new WebSocket.Server({ port: 8084 }); // WebSocket server running on port 8084
 
 // AWS IoT Core Device Connection
 const device = awsIot.device({
