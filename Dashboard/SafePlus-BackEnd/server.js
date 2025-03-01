@@ -1,16 +1,28 @@
 require("dotenv").config();
 const awsIot = require("aws-iot-device-sdk");
 const WebSocket = require("ws");
+const mongoose = require("mongoose");
+const HelmetData = require("./models/sensorData");
 
-const wss = new WebSocket.Server({ port: 8080 }); // WebSocket server running on port 8080
+// MongoDB connection using Mongoose
+mongoose.connect("mongodb://localhost:27017/", {
+})
+  .then(() => {
+    console.log("✅ MongoDB connected");
+  })
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err);
+  });
+
+const wss = new WebSocket.Server({ port: 8085 });
 
 // AWS IoT Core Device Connection
 const device = awsIot.device({
-  keyPath: process.env.PRIVATE_KEY_PATH,  
-  certPath: process.env.CERTIFICATE_PATH, 
-  caPath: process.env.ROOT_CA_PATH,       
-  clientId: "NodeBackendClient",          
-  host: process.env.AWS_IOT_ENDPOINT      
+  keyPath: process.env.PRIVATE_KEY_PATH,
+  certPath: process.env.CERTIFICATE_PATH,
+  caPath: process.env.ROOT_CA_PATH,
+  clientId: "NodeBackendClient",
+  host: process.env.AWS_IOT_ENDPOINT,
 });
 
 // Handle WebSocket connections
@@ -42,6 +54,16 @@ device.on("message", (topic, payload) => {
       client.send(JSON.stringify(data));
     }
   });
+
+  // Insert data into MongoDB using Mongoose model
+  const helmetData = new HelmetData(data);
+  helmetData.save()
+    .then(() => {
+      console.log("✅ Data inserted into MongoDB");
+    })
+    .catch((err) => {
+      console.error("❌ Failed to insert data into MongoDB:", err);
+    });
 });
 
 // Handle errors
