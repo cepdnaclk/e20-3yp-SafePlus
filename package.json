@@ -1,5 +1,20 @@
 {
   "dependencies": {
+    "mongodb": "^6.14.0",
+    "mqtt": "^5.10.4",
     "web-vitals": "^4.2.4"
-  }
+  },
+  "name": "e20-3yp-safeplus",
+  "version": "1.0.0",
+  "description": "[comment]: # \"This is the standard layout for the project, but you can clean this and use your own template\"",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
