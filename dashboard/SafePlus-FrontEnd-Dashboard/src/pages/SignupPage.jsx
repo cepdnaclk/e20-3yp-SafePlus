@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, Input, FormControl, FormLabel, VStack, Text, Link, Image, Heading } from "@chakra-ui/react";
+import { Box, Button, Input, FormControl, FormLabel, VStack, Text, Image, Heading } from "@chakra-ui/react";
 
-const LoginPage = () => {
-  const [formData, setFormData] = useState({ username: "", password: "" });
+const SignupPage = () => {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -13,15 +20,20 @@ const LoginPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Logging in with:", formData);
-  
-    // Dummy authentication check
-    if (formData.username === "admin" && formData.password === "1234") {
-      navigate("/home");
-    } else {
-      alert("Invalid credentials!");
+    const { password, confirmPassword } = formData;
+
+    // Basic validation
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
     }
+
+    // Dummy signup success
+    console.log("Signing up with:", formData);
+    setError("");
+    navigate("/login"); 
   };
+
   return (
     <Box
       width="100vw"
@@ -33,7 +45,7 @@ const LoginPage = () => {
       bgSize="cover"
       bgPosition="center"
     >
-      {/* Login Box */}
+      {/* Signup Box */}
       <Box
         bg="rgba(244, 243, 243, 0.6)"
         p={8}
@@ -49,8 +61,11 @@ const LoginPage = () => {
 
           {/* Title */}
           <Heading fontSize="2xl" color="#361717">
-            Login
+            Sign Up
           </Heading>
+
+          {/* Error Message */}
+          {error && <Text color="red.500">{error}</Text>}
 
           {/* Form */}
           <form onSubmit={handleSubmit} style={{ width: "100%" }}>
@@ -60,6 +75,18 @@ const LoginPage = () => {
                 type="text"
                 name="username"
                 value={formData.username}
+                onChange={handleChange}
+                bg="white"
+                borderRadius="md"
+              />
+            </FormControl>
+
+            <FormControl id="email" mt={4}>
+              <FormLabel color="#ABAAAA">Email</FormLabel>
+              <Input
+                type="email"
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
                 bg="white"
                 borderRadius="md"
@@ -78,19 +105,25 @@ const LoginPage = () => {
               />
             </FormControl>
 
-            {/* Forgot Password */}
-            <Text fontSize="sm" mt={2} color="#361717">
-              <Link href="#">Forgot Password?</Link>
-            </Text>
+            <FormControl id="confirmPassword" mt={4}>
+              <FormLabel color="#A8A6A6">Confirm Password</FormLabel>
+              <Input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                bg="white"
+                borderRadius="md"
+              />
+            </FormControl>
 
             {/* Buttons */}
             <VStack mt={6} spacing={3}>
               <Button type="submit" bg="#F1C35E" color="black" width="full">
-                Login
-              </Button>
-              
-              <Button bg="#E7D4AB" color="black" width="full" onClick={() => navigate("/signup")}>
                 Sign Up
+              </Button>
+              <Button bg="#E7D4AB" color="black" width="full" onClick={() => navigate("/login")}>
+                Already have an account? Login
               </Button>
             </VStack>
           </form>
@@ -100,4 +133,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default SignupPage;
