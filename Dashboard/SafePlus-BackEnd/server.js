@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const HelmetData = require("./models/sensorData");
 
 // MongoDB connection using Mongoose
-mongoose.connect("mongodb://localhost:27017/", {
+mongoose.connect("mongodb://localhost:27017/Helmet_data", {
 })
   .then(() => {
     console.log("✅ MongoDB connected");
