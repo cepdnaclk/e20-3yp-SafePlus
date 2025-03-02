@@ -31,7 +31,7 @@ const SignupPage = () => {
     // Dummy signup success
     console.log("Signing up with:", formData);
     setError("");
-    navigate("/login"); 
+    navigate("/"); 
   };
 
   return (
