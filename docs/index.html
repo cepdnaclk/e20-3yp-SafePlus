@@ -194,6 +194,23 @@
             <div class="line"></div>
         </div>
 
+        <video id="introVideo" width="80%" autoplay muted controls>
+            <source src="./images/Product Documentation Video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const video = document.getElementById("introVideo");
+        
+                // Wait for user interaction
+                document.body.addEventListener("click", () => {
+                    video.muted = false; // Unmute the video
+                    video.play(); // Play the video
+                }, { once: true }); // Ensure it only runs once
+            });
+        </script>
+
         <!-- Introduction -->
         <div class="section-title">
             <h2 id="introduction">Introduction</h2>
@@ -225,7 +242,7 @@
             <h2 id="detailed-budget">Detailed Budget</h2>
             <div class="line"></div>
         </div>
-        <img src="./images/budget.jpg" alt="Detailed Budget">
+        <img src="./images/budget.png" alt="Detailed Budget">
 
         <!-- Team -->
         <div class="section-title">
