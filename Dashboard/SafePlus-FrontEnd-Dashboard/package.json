@@ -14,9 +14,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
 
-    "axios": "^1.8.1",
-    "framer-motion": "^12.4.7",
-
+ 
     "@mui/material": "^6.4.5",
     "axios": "^1.8.1",
     "crypto-js": "^4.2.0",
