@@ -51,7 +51,7 @@ The impact of Safe Plus is much more than preventing accidents. It helps compani
 
 All items and costs
 
-![budget](./docs/images/budget.jpg)
+![budget](./docs/images/budget.png)
 
 ## Hardware and Software Designs
 
