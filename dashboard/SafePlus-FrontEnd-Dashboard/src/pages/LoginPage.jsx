@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Input, FormControl, FormLabel, VStack, Text, Link, Image, Heading } from "@chakra-ui/react";
+import axios from 'axios';
+import {toast } from 'react-hot-toast';
+
 
 const LoginPage = () => {
-  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [formData, setFormData] = useState({ name: "", password: "" });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -11,16 +14,38 @@ const LoginPage = () => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Logging in with:", formData);
-  
-    // Dummy authentication check
-    if (formData.username === "admin" && formData.password === "1234") {
-      navigate("/home");
-    } else {
-      alert("Invalid credentials!");
+    const {name,password}= formData
+    try {
+      const {data} = await axios.post('/login', {
+        name,
+        password
+      });
+      if(data.error){
+        toast.error(data.error)
+      } else{
+        setFormData({})
+        navigate('/dashboard')
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong. Please try again.");
+          
     }
+    
+    //validation
+    if (!name || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    
+    // Dummy authentication check
+    //if (formData.username === "admin" && formData.password === "1234") {
+    //  navigate("/home");
+    //} else {
+    //  alert("Invalid credentials!");
+    //}
   };
   return (
     <Box
@@ -54,11 +79,11 @@ const LoginPage = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} style={{ width: "100%" }}>
-            <FormControl id="username">
+            <FormControl id="name">
               <FormLabel color="#ABAAAA">User Name</FormLabel>
               <Input
                 type="text"
-                name="username"
+                name="name"
                 value={formData.username}
                 onChange={handleChange}
                 bg="white"

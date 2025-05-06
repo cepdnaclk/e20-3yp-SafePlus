@@ -6,9 +6,19 @@ import SignupPage from "./pages/SignupPage";
 import LiveData from "./pages/LiveData";
 import WorkerDetails from "./pages/WorkerDetails";
 import Reports from "./pages/Reports";
+import axios from 'axios';
+import {Toaster} from 'react-hot-toast'
+import { UserContextProvider } from "../context/userContext";
+import Dashboard from "./pages/Dashboard";
+
+axios.defaults.baseURL =  'http://localhost:8000'
+axios.defaults.withCredentials= true
+
 const App = () => {
   return (
+    <UserContextProvider>
     <ChakraProvider>
+      <Toaster position="top-middle" toastOptions={{duration:4000}}/>
       <Router>
         <Routes>
 
@@ -21,11 +31,13 @@ const App = () => {
           <Route path="/livedata" element={<LiveData />} />
           <Route path="/workerdetails" element={<WorkerDetails />} />
           <Route path="/reports" element={<Reports />} />
+          <Route path="/dashboard" element={<Dashboard />} />
 
 
         </Routes>
       </Router>
     </ChakraProvider>
+    </UserContextProvider>
   );
 };
 
