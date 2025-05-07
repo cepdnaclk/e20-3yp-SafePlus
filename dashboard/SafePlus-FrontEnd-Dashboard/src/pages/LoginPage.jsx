@@ -26,7 +26,7 @@ const LoginPage = () => {
         toast.error(data.error)
       } else{
         setFormData({})
-        navigate('/dashboard')
+        navigate('/home')
       }
     } catch (error) {
       console.error(error);
