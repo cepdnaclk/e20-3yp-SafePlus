@@ -1,8 +1,7 @@
-
 function LiveData() {
-  return (
-    <div>LiveData</div>
+  return ( <div>LiveData</div>
   )
-}
-
-export default LiveData
+  }
+  
+  export default LiveData
+  
