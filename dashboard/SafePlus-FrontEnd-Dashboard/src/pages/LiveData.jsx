@@ -1,7 +1,11 @@
+import Header from "../components/Header/Header"
 
 function LiveData() {
   return (
-    <div>LiveData</div>
+    <div>
+      <Header />
+
+      LiveData</div>
   )
 }
 

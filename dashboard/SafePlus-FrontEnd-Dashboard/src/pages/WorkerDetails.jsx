@@ -1,7 +1,11 @@
+import Header from "../components/Header/Header"
 
 function WorkerDetails() {
   return (
-    <div>WorkerDetails</div>
+    <div>
+      <Header />
+
+      WorkerDetails</div>
   )
 }
 
