@@ -1,7 +1,15 @@
+import Header from "../components/Header/Header"
+import IotCoreComponent from "../IotCoreComponent"
+
 function LiveData() {
-  return ( <div>LiveData</div>
+  return (
+    <div>
+      <Header />
+      <IotCoreComponent/>
+
+      LiveData</div>
   )
-  }
+}
   
-  export default LiveData
+export default LiveData
   

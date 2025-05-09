@@ -1,7 +1,11 @@
+import Header from "../components/Header/Header"
 
 function Reports() {
   return (
-    <div>Reports</div>
+    <div>
+      <Header />
+
+      Reports</div>
   )
 }
 

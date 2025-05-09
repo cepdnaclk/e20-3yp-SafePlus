@@ -26,7 +26,7 @@ const LoginPage = () => {
         toast.error(data.error)
       } else{
         setFormData({})
-        navigate('/home')
+        navigate('/livedata')
       }
     } catch (error) {
       console.error(error);
