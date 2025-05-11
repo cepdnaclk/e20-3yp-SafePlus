@@ -6,6 +6,7 @@ const HelmetData = require("./models/sensorData");
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const port = process.env.PORT || 8001;
 app.use(cors()); 
 
 app.use(express.json()); 
@@ -79,7 +80,7 @@ device.on("error", (err) => {
   console.error("❌ AWS IoT Error:", err);
 });
 
-app.listen(8000, () => {
-  console.log("🚀 Server is running on port 8000");
+app.listen(port, () => {
+  console.log("🚀 Server is running on port 8001");
 });
 

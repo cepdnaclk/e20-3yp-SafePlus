@@ -1,6 +1,7 @@
 import { useState } from "react";
 //await axios.post("/api/workers", { name, nic, contact, address });
 
+const apiUrl = process.env.REACT_APP_API_URL;
 const RegisterWorkerForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -20,7 +21,7 @@ const RegisterWorkerForm = ({ onSuccess }) => {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:8000/api/workers", {
+      const res = await fetch(`${apiUrl}/api/workers`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -30,7 +31,7 @@ const RegisterWorkerForm = ({ onSuccess }) => {
 
       if (res.ok) {
         alert("✅ Worker registered!");
-        onSuccess(); // Notify parent to close the form
+        onSuccess(); 
       } else {
         alert("❌ Error registering worker");
       }
