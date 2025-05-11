@@ -1,7 +1,6 @@
 import { useState } from "react";
 //await axios.post("/api/workers", { name, nic, contact, address });
-
-const apiUrl = process.env.REACT_APP_API_URL;
+const apiUrl = 'http://localhost:8001';
 const RegisterWorkerForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
     name: "",
