@@ -3,6 +3,14 @@ const awsIot = require("aws-iot-device-sdk");
 const WebSocket = require("ws");
 const mongoose = require("mongoose");
 const HelmetData = require("./models/sensorData");
+const express = require("express");
+const app = express();
+const cors = require("cors");
+app.use(cors()); 
+
+app.use(express.json()); 
+const workerRoutes = require("./routes/workerRoutes"); 
+app.use("/api/workers", workerRoutes);
 
 // MongoDB connection using Mongoose
 mongoose.connect(process.env.MONGO_URL, {
@@ -70,3 +78,8 @@ device.on("message", (topic, payload) => {
 device.on("error", (err) => {
   console.error("❌ AWS IoT Error:", err);
 });
+
+app.listen(8000, () => {
+  console.log("🚀 Server is running on port 8000");
+});
+

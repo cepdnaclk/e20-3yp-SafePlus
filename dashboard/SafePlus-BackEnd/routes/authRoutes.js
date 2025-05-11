@@ -1,7 +1,5 @@
 const express = require('express');
 const { test, register, login, getProfile } = require('../controllers/authController')
-
-
 const router = express.Router();
 const cors = require("cors");
 

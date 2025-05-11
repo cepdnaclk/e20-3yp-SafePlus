@@ -26,7 +26,7 @@ const IotCoreComponent = () => {
   return (
     <div style={{
       maxWidth: "500px", 
-      margin: "50px auto", 
+      margin: "0px auto", 
       padding: "20px", 
       borderRadius: "10px", 
       boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)", 
