@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, Input, FormControl, FormLabel, VStack, Text, Image, Heading } from "@chakra-ui/react";
+import { Box, Button, Input, FormControl, FormLabel, VStack, Image, Heading } from "@chakra-ui/react";
+import axios from 'axios';
+import {toast} from 'react-hot-toast';
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
 
-  const [error, setError] = useState("");
+  //const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,20 +20,47 @@ const SignupPage = () => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const { password, confirmPassword } = formData;
+    const { name, email, password, confirmPassword } = formData;
+
+    // Password match validation
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    try {
+      const res = await axios.post('/register', {name, email, password });
+      const data = res.data;
+
+      if (data.error) {
+        toast.error(data.error);
+      } else {
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+        toast.success('Signup Successful, Welcome!');
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong. Please try again..");
+    }
 
     // Basic validation
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
       return;
     }
 
     // Dummy signup success
-    console.log("Signing up with:", formData);
-    setError("");
-    navigate("/login"); 
+    //console.log("Signing up with:", formData);
+    //setError("");
+    //navigate("/"); 
   };
 
   return (
@@ -65,21 +94,23 @@ const SignupPage = () => {
           </Heading>
 
           {/* Error Message */}
-          {error && <Text color="red.500">{error}</Text>}
+          {/*error && <Text color="red.500">{error}</Text>*/}
 
           {/* Form */}
           <form onSubmit={handleSubmit} style={{ width: "100%" }}>
-            <FormControl id="username">
-              <FormLabel color="#ABAAAA">User Name</FormLabel>
-              <Input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                bg="white"
-                borderRadius="md"
-              />
-            </FormControl>
+          <FormControl id="name">
+            <FormLabel color="#ABAAAA">User Name</FormLabel>
+            <Input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              bg="white"
+              borderRadius="md"
+            />
+          </FormControl>
+
+
 
             <FormControl id="email" mt={4}>
               <FormLabel color="#ABAAAA">Email</FormLabel>
