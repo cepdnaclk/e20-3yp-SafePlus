@@ -3,10 +3,13 @@ import axios from 'axios';
 import RegisterWorkerForm from '../components/RegisterWorker/RegisterWorkerForm';
 import Header from '../components/Header/Header';
 import '../styles/WorkerDetails.css';
+import AssignHelmetForm from '../components/AssignHelmet/AssignHelmetForm';
+
 
 const WorkerDetails = () => {
   const [showForm, setShowForm] = useState(false);
   const [workers, setWorkers] = useState([]);
+  const [showHelmetForm, setShowHelmetForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(15);
 
@@ -58,13 +61,24 @@ const WorkerDetails = () => {
     <><div>       <Header />
     </div>
     <div className="worker-details-container">
-        <button className="register-btn" onClick={() => setShowForm(true)}>Register Worker</button>
-
+    <div className="button-container">
+      <button className="action-btn" onClick={() => setShowForm(true)}>Register Worker</button>
+      <button className="action-btn" onClick={() => setShowHelmetForm(true)}>Assign Helmet</button>
+    </div>
         {showForm && (
           <RegisterWorkerForm
             onClose={() => setShowForm(false)}
             onRegisterSuccess={(newWorker) => setWorkers(prev => [...prev, newWorker])} />
         )}
+
+
+        {showHelmetForm && (
+          <AssignHelmetForm
+            onClose={() => setShowHelmetForm(false)}
+            onAssignSuccess={() => alert('Helmet assigned successfully')}
+          />
+        )}
+
         <div className="table-wrapper">
         <table className="worker-table">
           <thead>

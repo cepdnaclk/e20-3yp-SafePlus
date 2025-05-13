@@ -10,16 +10,28 @@
   position: relative;
 }
 
-.register-btn {
-  background-color: #fdd835;
+.button-container {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.action-btn {
+  width: 50%;
+  padding: 10px 20px;
+  background-color:#fdd835; /* Bootstrap blue */
   color: black;
-  padding: 10px 16px;
   border: none;
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
-  margin-bottom: 16px;
+  transition: background-color 0.3s;
 }
+
+.action-btn:hover {
+  background-color: #f8b332;
+}
+
 
 .table-wrapper {
   flex-grow: 1;
