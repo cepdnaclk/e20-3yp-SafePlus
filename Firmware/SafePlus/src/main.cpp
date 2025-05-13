@@ -9,6 +9,7 @@
 const char* awsTopic = "helmet/data";
 unsigned long lastTimepublish = 0;
 unsigned long publishtimeThreshold = 2000;
+const char helmetID[] = "Helmet_1";
 
 void activateBuzzer() {
   Serial.println("BUZZER ON!");
@@ -89,8 +90,8 @@ void publishData() {
 
     char message[256];
     snprintf(message, sizeof(message),
-        "{\"temperature\": %.2f, \"humidity\": %.2f, \"acc_magnitude\": %.2f, \"gyro_magnitude\": %.2f, \"heart_rate\": %.2f, \"location\": {\"lat\": %.6f, \"lng\": %.6f}, \"gasvalues\": %.2f, \"button\": %s, \"impact\": \"%s\"}",
-        data.temperature, data.humidity, accMagnitude, gyroMagnitude, bpm, data.latitude, data.longitude, data.gasPPM,
+        "{\"helmet_id\": \"%s\",\"temperature\": %.2f, \"humidity\": %.2f, \"acc_magnitude\": %.2f, \"gyro_magnitude\": %.2f, \"heart_rate\": %.2f, \"location\": {\"lat\": %.6f, \"lng\": %.6f}, \"gasvalues\": %.2f, \"button\": %s, \"impact\": \"%s\"}",
+         helmetID, data.temperature, data.humidity, accMagnitude, gyroMagnitude, bpm, data.latitude, data.longitude, data.gasPPM,
         buttonPressed ? "true" : "false", impactDetected ? "impact" : "no impact");
 
     // High gas detection logic
@@ -114,6 +115,9 @@ void publishData() {
     else {
         if (publishnow - lastTimepublish > publishtimeThreshold) {
             publishMessage(awsTopic, message);
+            Serial.print("Message length: ");
+Serial.println(strlen(message));
+
             lastTimepublish = publishnow;
         }
     }

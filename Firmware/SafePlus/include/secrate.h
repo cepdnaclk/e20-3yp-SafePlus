@@ -3,12 +3,12 @@
 #define SECRET
 #define THINGNAME "SafePlusESP"                        
  
-// const char WIFI_SSID[] = "Dialog 4G 182";               
-// const char WIFI_PASSWORD[] = "2002@ravindu";          
+const char WIFI_SSID[] = "Dialog 4G 182";               
+const char WIFI_PASSWORD[] = "2002@ravindu";          
 // const char WIFI_SSID[] = "realme 7";              
 // const char WIFI_PASSWORD[] = "20020111";
-const char WIFI_SSID[] = "Samadhi";               
-const char WIFI_PASSWORD[] = "12345678";  
+// const char WIFI_SSID[] = "Samadhi";               
+// const char WIFI_PASSWORD[] = "12345678";  
 const char AWS_IOT_ENDPOINT[] = "ap3jce9arwnwr-ats.iot.eu-north-1.amazonaws.com";       
  
 // Amazon Root CA 1
