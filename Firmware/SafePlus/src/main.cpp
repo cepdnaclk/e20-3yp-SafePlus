@@ -89,10 +89,12 @@ void publishData() {
     float bpm = (data.irValue < 50000) ? 0 : data.irValue / 1000.0;
 
     char message[256];
-    snprintf(message, sizeof(message),
-        "{\"helmet_id\": \"%s\",\"temperature\": %.2f, \"humidity\": %.2f, \"acc_magnitude\": %.2f, \"gyro_magnitude\": %.2f, \"heart_rate\": %.2f, \"location\": {\"lat\": %.6f, \"lng\": %.6f}, \"gasvalues\": %.2f, \"button\": %s, \"impact\": \"%s\"}",
-         helmetID, data.temperature, data.humidity, accMagnitude, gyroMagnitude, bpm, data.latitude, data.longitude, data.gasPPM,
-        buttonPressed ? "true" : "false", impactDetected ? "impact" : "no impact");
+snprintf(message, sizeof(message),
+    "{\"id\":\"%s\",\"tmp\":%.1f,\"hum\":%.1f,\"acc\":%.2f,\"gyr\":%.2f,\"bpm\":%.1f,\"loc\":[%.4f,%.4f],\"gas\":%.1f,\"btn\":%s,\"imp\":\"%s\"}",
+    helmetID, data.temperature, data.humidity, accMagnitude, gyroMagnitude, bpm,
+    data.latitude, data.longitude, data.gasPPM,
+    buttonPressed ? "true" : "false", impactDetected ? "impact" : "no");
+
 
     // High gas detection logic
     if (data.gasPPM > 900) {  // Adjust threshold based on testing
@@ -115,8 +117,6 @@ void publishData() {
     else {
         if (publishnow - lastTimepublish > publishtimeThreshold) {
             publishMessage(awsTopic, message);
-            Serial.print("Message length: ");
-Serial.println(strlen(message));
 
             lastTimepublish = publishnow;
         }
