@@ -26,8 +26,8 @@ export default function HelmetMap({ location }) {
       <TileLayer
         attribution="&copy; OpenStreetMap contributors"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        maxNativeZoom={19}  // the highest zoom the server actually has
-        maxZoom={20}        // how far Leaflet will let you zoom in (tiles get upscaled)
+        maxNativeZoom={19}
+        maxZoom={20}
       />
       <Recenter location={loc} />
       <Marker position={loc}>

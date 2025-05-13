@@ -18,8 +18,8 @@ export default function LiveData() {
         console.log("📩 New data:", data);
         setSensorData(data);
 
-        if (data.location?.lat != null && data.location?.lng != null) {
-          setHelmetLocation([data.location.lat, data.location.lng]);
+        if (data.loc?.loc[0] != null && data.loc?.loc[1] != null) {
+          setHelmetLocation([data.loc.loc[0], data.loc.loc[1]]);
         }
       } catch (err) {
         console.error("❌ WS parse error:", err);
