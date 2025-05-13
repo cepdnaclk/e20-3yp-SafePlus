@@ -29,14 +29,19 @@ const WorkerDetails = () => {
   const currentWorkers = workers.slice(indexOfFirstItem, indexOfLastItem);
 
   const handleDelete = async (nic) => {
-    try {
-      await axios.delete(`/api/workers/${nic}`);
-      setWorkers(prev => prev.filter(worker => worker.nic !== nic));
-    } catch (err) {
-      console.error('Failed to delete worker:', err);
-      alert('Failed to delete worker');
-    }
-  };
+  const confirmDelete = window.confirm('Are you sure you want to delete this worker?');
+
+  if (!confirmDelete) return; // If user clicks "Cancel", exit the function
+
+  try {
+    await axios.delete(`/api/workers/${nic}`);
+    setWorkers(prev => prev.filter(worker => worker.nic !== nic));
+  } catch (err) {
+    console.error('Failed to delete worker:', err);
+    alert('Failed to delete worker');
+  }
+};
+
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
