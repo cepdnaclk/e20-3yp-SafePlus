@@ -31,7 +31,7 @@ const WorkerDetails = () => {
   const handleDelete = async (nic) => {
   const confirmDelete = window.confirm('Are you sure you want to delete this worker?');
 
-  if (!confirmDelete) return; // If user clicks "Cancel", exit the function
+  if (!confirmDelete) return;
 
   try {
     await axios.delete(`/api/workers/${nic}`);
