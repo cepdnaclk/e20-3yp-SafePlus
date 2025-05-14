@@ -89,6 +89,7 @@ const WorkerDetails = () => {
                 <th>#</th>
                 <th>Worker Name</th>
                 <th>NIC</th>
+                <th>Helmet ID</th>
                 <th>Contact</th>
                 <th>Address</th>
                 <th>Email</th>
@@ -103,6 +104,7 @@ const WorkerDetails = () => {
                   <td>{indexOfFirstItem + idx + 1}</td>
                   <td>{worker.name}</td>
                   <td>{worker.nic}</td>
+                  <td>{worker.helmetId ? worker.helmetId : "Not Assigned"}</td>
                   <td>{worker.contact}</td>
                   <td>{worker.address}</td>
                   <td>{worker.email}</td>
