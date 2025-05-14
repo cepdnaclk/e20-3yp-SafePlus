@@ -14,7 +14,6 @@ const ConfirmDeleteForm = ({ onClose, worker, onDeleteSuccess }) => {
         data: { username: name, password },
       });
       console.log('Delete response:', res.data);
-      toast.success("Worker deleted successfully!");
       onDeleteSuccess(worker._id);
       onClose();
     } catch (err) {
