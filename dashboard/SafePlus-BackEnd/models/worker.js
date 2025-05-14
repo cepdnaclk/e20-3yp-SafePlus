@@ -11,7 +11,9 @@ const workerSchema = new mongoose.Schema({
   registeredDate: {
     type: String,
     default: () => new Date().toISOString().split('T')[0] 
-  }
+  },
+  helmetId: { type: String, default: null }
+
 }, { timestamps: true });
 
 const worker = mongoose.model("worker", workerSchema);

@@ -49,6 +49,33 @@ const deleteWorker = async (req, res) => {
   }
 };
 
+// assign helmet to a worker
+const assignHelmet = async (req, res) => {
+  const nic = req.params.nic;
+  const { helmetID } = req.body;
+
+  try {
+    const worker = await Worker.findOne({ nic });
+
+    if (!worker) {
+      return res.status(404).json({ error: 'Worker not found' });
+    }
+
+    worker.helmetId = helmetID; // or whatever field you're using
+    await worker.save();
+
+    res.status(200).json({ message: 'Helmet assigned successfully', worker });
+  } catch (error) {
+    console.error('Error assigning helmet:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+
+  console.log('Updating NIC:', nic, 'with helmet ID:', helmetID);
+
+};
+
+
+
 // (Optional) Get all workers
 const getAllWorkers = async (req, res) => {
   try {
@@ -64,4 +91,5 @@ module.exports = {
   registerWorker,
   deleteWorker,
   getAllWorkers,
+  assignHelmet,
 };

@@ -1,14 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import RegisterWorkerForm from '../components/RegisterWorker/RegisterWorkerForm';
 import Header from '../components/Header/Header';
 import '../styles/WorkerDetails.css';
 import AssignHelmetForm from '../components/AssignHelmet/AssignHelmetForm';
 
-
 const WorkerDetails = () => {
-  const [showForm, setShowForm] = useState(false);
   const [workers, setWorkers] = useState([]);
+  const [showForm, setShowForm] = useState(false);
   const [showHelmetForm, setShowHelmetForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(15);
@@ -32,19 +31,23 @@ const WorkerDetails = () => {
   const currentWorkers = workers.slice(indexOfFirstItem, indexOfLastItem);
 
   const handleDelete = async (nic) => {
-  const confirmDelete = window.confirm('Are you sure you want to delete this worker?');
+    const confirmDelete = window.confirm('Are you sure you want to delete this worker?');
 
-  if (!confirmDelete) return;
+    if (!confirmDelete) return;
 
-  try {
-    await axios.delete(`/api/workers/${nic}`);
-    setWorkers(prev => prev.filter(worker => worker.nic !== nic));
-  } catch (err) {
-    console.error('Failed to delete worker:', err);
-    alert('Failed to delete worker');
-  }
-};
+    try {
+      await axios.delete(`/api/workers/${nic}`);
+      setWorkers(prev => prev.filter(worker => worker.nic !== nic));
+    } catch (err) {
+      console.error('Failed to delete worker:', err);
+      alert('Failed to delete worker');
+    }
+  };
 
+  const handleAssignSuccess = () => {
+
+    fetchWorkers();
+  };
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -58,60 +61,60 @@ const WorkerDetails = () => {
   };
 
   return (
-    <><div>       <Header />
-    </div>
-    <div className="worker-details-container">
-    <div className="button-container">
-      <button className="action-btn" onClick={() => setShowForm(true)}>Register Worker</button>
-      <button className="action-btn" onClick={() => setShowHelmetForm(true)}>Assign Helmet</button>
-    </div>
+    <div>
+      <Header />
+      <div className="worker-details-container">
+        <div className="button-container">
+          <button className="action-btn" onClick={() => setShowForm(true)}>Register Worker</button>
+          <button className="action-btn" onClick={() => setShowHelmetForm(true)}>Assign Helmet</button>
+        </div>
+
         {showForm && (
           <RegisterWorkerForm
             onClose={() => setShowForm(false)}
             onRegisterSuccess={(newWorker) => setWorkers(prev => [...prev, newWorker])} />
         )}
 
-
         {showHelmetForm && (
           <AssignHelmetForm
             onClose={() => setShowHelmetForm(false)}
-            onAssignSuccess={() => alert('Helmet assigned successfully')}
+            onAssignSuccess={handleAssignSuccess}
           />
         )}
 
         <div className="table-wrapper">
-        <table className="worker-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Worker Name</th>
-              <th>NIC</th>
-              <th>Contact</th>
-              <th>Address</th>
-              <th>Email</th>
-              <th>Date of Birth</th>
-              <th>Worker Since</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentWorkers.map((worker, idx) => (
-              <tr key={worker.nic}>
-                <td>{indexOfFirstItem + idx + 1}</td>
-                <td>{worker.name}</td>
-                <td>{worker.nic}</td>
-                <td>{worker.contact}</td>
-                <td>{worker.address}</td>
-                <td>{worker.email}</td>
-                <td>{worker.birth}</td>
-                <td>{worker.registeredDate}</td>
-                <td>
-                  <button className="delete-btn" onClick={() => handleDelete(worker.nic)}>Delete</button>
-                </td>
+          <table className="worker-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Worker Name</th>
+                <th>NIC</th>
+                <th>Contact</th>
+                <th>Address</th>
+                <th>Email</th>
+                <th>Date of Birth</th>
+                <th>Worker Since</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentWorkers.map((worker, idx) => (
+                <tr key={worker.nic}>
+                  <td>{indexOfFirstItem + idx + 1}</td>
+                  <td>{worker.name}</td>
+                  <td>{worker.nic}</td>
+                  <td>{worker.contact}</td>
+                  <td>{worker.address}</td>
+                  <td>{worker.email}</td>
+                  <td>{worker.birth}</td>
+                  <td>{worker.registeredDate}</td>
+                  <td>
+                    <button className="delete-btn" onClick={() => handleDelete(worker.nic)}>Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {/* Pagination Controls */}
@@ -131,7 +134,8 @@ const WorkerDetails = () => {
             items per page
           </div>
         </div>
-      </div></>
+      </div>
+    </div>
   );
 };
 

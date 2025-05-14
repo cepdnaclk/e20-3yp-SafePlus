@@ -3,7 +3,6 @@ import axios from 'axios';
 import './AssignHelmetForm.css';
 import PropTypes from 'prop-types';
 
-
 const AssignHelmetForm = ({ onClose, onAssignSuccess }) => {
   const [workers, setWorkers] = useState([]);
   const [selectedNIC, setSelectedNIC] = useState('');
@@ -18,11 +17,8 @@ const AssignHelmetForm = ({ onClose, onAssignSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/helmet-assignments', {
-        nic: selectedNIC,
-        helmetID,
-      });
-      onAssignSuccess(); // refresh data if needed
+      await axios.put(`/api/workers/assignHelmet/${selectedNIC}`, { helmetID });
+      onAssignSuccess();
       onClose();
     } catch (err) {
       console.error('Error assigning helmet:', err);

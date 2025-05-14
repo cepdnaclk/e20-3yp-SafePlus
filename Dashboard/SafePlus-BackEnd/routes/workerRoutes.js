@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const cors = require('cors');
-const { registerWorker, deleteWorker, getAllWorkers } = require('../controllers/workerController');
+const { registerWorker, deleteWorker, getAllWorkers , assignHelmet,} = require('../controllers/workerController');
 
 // CORS middleware
 router.use(
@@ -14,6 +14,8 @@ router.use(
 // Routes
 router.post('/register', registerWorker);
 router.delete('/:nic', deleteWorker);
-router.get('/', getAllWorkers); // Optional: for displaying all workers
+router.delete('/:nic', deleteWorker);
+router.put('/assignHelmet/:nic', assignHelmet);
+router.get('/', getAllWorkers); 
 
 module.exports = router;
