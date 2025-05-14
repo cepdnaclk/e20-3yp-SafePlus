@@ -4,6 +4,8 @@ import RegisterWorkerForm from '../components/RegisterWorker/RegisterWorkerForm'
 import Header from '../components/Header/Header';
 import '../styles/WorkerDetails.css';
 import AssignHelmetForm from '../components/AssignHelmet/AssignHelmetForm';
+import ConfirmDeleteForm from '../components/ConfirmDelete/ConfirmDeleteForm';
+import { toast } from 'react-hot-toast'; // Assuming you're using react-toastify
 
 const WorkerDetails = () => {
   const [workers, setWorkers] = useState([]);
@@ -11,6 +13,8 @@ const WorkerDetails = () => {
   const [showHelmetForm, setShowHelmetForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(15);
+  const [showDeleteForm, setShowDeleteForm] = useState(false);
+  const [deleteWorker, setDeleteWorker] = useState(null); // Store the worker to be deleted
 
   const fetchWorkers = async () => {
     try {
@@ -30,22 +34,17 @@ const WorkerDetails = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentWorkers = workers.slice(indexOfFirstItem, indexOfLastItem);
 
-  const handleDelete = async (nic) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this worker?');
+  const handleDelete = (worker) => {
+    setDeleteWorker(worker);  // Set the worker to be deleted
+    setShowDeleteForm(true);  // Show the delete confirmation modal
+  };
 
-    if (!confirmDelete) return;
-
-    try {
-      await axios.delete(`/api/workers/${nic}`);
-      setWorkers(prev => prev.filter(worker => worker.nic !== nic));
-    } catch (err) {
-      console.error('Failed to delete worker:', err);
-      alert('Failed to delete worker');
-    }
+  const handleDeleteSuccess = (deletedWorkerId) => {
+    setWorkers(prev => prev.filter(worker => worker._id !== deletedWorkerId));
+    toast.success("Worker deleted successfully!");
   };
 
   const handleAssignSuccess = () => {
-
     fetchWorkers();
   };
 
@@ -82,6 +81,14 @@ const WorkerDetails = () => {
           />
         )}
 
+        {showDeleteForm && (
+          <ConfirmDeleteForm
+            onClose={() => setShowDeleteForm(false)}
+            worker={deleteWorker} 
+            onDeleteSuccess={handleDeleteSuccess}  // Pass the success handler here
+          />
+        )}
+
         <div className="table-wrapper">
           <table className="worker-table">
             <thead>
@@ -111,7 +118,7 @@ const WorkerDetails = () => {
                   <td>{worker.birth}</td>
                   <td>{worker.registeredDate}</td>
                   <td>
-                    <button className="delete-btn" onClick={() => handleDelete(worker.nic)}>Delete</button>
+                    <button className="delete-btn" onClick={() => handleDelete(worker)}>Delete</button>
                   </td>
                 </tr>
               ))}

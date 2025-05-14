@@ -1,4 +1,6 @@
 const Worker = require('../models/worker');
+const User = require("../models/User");
+const jwt = require('jsonwebtoken');
 
 // Register a new worker
 const registerWorker = async (req, res) => {
@@ -32,12 +34,29 @@ const registerWorker = async (req, res) => {
   }
 };
 
-// Delete worker by NIC
 const deleteWorker = async (req, res) => {
   try {
-    const { nic } = req.params;
+    const { workerId } = req.params;
 
-    const deletedWorker = await Worker.findOneAndDelete({ nic });
+    // Extract token from request (cookie or headers)
+    const token = req.cookies.token || req.headers['authorization'].split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { name } = decoded;
+
+    // Validate the worker's existence
+    const worker = await Worker.findById(workerId);
+    if (!worker) {
+      return res.status(404).json({ error: 'Worker not found' });
+    }
+
+    // Proceed with deletion
+    const deletedWorker = await Worker.findByIdAndDelete(workerId);
     if (!deletedWorker) {
       return res.status(404).json({ error: 'Worker not found' });
     }

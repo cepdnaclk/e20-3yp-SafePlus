@@ -13,8 +13,7 @@ router.use(
 
 // Routes
 router.post('/register', registerWorker);
-router.delete('/:nic', deleteWorker);
-router.delete('/:nic', deleteWorker);
+router.delete('/:workerId', deleteWorker);
 router.put('/assignHelmet/:nic', assignHelmet);
 router.get('/', getAllWorkers); 
 
