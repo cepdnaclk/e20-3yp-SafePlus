@@ -106,9 +106,21 @@ const getAllWorkers = async (req, res) => {
   }
 };
 
+const getWorkersWithHelmets = async (req, res) => {
+  try {
+    const workers = await Worker.find({ helmetId: { $exists: true, $ne: null } });
+    res.json(workers);
+  } catch (err) {
+    console.error("Error fetching assigned workers:", err);
+    res.status(500).json({ error: "Server Error" });
+  }
+};
+
+
 module.exports = {
   registerWorker,
   deleteWorker,
   getAllWorkers,
   assignHelmet,
+  getWorkersWithHelmets,
 };

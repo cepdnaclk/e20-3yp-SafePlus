@@ -11,10 +11,7 @@ app.use(cors());
 
 
 app.use(express.json()); 
-
-//const helmetAssignmentsRouter = require('./routes/helmetAssignments');
 const workerRoutes = require("./routes/workerRoutes"); 
-//app.use('/api/helmet-assignments', helmetAssignmentsRouter);
 app.use("/api/workers", workerRoutes);
 
 // MongoDB connection using Mongoose

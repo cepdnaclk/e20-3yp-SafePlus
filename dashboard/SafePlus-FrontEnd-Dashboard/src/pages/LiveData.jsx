@@ -1,62 +1,96 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import Header from "../components/Header/Header";
-import IotCoreComponent from "../IotCoreComponent";
 import HelmetMap from "../MapComp/HelmetMap";
-
-const defaultLocation = [6.9271, 79.8612];
+import WorkerCard from "../components/WorkerCard/WorkerCard";
 
 export default function LiveData() {
-  const [sensorData, setSensorData]     = useState(null);
-  const [helmetLocation, setHelmetLocation] = useState(defaultLocation);
+  const [helmetSensorMap, setHelmetSensorMap] = useState({});
+  const [helmetLocations, setHelmetLocations] = useState({});
+  const [assignedWorkers, setAssignedWorkers] = useState([]);
 
+  // Fetch assigned workers
+  useEffect(() => {
+    axios
+      .get("http://localhost:8000/api/workers/assigned")
+      .then((res) => setAssignedWorkers(res.data))
+      .catch((err) =>
+        console.error("❌ Failed to fetch assigned workers", err)
+      );
+  }, []);
+
+  // WebSocket: Listen for real-time helmet data
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:8085");
-    ws.onopen    = () => console.log("✅ WS connected");
+
+    ws.onopen = () => console.log("✅ WS connected");
+
     ws.onmessage = (evt) => {
       try {
         const data = JSON.parse(evt.data);
         console.log("📩 New data:", data);
-        setSensorData(data);
 
-        if (data.loc?.[0] != null && data.loc?.[1] != null) {
-          setHelmetLocation([data.loc[0], data.loc[1]]);
+        if (data.id) {
+          setHelmetSensorMap((prev) => ({
+            ...prev,
+            [data.id]: data,
+          }));
+        }
+
+        if (data.id && data.loc?.[0] != null && data.loc?.[1] != null) {
+          setHelmetLocations((prev) => ({
+            ...prev,
+            [data.id]: [data.loc[0], data.loc[1]],
+          }));
         }
       } catch (err) {
         console.error("❌ WS parse error:", err);
       }
     };
+
     ws.onclose = () => console.log("❌ WS closed");
-    return () => ws.close();
+    return () => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+    };
   }, []);
 
   return (
     <div>
       <Header />
-      <h2 style={{ textAlign: "center", margin: "1rem 0" }}>Live Feed</h2>
+      <h2 style={{ textAlign: "center", margin: "1rem 0" }}>Live Worker Feed</h2>
 
-      <div style={{
-        display: "flex",
-        gap: "1rem",
-        padding: "1rem",
-      }}>
-        {/* Sensor Data Panel */}
-        <div style={{
-          flex: 1,
-          backgroundColor: "#f9f9f9",
-          padding: "1rem",
-          borderRadius: "8px",
-        }}>
-          <IotCoreComponent sensorData={sensorData} />
+      <div style={{ display: "flex", gap: "1rem", padding: "1rem" }}>
+        {/* Worker Cards */}
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "1rem",
+            overflowY: "auto",
+            maxHeight: "80vh",
+          }}
+        >
+          {assignedWorkers.map((worker) => (
+            <WorkerCard
+              key={worker.helmetId}
+              worker={worker}
+              sensorData={helmetSensorMap[worker.helmetId]}
+            />
+          ))}
         </div>
 
-        {/* Map Panel */}
-        <div style={{
-          flex: 1,
-          borderRadius: "8px",
-          overflow: "hidden",
-        }}>
-            <HelmetMap location={helmetLocation} zoom ={8} />
-
+        {/* Map */}
+        <div
+          style={{
+            flex: 1,
+            borderRadius: "8px",
+            overflow: "hidden",
+          }}
+        >
+          <HelmetMap helmetLocations={helmetLocations} zoom={8} />
         </div>
       </div>
     </div>
