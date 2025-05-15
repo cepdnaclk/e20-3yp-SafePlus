@@ -62,7 +62,6 @@ export default function AssignedWorkersPage() {
 
   return (
     <div style={{ padding: "2rem" }}>
-      <h2>🪖 Workers Assigned to Helmets</h2>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
         {workers.map((worker) => {
           const liveData = liveSensorData[worker.helmetId];
