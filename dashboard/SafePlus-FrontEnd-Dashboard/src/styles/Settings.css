@@ -1,0 +1,60 @@
+/* Settings.css */
+
+.settings-container {
+  height: 100%;
+  background-color: #d6c39c;
+  padding: 1.5rem;
+  display: flex;
+}
+
+.sidebar {
+  width: 270px;
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem 1rem;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+}
+
+.sidebar-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.tab-button {
+  justify-content: flex-start;
+  border-radius: 0.75rem;
+}
+
+.tab-button.active {
+  background-color: #9c7b3c;
+  color: white;
+}
+
+.tab-button:hover {
+  background-color: #ccb074;
+  color: white;
+}
+
+.content-box {
+  flex: 1;
+  margin-left: 2.5rem;
+}
+
+.account-box {
+  background-color: #f6f6f6;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.account-heading {
+  color: #9c7b3c;
+  margin-bottom: 1rem;
+}
+
+.account-divider {
+  margin-bottom: 1rem;
+  border-color: #9c7b3c;
+}

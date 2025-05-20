@@ -7,11 +7,24 @@ const {hashPassword, comparePassword} = require('../helpers/auth')
 //signup endpoint
 const register = async (req, res) => {
   try{
-    const {name, email, password} = req.body;
+    const {fname,name, email, password} = req.body;
     //check if name was entered
+    if(!fname){
+     return res.json({
+       error: 'full name is required'
+     })
+    };
+    //username
     if(!name){
      return res.json({
        error: 'name is required'
+     })
+    };
+    //check ifemail exist
+    const existuser = await User.findOne({name});
+    if(existuser){
+     return res.json({
+       error: 'username is taken already'
      })
     };
      //check if password is good
@@ -33,6 +46,7 @@ const register = async (req, res) => {
 
      //create user in db
      const user = await User.create({
+      fname,
       name,
       email,
       password: hashedPassword,
@@ -91,10 +105,61 @@ if (token){
 }
 }
 
+// Update user profile
+const updateProfile = async (req, res) => {
+  try {
+    const { token } = req.cookies;
+    if (!token) return res.status(401).json({ message: 'Not authenticated' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    const { fname, name, email } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { fname, name, email },
+      { new: true }
+    );
+
+    if (!updatedUser) return res.status(404).json({ message: 'User not found' });
+
+    res.json({
+      fname: updatedUser.fname,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      id: updatedUser._id
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Update failed' });
+  }
+};
+
+const getProfilebyname = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const user = await User.findOne({ name: username }).select('-password'); // exclude password
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+
+
 // Export all controllers
 module.exports = {
   register,
   login,
   test,
-  getProfile
+  getProfile,
+  updateProfile,
+  getProfilebyname
 };
