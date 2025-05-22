@@ -9,6 +9,7 @@ const cors = require("cors");
 const port = process.env.PORT || 8001;
 app.use(cors()); 
 
+
 app.use(express.json()); 
 // Authentication routes for the Web App
 const workerRoutes = require("./routes/workerRoutes"); 

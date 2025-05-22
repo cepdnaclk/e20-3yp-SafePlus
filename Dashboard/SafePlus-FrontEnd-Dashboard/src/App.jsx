@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from "./pages/SignupPage";
 import LiveData from "./pages/LiveData";
 import WorkerDetails from "./pages/WorkerDetails";
+import AssignedWorkersPage from "./pages/AssignedWorkersPage";
 import Reports from "./pages/Reports";
 import axios from 'axios';
 import {Toaster} from 'react-hot-toast'
@@ -32,6 +33,7 @@ const App = () => {
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/assigned-workers" element={<AssignedWorkersPage />} />
 
 
         </Routes>

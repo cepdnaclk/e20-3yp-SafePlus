@@ -19,12 +19,12 @@ export default function IotCoreComponent({ sensorData }) {
     >
       <h2 style={{ color: "#007bff" }}>📡 Real-Time Sensor Data</h2>
       <div style={{ textAlign: "left", padding: "10px" }}>
-        <p><strong>🌡️ Temperature:</strong> {sensorData.temperature} °C</p>
-        <p><strong>💧 Humidity:</strong> {sensorData.humidity} %</p>
-        <p><strong>❤️ Heart Rate:</strong> {sensorData.heart_rate} bpm</p>
-        <p><strong>📊 Acceleration:</strong> {sensorData.acc_magnitude} g</p>
-        <p><strong>🌀 Gyro:</strong> {sensorData.gyro_magnitude} °/s</p>
-        <p><strong>☢️ Gas:</strong> {sensorData.gasvalues} ppm</p>
+        <p><strong>🌡️ Temperature:</strong> {sensorData.tmp} °C</p>
+        <p><strong>💧 Humidity:</strong> {sensorData.hum} %</p>
+        <p><strong>❤️ Heart Rate:</strong> {sensorData.bpm} bpm</p>
+        <p><strong>📊 Acceleration:</strong> {sensorData.acc} g</p>
+        <p><strong>🌀 Gyro:</strong> {sensorData.gyr} °/s</p>
+        <p><strong>☢️ Gas:</strong> {sensorData.gas} ppm</p>
 
         {/* Impact Box */}
         <div
@@ -44,7 +44,7 @@ export default function IotCoreComponent({ sensorData }) {
         >
           <h3>
             Impact:{" "}
-            {sensorData.impact === "impact"
+            {sensorData.imp === "impact"
               ? "🚨 Impact Detected"
               : "👍 Safe"}
           </h3>
@@ -68,14 +68,14 @@ export default function IotCoreComponent({ sensorData }) {
         >
           <h3>
             Gas Level:{" "}
-            {sensorData.gasvalues > 900
+            {sensorData.gas > 900
               ? "☠️ High Gas Detected"
               : "👍 Gas Levels Normal"}
           </h3>
         </div>
 
         {/* SOS Alert Box */}
-        {sensorData.button && (
+        {sensorData.btn && (
           <div
             style={{
               marginTop: "20px",
