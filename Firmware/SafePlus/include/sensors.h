@@ -5,7 +5,6 @@
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
 #include <MPU6050.h>
-#include "MAX30105.h"
 #include <HardwareSerial.h>
 #include <TinyGPSPlus.h>
 
@@ -21,12 +20,14 @@ struct SensorData {
     float temperature;
     float humidity;
     int16_t ax, ay, az, gx, gy, gz;
-    int irValue;
     double latitude, longitude;
     float gasPPM;
 };
 // Function declarations
 void initSensors();
 SensorData collectSensorData();
+void initHeartRateSensor();
+float getHeartRate();
+
 
 #endif 
