@@ -1,18 +1,20 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import LoginScreen from "./LoginScreen";
-import HomeScreen from "./HomeScreen";
+import WelcomeScreen from "./screens/WelcomeScreen";
+import HomePage from "./screens/HomeScreen";
+import UserAccountPage from "./screens/UserAccountScreen";
 import IotCoreComponent from "./SensorOutputs";
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="Home" component={HomePage} />
         <Stack.Screen name="Data" component={IotCoreComponent}/>
+        <Stack.Screen name="Account" component={UserAccountPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );
