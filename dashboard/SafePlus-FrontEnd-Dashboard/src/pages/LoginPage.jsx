@@ -22,6 +22,11 @@ const LoginPage = () => {
         name,
         password
       });
+
+      // Store token and username after successful login
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('username', data.username);
+
       if(data.error){
         toast.error(data.error)
       } else{

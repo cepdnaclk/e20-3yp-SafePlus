@@ -27,7 +27,7 @@ const Header = () => {
   return (
     <nav>
       <div className='header'>
-        <img src={logo} alt='Logo' className='logo' />
+        <img src={logo || null} alt='Logo' className='logo' />
         <div className='dashboard'>Supervisor Dashboard</div>
         
 
@@ -49,7 +49,6 @@ const Header = () => {
           </li>
         </ul>
         
-        <img src='' alt='' className='setting' />
       </div>
     </nav>
   );

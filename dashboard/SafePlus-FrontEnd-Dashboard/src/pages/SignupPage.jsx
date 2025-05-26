@@ -6,6 +6,7 @@ import {toast} from 'react-hot-toast';
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
+    fname: "",
     name: "",
     email: "",
     password: "",
@@ -22,7 +23,7 @@ const SignupPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, password, confirmPassword } = formData;
+    const { fname, name, email, password, confirmPassword } = formData;
 
     // Password match validation
     if (password !== confirmPassword) {
@@ -31,13 +32,14 @@ const SignupPage = () => {
     }
 
     try {
-      const res = await axios.post('/register', {name, email, password });
+      const res = await axios.post('/register', {fname, name, email, password });
       const data = res.data;
 
       if (data.error) {
         toast.error(data.error);
       } else {
         setFormData({
+          fname:"",
           name: "",
           email: "",
           password: "",
@@ -98,6 +100,17 @@ const SignupPage = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+          <FormControl id="fname">
+            <FormLabel color="#ABAAAA">Full Name</FormLabel>
+            <Input
+              type="text"
+              name="fname"
+              value={formData.fname}
+              onChange={handleChange}
+              bg="white"
+              borderRadius="md"
+            />
+          </FormControl>
           <FormControl id="name">
             <FormLabel color="#ABAAAA">User Name</FormLabel>
             <Input
