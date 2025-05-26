@@ -18,14 +18,11 @@ app.use(cookieParser());
 app.use(express.urlencoded({extended:false}))
 
 
-app.use('/', require('./routes/authRoutes'))
-<<<<<<< HEAD
+app.use('/', require('./routes/authRoutes'));
 app.use('/api/mobile', require('./routes/mobileRoutes'));
 app.use('/api/mobile/data', require('./routes/MobileData'));
-=======
 app.use('/api/workers', require('./routes/workerRoutes'));
 
 
->>>>>>> 396660d478480ecacc952ea815fec124e166ed91
 const port =8000;
 app.listen(port, ()=>console.log(`Server is running on port ${port}`))
