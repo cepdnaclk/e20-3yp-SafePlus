@@ -9,8 +9,9 @@ import {
   TextInput,
   ImageBackground,
 } from 'react-native';
-import { BlurView } from 'expo-blur';
 import styles from '../styles/WelcomeScreen';
+import { login, signup } from '../services/api';
+
 
 export default function WelcomeScreen({ navigation }) {
   const [isModalVisible, setModalVisible] = React.useState(false);
@@ -21,38 +22,62 @@ export default function WelcomeScreen({ navigation }) {
   const [signupConfirmPassword, setSignupConfirmPassword] = React.useState('');
   const [loginUsername, setLoginUsername] = React.useState('');
   const [loginPassword, setLoginPassword] = React.useState('');
+  const showMainContent = !isModalVisible && !isSignupModalVisible;
 
   const onClose = () => {
+    
     setModalVisible(false);
     setSignupModalVisible(false);
   };
 
-  const handleSignup = () => {
-    if (!signupUsername || !signupEmail || !signupPassword || !signupConfirmPassword) {
-      alert('Please fill all the fields.');
-      return;
+  const handleLogin = async () => {
+  try {
+    const data = await login({ username: loginUsername, password: loginPassword });
+    console.log('Login success:', data);
+    if (data.userId) {
+      // Clear login fields 
+      setLoginUsername('');
+      setLoginPassword('');
+    navigation.navigate('Home', { user:data});}
+    else {
+      alert('Login failed. User Name or password is incorrect.');
     }
-    if (signupPassword !== signupConfirmPassword) {
-      alert('Passwords do not match.');
-      return;
-    }
+  } catch (err) {
+    console.error('Login failed:', err);
+  }
+};
+  const handleSignup = async () => {
+  if (!signupUsername || !signupEmail || !signupPassword || !signupConfirmPassword) {
+    alert('Please fill all the fields.');
+    return;
+  }
+  if (signupPassword !== signupConfirmPassword) {
+    alert('Passwords do not match.');
+    return;
+  }
 
-    console.log('SignUp Data:', {
+  try {
+    const data = await signup({
       username: signupUsername,
       email: signupEmail,
       password: signupPassword,
     });
+    console.log('Signup success:', data);
+    
+  // Clear signup fields
+  setSignupUsername('');
+  setSignupEmail('');
+  setSignupPassword('');
+  setSignupConfirmPassword('');
 
-    // Clear signup fields
-    setSignupUsername('');
-    setSignupEmail('');
-    setSignupPassword('');
-    setSignupConfirmPassword('');
+  // Show login modal
+  setSignupModalVisible(false);
+  setModalVisible(true);
+  } catch (err) {
+    console.error('Signup failed:', err);
+  }
 
-    // Show login modal
-    setSignupModalVisible(false);
-    setModalVisible(true);
-  };
+};
 
   return (
     <ImageBackground
@@ -62,51 +87,47 @@ export default function WelcomeScreen({ navigation }) {
     >
       <View style={styles.fullScreenOverlay} />
       <View style={styles.contentContainer}>
-        <View style={styles.logoContainer}>
-          <Image
-            source={require('../assets/logo.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={styles.title}>SafePlus</Text>
-        </View>
+      {showMainContent && (
+        <>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require('../assets/logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text style={styles.title}>SafePlus</Text>
+          </View>
 
-        <TouchableOpacity
-          style={styles.loginButton}
-          onPress={() => setModalVisible(true)}
-        >
-          <Text style={styles.loginButtonText}>Login</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => setModalVisible(true)}
+          >
+            <Text style={styles.loginButtonText}>Login</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.signupButton}
-          onPress={() => setSignupModalVisible(true)}
-        >
-          <Text style={styles.signupButtonText}>Sign Up</Text>
-        </TouchableOpacity>
-      </View>
-
+          <TouchableOpacity
+            style={styles.signupButton}
+            onPress={() => setSignupModalVisible(true)}
+          >
+            <Text style={styles.signupButtonText}>Sign Up</Text>
+          </TouchableOpacity>
+        </>
+      )}</View>
       {/* Login Modal */}
       <Modal
-        bg="rgba(244,243,243,0.6)"
-        backdropFilter="blur(10px)"
-        animationType="slide"
+        //bg="rgba(244,243,243,0.6)"
+        animationType="fade"
         transparent={true}
         visible={isModalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <BlurView
-            style={styles.modalContainer}
-            blurType="light"
-            blurAmount={10}
-            reducedTransparencyFallbackColor="rgba(244,243,243,0.6)"
-            >
+          <View style={[styles.modalContainer, styles.signupModal]}>
             <View style={styles.tabs}>
-              <Text style={styles.tabText}>Log In</Text>
-              <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
+                <Text style={styles.tabText}>Log In</Text>
+                <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+                <Text style={styles.closeButtonText}>✕</Text>
+                </TouchableOpacity>
             </View>
 
             <TextInput
@@ -135,17 +156,27 @@ export default function WelcomeScreen({ navigation }) {
 
             <TouchableOpacity
               style={styles.authButton}
-              onPress={() => navigation.navigate('Home')}
+              onPress = {handleLogin}
             >
               <Text style={styles.authText}>Login</Text>
             </TouchableOpacity>
-          </BlurView>
+            <TouchableOpacity
+              onPress={() => {
+                setSignupModalVisible(true);
+                setModalVisible(false);
+              }}
+            >
+              <Text style={styles.loginSwitchText}>
+                Don't have an account? Sign Up
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
 
       {/* SignUp Modal */}
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={isSignupModalVisible}
         onRequestClose={() => setSignupModalVisible(false)}
@@ -155,7 +186,7 @@ export default function WelcomeScreen({ navigation }) {
             <View style={styles.tabs}>
               <Text style={styles.tabText}>Sign Up</Text>
               <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-                <Text style={styles.closeButtonText}>Close</Text>
+                <Text style={styles.closeButtonText}>✕</Text>
               </TouchableOpacity>
             </View>
 

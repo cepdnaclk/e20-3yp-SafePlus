@@ -88,4 +88,18 @@ device.on("error", (err) => {
 app.listen(port, () => {
   console.log("🚀 Server is running on port 8001");
 });
+/*
+app.get('/data/:userId', (req, res) => {
+  const { userId } = req.params;
+  console.log(`Serving mock data for user ${userId}`);
+  const sampleData = {
+    temperature: [25, 26, 27],
+    heartRate: [70, 72, 69],
+    gas: [0.03, 0.04, 0.05],
+  };
+
+  // You could later filter based on userId if needed
+  res.json(sampleData);
+});*/
+
 

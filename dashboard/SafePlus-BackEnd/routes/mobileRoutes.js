@@ -1,36 +1,43 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../models/MobileUser"); // You may need to create this model
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const MobileUser = require("../models/MobileUser"); // create this model
+const bcrypt = require("bcryptjs");
 
-// Signup
+// Mobile Signup
 router.post("/signup", async (req, res) => {
+  console.log("Signup request received"); 
   const { username, email, password } = req.body;
+
   try {
+    const existing = await MobileUser.findOne({ email });
+    if (existing) return res.status(400).json({ message: "Email already registered" });
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, email, password: hashedPassword });
-    await newUser.save();
-    res.status(201).json({ message: "User created" });
+    const user = new MobileUser({ username, email, password: hashedPassword });
+    await user.save();
+
+    res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 
-// Login
+// Mobile Login
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  console.log("Login request received"); 
+  const { username, password } = req.body;
+
   try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ error: "Invalid credentials" });
+    const user = await MobileUser.findOne({ username });
+    if (!user) return res.status(400).json({ message: "User not found" });
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(401).json({ error: "Invalid credentials" });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-    res.json({ token, username: user.username });
+    res.status(200).json({ message: "Login successful", userId: user._id ,username: user.username, email: user.email });
+    console.log("Login successful for user:", user.username);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 

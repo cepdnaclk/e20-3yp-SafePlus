@@ -1,18 +1,23 @@
-// models/User.js
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const mongoose = require("mongoose");
 
-const UserSchema = new mongoose.Schema({
-  username: { type: String, required: true },
+const mobileUserSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
   email:    { type: String, required: true, unique: true },
   password: { type: String, required: true },
-});
+}, { timestamps: true });
 
-UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
+module.exports = mongoose.model("MobileUser", mobileUserSchema);
 
-module.exports = mongoose.model('User', UserSchema);
+const helmetDataSchema = new mongoose.Schema({
+  temperature: { type: Number, required: true },
+  humidity: { type: Number, required: true },
+  acc_magnitude: { type: Number, required: true },
+  gyro_magnitude: { type: Number, required: true },
+  heart_rate: { type: Number, required: true },
+  location: { lat: Number, lng: Number },
+  gasvalues: { type: Number, required: true },
+  button: { type: Boolean, required: true },
+  impact: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now }  // ✅ Add this
+});
+module.exports = mongoose.model("HelmetData", helmetDataSchema);
