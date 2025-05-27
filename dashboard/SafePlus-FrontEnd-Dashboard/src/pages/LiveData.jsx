@@ -59,8 +59,6 @@ export default function LiveData() {
   return (
     <div>
       <Header />
-      <h2 style={{ textAlign: "center", margin: "1rem 0" }}>Live Worker Feed</h2>
-
       <div style={{ display: "flex", gap: "1rem", padding: "1rem" }}>
         {/* Worker Cards */}
         <div
