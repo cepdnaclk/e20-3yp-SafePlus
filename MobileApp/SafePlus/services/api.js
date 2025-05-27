@@ -31,9 +31,12 @@ export const login = async ({ username, password }) => {
   }
 };
 export const fetchUserData = async (userId) => {
+  console.log('Fetching user data for ID:', userId);
   try {
     const response = await fetch(`${BASE_URL}/data/${userId}`);
+    console.log('User data fetched successfully:', response);
     return await response.json();
+    
   } catch (error) {
     console.error('Fetch user data error:', error);
     throw error;

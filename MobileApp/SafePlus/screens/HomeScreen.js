@@ -14,6 +14,7 @@ export default function HomePage({ route, navigation }) {
 
   useEffect(() => {
     if (user?.userId) {
+      console.log("Fetching data for user:", user.userId);
       fetchUserData(user.userId)
         .then(data => setSensorData(data))
         .catch(error => console.error("Failed to load sensor data:", error));
