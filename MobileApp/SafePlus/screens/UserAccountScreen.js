@@ -7,6 +7,7 @@ import styles from '../styles/UserAccountScreen.js';
 export default function UserAccountPage({ navigation }) {
   const [showAddHelmet, setShowAddHelmet] = useState(false);
   const helmets = ['Helmet 1', 'Helmet 2', 'Helmet 3'];
+  const { user } = route.params || {};
 
   return (
     <LinearGradient
@@ -18,7 +19,7 @@ export default function UserAccountPage({ navigation }) {
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Text>←</Text>
       </TouchableOpacity>
-      <Text style={styles.title}>User: User1</Text>
+      <Text style={styles.title}>User: {user.userName}</Text>
       
       <Text style={styles.email}>Email: user1@gmail.com</Text>
       <Text style={styles.helmetNo}>Helmet Currently Using: Helmet 1</Text>

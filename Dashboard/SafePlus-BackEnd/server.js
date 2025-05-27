@@ -6,6 +6,7 @@ const HelmetData = require("./models/sensorData");
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const sampleData = require("./mockData.js"); // Importing mock data
 const port = process.env.PORT || 8001;
 app.use(cors()); 
 
@@ -17,6 +18,7 @@ app.use("/api/workers", workerRoutes);
 
 // Authentication routes for the Mobile App
 const mobileRoutes = require("./routes/mobileRoutes");
+const { use } = require("react");
 app.use("/api/mobile", mobileRoutes);
 
 // MongoDB connection using Mongoose
@@ -71,7 +73,7 @@ device.on("message", (topic, payload) => {
   });
 
   // Insert data into MongoDB using Mongoose model
-  const helmetData = new HelmetData(data);
+  const helmetData = new HelmetData({...data,userId:data.userId||'defaultUserId',});
   helmetData.save()
     .then(() => {
       console.log("✅ Data inserted into MongoDB");
@@ -86,7 +88,7 @@ device.on("error", (err) => {
   console.error("❌ AWS IoT Error:", err);
 });
 
-app.listen(port, () => {
-  console.log("🚀 Server is running on port 8001");
-});
+
+
+
 

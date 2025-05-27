@@ -94,15 +94,31 @@ signupModal: {
   paddingVertical: 32,
 },
   tabs: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 15,
-  },
-  tabText: {
-    fontWeight: 'bold',
-    fontSize: 18,
-    color: '#000',
-  },
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBottom: 15,
+  position: 'relative',
+},
+
+tabText: {
+  fontWeight: 'bold',
+  fontSize: 30,
+  color: '#000',
+  textAlign: 'center',
+},
+
+closeBtn: {
+  position: 'absolute',
+  right: -15,
+  top: -30,
+  padding: 10,
+},
+
+closeButtonText: {
+  fontSize: 30,
+  color: '#800517',
+},
+
   input: {
     backgroundColor: '#f5f5f5',
     borderRadius: 5,
@@ -113,11 +129,8 @@ signupModal: {
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 10,
-    backgroundColor: '#fff',
-    padding: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 5,
+   
+    
   },
   icon: {
     width: 20,
@@ -128,29 +141,31 @@ signupModal: {
     color: '#444',
   },
   authButton: {
-    backgroundColor: '#111',
+    marginTop: 12,
+    backgroundColor: '#F1C35E',
+    paddingHorizontal: 40,
     paddingVertical: 10,
-    borderRadius: 5,
-    marginTop: 10,
+    borderRadius: 30,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    transform: [{ scale: 1.05 }],
   },
   authText: {
-    color: '#fff',
+    color: '#000',
     textAlign: 'center',
     fontSize: 16,
+    fontWeight: 'bold',
   },
-  closeBtn: {
-    position: 'absolute',
-    top: 5,
-    right: 10,
-  },
-  closeButtonText: {
-    fontSize: 16,
-    color: '#000',
-  },
+  
   loginSwitchText: {
-    color: '#007BFF',
+    color: '#000',
     textAlign: 'center',
     marginTop: 12,
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });
 
