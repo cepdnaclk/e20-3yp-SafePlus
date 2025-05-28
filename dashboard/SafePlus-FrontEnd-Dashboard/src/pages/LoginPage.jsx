@@ -85,7 +85,7 @@ const LoginPage = () => {
           {/* Form */}
           <form onSubmit={handleSubmit} style={{ width: "100%" }}>
             <FormControl id="name">
-              <FormLabel color="#ABAAAA">User Name</FormLabel>
+              <FormLabel color="#4d4b48">User Name</FormLabel>
               <Input
                 type="text"
                 name="name"
@@ -97,7 +97,7 @@ const LoginPage = () => {
             </FormControl>
 
             <FormControl id="password" mt={4}>
-              <FormLabel color="#A8A6A6">Password</FormLabel>
+              <FormLabel color="#4d4b48">Password</FormLabel>
               <Input
                 type="password"
                 name="password"
