@@ -31,7 +31,7 @@ mongoose.connect(process.env.MONGO_URL, {
     console.error("❌ MongoDB connection error:", err);
   });
 
-const wss = new WebSocket.Server({ port: 8085 });
+const wss = new WebSocket.Server({ port: 8086 });
 
 // AWS IoT Core Device Connection
 const device = awsIot.device({

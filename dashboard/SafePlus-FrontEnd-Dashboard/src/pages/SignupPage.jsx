@@ -101,7 +101,7 @@ const SignupPage = () => {
           {/* Form */}
           <form onSubmit={handleSubmit} style={{ width: "100%" }}>
           <FormControl id="fname">
-            <FormLabel color="#ABAAAA">Full Name</FormLabel>
+            <FormLabel color="#4d4b48">Full Name</FormLabel>
             <Input
               type="text"
               name="fname"
@@ -112,7 +112,7 @@ const SignupPage = () => {
             />
           </FormControl>
           <FormControl id="name">
-            <FormLabel color="#ABAAAA">User Name</FormLabel>
+            <FormLabel color="#4d4b48">User Name</FormLabel>
             <Input
               type="text"
               name="name"
@@ -126,7 +126,7 @@ const SignupPage = () => {
 
 
             <FormControl id="email" mt={4}>
-              <FormLabel color="#ABAAAA">Email</FormLabel>
+              <FormLabel color="#4d4b48">Email</FormLabel>
               <Input
                 type="email"
                 name="email"
@@ -138,7 +138,7 @@ const SignupPage = () => {
             </FormControl>
 
             <FormControl id="password" mt={4}>
-              <FormLabel color="#A8A6A6">Password</FormLabel>
+              <FormLabel color="#4d4b48">Password</FormLabel>
               <Input
                 type="password"
                 name="password"
@@ -150,7 +150,7 @@ const SignupPage = () => {
             </FormControl>
 
             <FormControl id="confirmPassword" mt={4}>
-              <FormLabel color="#A8A6A6">Confirm Password</FormLabel>
+              <FormLabel color="#4d4b48">Confirm Password</FormLabel>
               <Input
                 type="password"
                 name="confirmPassword"
