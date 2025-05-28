@@ -1,8 +1,6 @@
 // mockData.js
 const sampleData = [
   {
-    temperature: 36.5,
-    humidity: 45,
     acc_magnitude: 0.5,
     gyro_magnitude: 0.3,
     heart_rate: 5,
@@ -13,8 +11,6 @@ const sampleData = [
     timestamp: new Date()
   },
   {
-    temperature: 30.0,
-    humidity: 50,
     acc_magnitude: 0.7,
     gyro_magnitude: 0.5,
     heart_rate: 78,
