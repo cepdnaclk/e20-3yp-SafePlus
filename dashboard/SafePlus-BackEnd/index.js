@@ -3,7 +3,7 @@ const dotenv= require('dotenv').config();
 const cors = require('cors');
 const {mongoose} = require('mongoose');
 const cookieParser = require('cookie-parser');
-
+require('./server'); // imports and starts server.js
 
 const app = express();
 
@@ -18,7 +18,9 @@ app.use(cookieParser());
 app.use(express.urlencoded({extended:false}))
 
 
-app.use('/', require('./routes/authRoutes'))
+app.use('/', require('./routes/authRoutes'));
+app.use('/api/mobile', require('./routes/mobileRoutes'));
+app.use('/api/mobile/data', require('./routes/MobileData'));
 app.use('/api/workers', require('./routes/workerRoutes'));
 
 
