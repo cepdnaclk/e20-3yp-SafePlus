@@ -19,8 +19,6 @@ export default function IotCoreComponent({ sensorData }) {
     >
       <h2 style={{ color: "#007bff" }}>📡 Real-Time Sensor Data</h2>
       <div style={{ textAlign: "left", padding: "10px" }}>
-        <p><strong>🌡️ Temperature:</strong> {sensorData.tmp} °C</p>
-        <p><strong>💧 Humidity:</strong> {sensorData.hum} %</p>
         <p><strong>❤️ Heart Rate:</strong> {sensorData.bpm} bpm</p>
         <p><strong>📊 Acceleration:</strong> {sensorData.acc} g</p>
         <p><strong>🌀 Gyro:</strong> {sensorData.gyr} °/s</p>

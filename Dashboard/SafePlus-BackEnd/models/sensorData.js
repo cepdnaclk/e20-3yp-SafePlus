@@ -3,9 +3,6 @@ const Schema = mongoose.Schema;
 
 const helmetDataSchema = new mongoose.Schema({
   id: { type: String, required: true },
-  tmp: { type: Number, required: true },
-  hum: { type: Number, required: true },
-
   acc: { type: Number, required: true },
   gyr: { type: Number, required: true },
 
