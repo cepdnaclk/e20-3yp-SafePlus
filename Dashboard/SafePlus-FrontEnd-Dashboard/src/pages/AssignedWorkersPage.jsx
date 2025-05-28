@@ -10,7 +10,7 @@ export default function AssignedWorkersPage() {
   // Fetch assigned workers
   useEffect(() => {
     axios
-      .get("http://localhost:8001/api/workers/assigned")
+      .get("http://localhost:8000/api/workers/assigned")
       .then((res) => setWorkers(res.data))
       .catch((err) => console.error("Error fetching assigned workers:", err));
   }, []);
