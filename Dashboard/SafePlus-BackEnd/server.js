@@ -6,7 +6,6 @@ const HelmetData = require("./models/sensorData");
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const sampleData = require("./mockData.js"); // Importing mock data
 const port = process.env.PORT || 8001;
 app.use(cors()); 
 
