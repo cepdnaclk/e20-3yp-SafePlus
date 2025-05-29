@@ -9,7 +9,7 @@ import {
   Button,
 } from '@chakra-ui/react';
 import { MdLogout, MdSecurity } from 'react-icons/md';
-import { FaBell, FaUser, FaSlidersH } from 'react-icons/fa';
+import { FaBell, FaSlidersH } from 'react-icons/fa';
 import { BiUserCircle } from 'react-icons/bi';
 
 import AccountDetails from '../components/settings/AccountDetails';

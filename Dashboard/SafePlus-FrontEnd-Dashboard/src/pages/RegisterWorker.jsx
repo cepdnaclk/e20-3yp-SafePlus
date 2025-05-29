@@ -1,4 +1,6 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
+
 const apiUrl = 'http://localhost:8001';
 const RegisterWorkerForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -76,6 +78,10 @@ const RegisterWorkerForm = ({ onSuccess }) => {
       <button type="submit" style={{ marginTop: "10px" }}>✅ Submit</button>
     </form>
   );
+};
+
+RegisterWorkerForm.propTypes = {
+  onSuccess: PropTypes.func
 };
 
 export default RegisterWorkerForm;
