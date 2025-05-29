@@ -10,74 +10,65 @@ import {
   ImageBackground,
 } from 'react-native';
 import styles from '../styles/WelcomeScreen';
-import { login, signup } from '../services/api';
-
+import { login, changePassword } from '../services/api';
 
 export default function WelcomeScreen({ navigation }) {
   const [isModalVisible, setModalVisible] = React.useState(false);
   const [isSignupModalVisible, setSignupModalVisible] = React.useState(false);
-  const [signupUsername, setSignupUsername] = React.useState('');
-  const [signupEmail, setSignupEmail] = React.useState('');
-  const [signupPassword, setSignupPassword] = React.useState('');
-  const [signupConfirmPassword, setSignupConfirmPassword] = React.useState('');
-  const [loginUsername, setLoginUsername] = React.useState('');
+
+  // Login fields (email/password)
+  const [loginEmail, setLoginEmail] = React.useState('');
   const [loginPassword, setLoginPassword] = React.useState('');
+
+  // Password reset fields
+  const [email, setEmail] = React.useState('');
+  const [newPassword, setNewPassword] = React.useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = React.useState('');
+
   const showMainContent = !isModalVisible && !isSignupModalVisible;
 
   const onClose = () => {
-    
     setModalVisible(false);
     setSignupModalVisible(false);
   };
 
   const handleLogin = async () => {
-  try {
-    const data = await login({ username: loginUsername, password: loginPassword });
-    console.log('Login success:', data);
-    if (data.userId) {
-      // Clear login fields 
-      setLoginUsername('');
-      setLoginPassword('');
-    navigation.navigate('Home', { user:data});}
-    else {
-      alert('Login failed. User Name or password is incorrect.');
+    try {
+      const data = await login({ email: loginEmail, password: loginPassword });
+      console.log('Login success:', data);
+      if (data.userId) {
+        setLoginEmail('');
+        setLoginPassword('');
+        navigation.navigate('Home', { user: data });
+      } else {
+        alert('Login failed. Email or password is incorrect.');
+      }
+    } catch (err) {
+      console.error('Login failed:', err);
     }
-  } catch (err) {
-    console.error('Login failed:', err);
-  }
-};
-  const handleSignup = async () => {
-  if (!signupUsername || !signupEmail || !signupPassword || !signupConfirmPassword) {
-    alert('Please fill all the fields.');
-    return;
-  }
-  if (signupPassword !== signupConfirmPassword) {
-    alert('Passwords do not match.');
-    return;
-  }
+  };
 
-  try {
-    const data = await signup({
-      username: signupUsername,
-      email: signupEmail,
-      password: signupPassword,
-    });
-    console.log('Signup success:', data);
-    
-  // Clear signup fields
-  setSignupUsername('');
-  setSignupEmail('');
-  setSignupPassword('');
-  setSignupConfirmPassword('');
+  const handleChangePassword = async () => {
+    if (!email || !newPassword || !confirmNewPassword) {
+      alert('Please fill all fields.');
+      return;
+    }
 
-  // Show login modal
-  setSignupModalVisible(false);
-  setModalVisible(true);
-  } catch (err) {
-    console.error('Signup failed:', err);
-  }
+    if (newPassword !== confirmNewPassword) {
+      alert('Passwords do not match.');
+      return;
+    }
 
-};
+    try {
+      const data = await changePassword({ email, newPassword });
+      alert('Password updated. You can now log in.');
+      setSignupModalVisible(false);
+      setModalVisible(true);
+    } catch (err) {
+      console.error('Change password error:', err);
+      alert(err.message || 'Something went wrong. Please try again.');
+    }
+  };
 
   return (
     <ImageBackground
@@ -87,55 +78,52 @@ export default function WelcomeScreen({ navigation }) {
     >
       <View style={styles.fullScreenOverlay} />
       <View style={styles.contentContainer}>
-      {showMainContent && (
-        <>
-          <View style={styles.logoContainer}>
-            <Image
-              source={require('../assets/logo.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <Text style={styles.title}>SafePlus</Text>
-          </View>
+        {showMainContent && (
+          <>
+            <View style={styles.logoContainer}>
+              <Image
+                source={require('../assets/logo.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+              <Text style={styles.title}>SafePlus</Text>
+            </View>
 
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={() => setModalVisible(true)}
-          >
-            <Text style={styles.loginButtonText}>Login</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={() => setModalVisible(true)}
+            >
+              <Text style={styles.loginButtonText}>Login</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.signupButton}
-            onPress={() => setSignupModalVisible(true)}
-          >
-            <Text style={styles.signupButtonText}>Sign Up</Text>
-          </TouchableOpacity>
-        </>
-      )}</View>
+            <TouchableOpacity
+              style={styles.signupButton}
+              onPress={() => setSignupModalVisible(true)}
+            >
+              <Text style={styles.signupButtonText}>Change Password</Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
+
       {/* Login Modal */}
-      <Modal
-        //bg="rgba(244,243,243,0.6)"
-        animationType="fade"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
+      <Modal animationType="fade" transparent={true} visible={isModalVisible}>
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContainer, styles.signupModal]}>
             <View style={styles.tabs}>
-                <Text style={styles.tabText}>Log In</Text>
-                <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+              <Text style={styles.tabText}>Log In</Text>
+              <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
                 <Text style={styles.closeButtonText}>✕</Text>
-                </TouchableOpacity>
+              </TouchableOpacity>
             </View>
 
             <TextInput
               style={styles.input}
-              placeholder="User Name"
+              placeholder="Email"
               placeholderTextColor="#999"
-              value={loginUsername}
-              onChangeText={setLoginUsername}
+              value={loginEmail}
+              onChangeText={setLoginEmail}
+              autoCapitalize="none"
             />
             <TextInput
               style={styles.input}
@@ -156,10 +144,11 @@ export default function WelcomeScreen({ navigation }) {
 
             <TouchableOpacity
               style={styles.authButton}
-              onPress = {handleLogin}
+              onPress={handleLogin}
             >
               <Text style={styles.authText}>Login</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               onPress={() => {
                 setSignupModalVisible(true);
@@ -167,24 +156,19 @@ export default function WelcomeScreen({ navigation }) {
               }}
             >
               <Text style={styles.loginSwitchText}>
-                Don't have an account? Sign Up
+                Forgot password? Reset here
               </Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
 
-      {/* SignUp Modal */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={isSignupModalVisible}
-        onRequestClose={() => setSignupModalVisible(false)}
-      >
+      {/* Change Password Modal */}
+      <Modal animationType="fade" transparent={true} visible={isSignupModalVisible}>
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContainer, styles.signupModal]}>
             <View style={styles.tabs}>
-              <Text style={styles.tabText}>Sign Up</Text>
+              <Text style={styles.tabText}>Set Password</Text>
               <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
                 <Text style={styles.closeButtonText}>✕</Text>
               </TouchableOpacity>
@@ -192,37 +176,30 @@ export default function WelcomeScreen({ navigation }) {
 
             <TextInput
               style={styles.input}
-              placeholder="User Name"
+              placeholder="Registered Email"
               placeholderTextColor="#999"
-              value={signupUsername}
-              onChangeText={setSignupUsername}
+              value={email}
+              onChangeText={setEmail}
             />
             <TextInput
               style={styles.input}
-              placeholder="Email"
-              placeholderTextColor="#999"
-              value={signupEmail}
-              onChangeText={setSignupEmail}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
+              placeholder="New Password"
               placeholderTextColor="#999"
               secureTextEntry
-              value={signupPassword}
-              onChangeText={setSignupPassword}
+              value={newPassword}
+              onChangeText={setNewPassword}
             />
             <TextInput
               style={styles.input}
-              placeholder="Confirm Password"
+              placeholder="Confirm New Password"
               placeholderTextColor="#999"
               secureTextEntry
-              value={signupConfirmPassword}
-              onChangeText={setSignupConfirmPassword}
+              value={confirmNewPassword}
+              onChangeText={setConfirmNewPassword}
             />
 
-            <TouchableOpacity style={styles.authButton} onPress={handleSignup}>
-              <Text style={styles.authText}>Sign Up</Text>
+            <TouchableOpacity style={styles.authButton} onPress={handleChangePassword}>
+              <Text style={styles.authText}>Update Password</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -231,9 +208,7 @@ export default function WelcomeScreen({ navigation }) {
                 setModalVisible(true);
               }}
             >
-              <Text style={styles.loginSwitchText}>
-                Already have an account? Login
-              </Text>
+              <Text style={styles.loginSwitchText}>Back to Login</Text>
             </TouchableOpacity>
           </View>
         </View>

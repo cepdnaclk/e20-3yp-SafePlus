@@ -1,6 +1,8 @@
 const Worker = require('../models/worker');
-const User = require("../models/User");
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const { sendCredentialsEmail } = require('../helpers/autoemail');
 
 // Register a new worker
 const registerWorker = async (req, res) => {
@@ -16,7 +18,9 @@ const registerWorker = async (req, res) => {
     if (existing) {
       return res.status(400).json({ error: 'Worker with this NIC already exists' });
     }
-
+    const plainPassword = Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
+    
     const newWorker = await Worker.create({
       name,
       nic,
@@ -25,9 +29,15 @@ const registerWorker = async (req, res) => {
       email,
       birth,
       registeredDate: new Date().toISOString().split('T')[0],
+      password: hashedPassword,
     });
 
     res.status(201).json(newWorker);
+    await sendCredentialsEmail(email, plainPassword);
+    if (!hashedPassword) {
+      console.error('Error hashing password');}
+    console.log(`Generated password for ${email}: ${plainPassword}`);
+    console.log(`Credentials sent to ${email}: Username: ${email}, Password: ${plainPassword}`);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server Error' });
