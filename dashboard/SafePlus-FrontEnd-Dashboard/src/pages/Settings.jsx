@@ -21,7 +21,6 @@ const Settings = () => {
 
   const tabList = [
     { key: 'account', label: 'Account', icon: BiUserCircle },
-    { key: 'worker', label: 'Add/ Delete Worker', icon: FaUser },
     { key: 'notifications', label: 'Notifications', icon: FaBell },
     { key: 'security', label: 'Security', icon: MdSecurity },
     { key: 'advanced', label: 'Advanced settings', icon: FaSlidersH },
