@@ -1,4 +1,4 @@
-const BASE_URL = 'http://10.30.0.231:8000/api/mobile'; // replace with your IP
+const BASE_URL = 'http://192.168.125.24:8000/api/mobile'; // replace with your IP
 
 export const signup = async ({ username, email, password }) => {
   print('Signing up with:', { username, email, password });
