@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import WorkerCard from "../components/WorkerCard/WorkerCard";
 import axios from "axios";
 
