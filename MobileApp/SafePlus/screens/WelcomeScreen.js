@@ -14,22 +14,27 @@ import { login, changePassword } from '../services/api';
 
 export default function WelcomeScreen({ navigation }) {
   const [isModalVisible, setModalVisible] = React.useState(false);
-  const [isSignupModalVisible, setSignupModalVisible] = React.useState(false);
+  const [isChangePasswordModalVisible, setChangePasswordModelVisible
 
-  // Login fields (email/password)
+  ] = React.useState(false);
+
+  // Login fields (email/password) and change password fields
   const [loginEmail, setLoginEmail] = React.useState('');
   const [loginPassword, setLoginPassword] = React.useState('');
-
+  const [userData, setUserData] = React.useState(null);
+  const [mustChangePassword, setMustChangePassword] = React.useState(false);
+  const [userId, setUserId] = React.useState(null);
   // Password reset fields
   const [email, setEmail] = React.useState('');
   const [newPassword, setNewPassword] = React.useState('');
   const [confirmNewPassword, setConfirmNewPassword] = React.useState('');
 
-  const showMainContent = !isModalVisible && !isSignupModalVisible;
+  const showMainContent = !isModalVisible && !isChangePasswordModalVisible;
 
   const onClose = () => {
     setModalVisible(false);
-    setSignupModalVisible(false);
+    setChangePasswordModelVisible
+    (false);
   };
 
   const handleLogin = async () => {
@@ -42,9 +47,19 @@ export default function WelcomeScreen({ navigation }) {
       const data = await login({ email: loginEmail.trim().toLowerCase(), password: loginPassword });
       console.log('Login success:', data);
       if (data.userId) {
+        setUserData(data);
+        setUserId(data.userId);
+        // Reset fields after successful login
         setLoginEmail('');
         setLoginPassword('');
-        navigation.navigate('Home', { user: data });
+        setModalVisible(false);
+        console.log('User data:', data);
+        if (data.mustChangePassword) {
+          setMustChangePassword(true);
+          setChangePasswordModelVisible(true);
+        }else {
+          navigation.navigate('Home', { user: data });
+        }
       } else {
         alert('Login failed. Email or password is incorrect.');
       }
@@ -54,7 +69,7 @@ export default function WelcomeScreen({ navigation }) {
   };
 
   const handleChangePassword = async () => {
-    if (!email || !newPassword || !confirmNewPassword) {
+    if (!newPassword || !confirmNewPassword) {
       alert('Please fill all fields.');
       return;
     }
@@ -65,14 +80,22 @@ export default function WelcomeScreen({ navigation }) {
     }
 
     try {
-      const data = await changePassword({ email, newPassword });
-      alert('Password updated. You can now log in.');
-      setSignupModalVisible(false);
-      setModalVisible(true);
+      const data = await changePassword({ userId, newPassword });
+      alert('Password updated. You can now log in with your new password.');
+      setChangePasswordModelVisible(false);
+      setMustChangePassword(false);
+      navigation.navigate('Home', { user: { userId }});
     } catch (err) {
       console.error('Change password error:', err);
       alert(err.message || 'Something went wrong. Please try again.');
     }
+  };
+  // Skip button handler
+  const handleSkipChangePassword = () => {
+    setChangePasswordModelVisible(false);
+    setMustChangePassword(false);
+    // Navigate to home or main screen
+    navigation.navigate('Home', { user: { userId: userData.userId } });
   };
 
   return (
@@ -101,12 +124,7 @@ export default function WelcomeScreen({ navigation }) {
               <Text style={styles.loginButtonText}>Login</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.signupButton}
-              onPress={() => setSignupModalVisible(true)}
-            >
-              <Text style={styles.signupButtonText}>Change Password</Text>
-            </TouchableOpacity>
+           
           </>
         )}
       </View>
@@ -156,7 +174,8 @@ export default function WelcomeScreen({ navigation }) {
 
             <TouchableOpacity
               onPress={() => {
-                setSignupModalVisible(true);
+                setChangePasswordModelVisible
+                (true);
                 setModalVisible(false);
               }}
             >
@@ -169,7 +188,7 @@ export default function WelcomeScreen({ navigation }) {
       </Modal>
 
       {/* Change Password Modal */}
-      <Modal animationType="fade" transparent={true} visible={isSignupModalVisible}>
+      <Modal animationType="fade" transparent={true} visible={isChangePasswordModalVisible}>
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContainer, styles.signupModal]}>
             <View style={styles.tabs}>
@@ -179,13 +198,7 @@ export default function WelcomeScreen({ navigation }) {
               </TouchableOpacity>
             </View>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Registered Email"
-              placeholderTextColor="#999"
-              value={email}
-              onChangeText={setEmail}
-            />
+            
             <TextInput
               style={styles.input}
               placeholder="New Password"
@@ -204,12 +217,17 @@ export default function WelcomeScreen({ navigation }) {
             />
 
             <TouchableOpacity style={styles.authButton} onPress={handleChangePassword}>
-              <Text style={styles.authText}>Update Password</Text>
-            </TouchableOpacity>
+          <Text style={styles.authText}>Update Password</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.skipButton} onPress={handleSkipChangePassword}>
+          <Text style={styles.skipText}>Skip</Text>
+        </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => {
-                setSignupModalVisible(false);
+                setChangePasswordModelVisible
+                (false);
                 setModalVisible(true);
               }}
             >

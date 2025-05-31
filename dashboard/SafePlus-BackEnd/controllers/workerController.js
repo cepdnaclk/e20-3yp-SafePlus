@@ -8,6 +8,8 @@ const { sendCredentialsEmail } = require('../helpers/autoemail');
 const registerWorker = async (req, res) => {
   try {
     const { name, nic, contact, address, email, birth } = req.body;
+    const plainPassword = Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
     // Validations
     if (!name || !nic || !contact || !address || !email || !birth) {
@@ -18,8 +20,9 @@ const registerWorker = async (req, res) => {
     if (existing) {
       return res.status(400).json({ error: 'Worker with this NIC already exists' });
     }
-    const plainPassword = Math.random().toString(36).slice(-8);
-    const hashedPassword = await bcrypt.hash(plainPassword, 10);
+    
+    console.log(`Generated plain password for ${email}: ${plainPassword}`);
+    // Hash the password
     
     const newWorker = await Worker.create({
       name,
@@ -30,6 +33,7 @@ const registerWorker = async (req, res) => {
       birth,
       registeredDate: new Date().toISOString().split('T')[0],
       password: hashedPassword,
+      mustChangePassword: true // Set to true for first-time login
     });
 
     res.status(201).json(newWorker);
@@ -128,20 +132,22 @@ const getWorkersWithHelmets = async (req, res) => {
 
 // Login function for mobile app
 const loginWorker = async (req, res) => {
-  const { email, password } = req.body;
+  let { email, password } = req.body;
+  email = email.trim().toLowerCase();
   console.log('Login attempt with email:', email);
   try {
     const worker = await Worker.findOne({ email });
     if (!worker) return res.status(400).json({ message: "User not found" });
-
+    console.log('Worker found:', worker.name);
     const isMatch = await bcrypt.compare(password, worker.password);
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
-
+    console.log('Password match for worker:', worker.name);
     res.status(200).json({
       message: "Login successful",
       userId: worker._id,
       username: worker.name,
-      email: worker.email
+      email: worker.email,
+      mustChangePassword: worker.mustChangePassword || false
     });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
@@ -150,18 +156,19 @@ const loginWorker = async (req, res) => {
 
 // Change password mobile application
 const changePassword = async (req, res) => {
-  const { userId, currentPassword, newPassword } = req.body;
-
+  const { userId, newPassword } = req.body;
+  console.log('Change password request:', req.body);
   try {
+    
     const worker = await Worker.findById(userId);
     if (!worker) return res.status(404).json({ message: "User not found" });
-
-    const isMatch = await bcrypt.compare(currentPassword, worker.password);
-    if (!isMatch) return res.status(400).json({ message: "Incorrect current password" });
+    console.log('Worker found for password change:', worker.name);
 
     worker.password = await bcrypt.hash(newPassword, 10);
+    console.log('New password hashed for worker:', worker.name);
+    worker.mustChangePassword = false; // Reset mustChangePassword flag
     await worker.save();
-
+    
     res.status(200).json({ message: "Password updated successfully" });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });

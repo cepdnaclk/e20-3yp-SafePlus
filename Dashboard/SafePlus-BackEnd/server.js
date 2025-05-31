@@ -14,14 +14,15 @@ app.use(express.json());
 // Authentication routes for the Web App
 const workerRoutes = require("./routes/workerRoutes"); 
 app.use("/api/workers", workerRoutes);
-
+  
 // Authentication routes for the Mobile App
-
+const mobileDataRoutes = require('./routes/MobileData');
+app.use('/api/workers/fetchHelmetData', mobileDataRoutes);
 // MongoDB connection using Mongoose
 mongoose.connect(process.env.MONGO_URL, {
 })
   .then(() => {
-    console.log("✅ MongoDB connected");
+    //console.log("✅ MongoDB connected");
   })
   .catch((err) => {
     console.error("❌ MongoDB connection error:", err);
@@ -40,18 +41,18 @@ const device = awsIot.device({
 
 // Handle WebSocket connections
 wss.on("connection", (ws) => {
-  console.log("✅ Frontend connected to WebSocket Server");
+  //console.log("✅ Frontend connected to WebSocket Server");
   ws.send(JSON.stringify({ message: "Connected to WebSocket Server" }));
 });
 
 // Subscribe to AWS IoT Core
 device.on("connect", () => {
-  console.log("✅ Connected to AWS IoT Core");
+  //console.log("✅ Connected to AWS IoT Core");
   device.subscribe("helmet/data", (err) => {
     if (err) {
       console.error("❌ Subscription failed:", err);
     } else {
-      console.log("✅ Subscribed to topic: helmet/data");
+      //console.log("✅ Subscribed to topic: helmet/data");
     }
   });
 });
@@ -78,6 +79,7 @@ device.on("message", (topic, payload) => {
       console.error("❌ Failed to insert data into MongoDB:", err);
     });
 });
+
 
 // Handle errors
 device.on("error", (err) => {
