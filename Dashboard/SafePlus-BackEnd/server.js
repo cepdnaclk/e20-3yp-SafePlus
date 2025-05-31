@@ -2,38 +2,30 @@ require("dotenv").config();
 const awsIot = require("aws-iot-device-sdk");
 const WebSocket = require("ws");
 const mongoose = require("mongoose");
-const HelmetData = require("./models/sensorData");
+//const HelmetData = require("./models/sensorData");
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const sampleData = require("./mockData.js"); // Importing mock data
-const port = process.env.PORT || 8001;
-app.use(cors()); 
 
+app.use(cors());
+app.use(express.json());
 
-app.use(express.json()); 
-// Authentication routes for the Web App
-const workerRoutes = require("./routes/workerRoutes"); 
+// Authentication routes
+const workerRoutes = require("./routes/workerRoutes");
 app.use("/api/workers", workerRoutes);
 
-// Authentication routes for the Mobile App
 const mobileRoutes = require("./routes/mobileRoutes");
-const { use } = require("react");
 app.use("/api/mobile", mobileRoutes);
 
-// MongoDB connection using Mongoose
-mongoose.connect(process.env.MONGO_URL, {
-})
-  .then(() => {
-    console.log("✅ MongoDB connected");
-  })
-  .catch((err) => {
-    console.error("❌ MongoDB connection error:", err);
-  });
+// MongoDB connection
+mongoose.connect(process.env.MONGO_URL, {})
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-const wss = new WebSocket.Server({ port: 8086 });
+// WebSocket server
+const wss = new WebSocket.Server({ port: 8085 });
 
-// AWS IoT Core Device Connection
+// AWS IoT Core connection
 const device = awsIot.device({
   keyPath: process.env.PRIVATE_KEY_PATH,
   certPath: process.env.CERTIFICATE_PATH,
@@ -42,13 +34,11 @@ const device = awsIot.device({
   host: process.env.AWS_IOT_ENDPOINT,
 });
 
-// Handle WebSocket connections
 wss.on("connection", (ws) => {
   console.log("✅ Frontend connected to WebSocket Server");
   ws.send(JSON.stringify({ message: "Connected to WebSocket Server" }));
 });
 
-// Subscribe to AWS IoT Core
 device.on("connect", () => {
   console.log("✅ Connected to AWS IoT Core");
   device.subscribe("helmet/data", (err) => {
@@ -60,35 +50,82 @@ device.on("connect", () => {
   });
 });
 
-// Send IoT messages to frontend via WebSockets
 device.on("message", (topic, payload) => {
   const data = JSON.parse(payload.toString());
   console.log(`📩 Data received from topic "${topic}":`, data);
 
-  // Send the data to all connected WebSocket clients
+  // Broadcast to WebSocket clients
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
       client.send(JSON.stringify(data));
     }
   });
 
-  // Insert data into MongoDB using Mongoose model
-  const helmetData = new HelmetData({...data,userId:data.userId||'defaultUserId',});
-  helmetData.save()
+  // Save to MongoDB
+  //const helmetData = new HelmetData({ ...data, userId: data.userId || 'defaultUserId' });
+
+  //helmetData.save()
+  //  .then(() => {
+  //    console.log("✅ Data inserted into MongoDB");
+
+  // rolling window
+  const HourlyStats = require("./models/HourlyStatModel");
+  const now = new Date();
+  const helmetId = data.id;
+
+  HourlyStats.findOne({ helmetId }).sort({ hourWindowStart: -1 })
+    .then((lastStats) => {
+      const isImpact = data.imp === "yes";
+      const isGasAlert = data.gas > 300;
+
+      const tempVal = Number(data.temp);
+      const humVal = Number(data.hum);
+
+      if (lastStats) {
+        const windowStart = new Date(lastStats.hourWindowStart);
+        const windowEnd = new Date(windowStart.getTime() + 60 * 60 * 1000); 
+
+        if (now < windowEnd) {
+          // Update existing stat
+          const newCount = lastStats.count + 1;
+
+          if (!isNaN(tempVal)) {
+            lastStats.avgTemp = ((lastStats.avgTemp || 0) * lastStats.count + tempVal) / newCount;
+            }
+
+          if (!isNaN(humVal)) {
+            lastStats.avgHum = ((lastStats.avgHum || 0) * lastStats.count + humVal) / newCount;
+            }
+
+          lastStats.impactCount += isImpact ? 1 : 0;
+          lastStats.gasAlerts += isGasAlert ? 1 : 0;
+          lastStats.count = newCount;
+
+          return lastStats.save();
+        }
+      }
+
+      // Create new rolling window
+      const newStats = new HourlyStats({
+        helmetId,
+        hourWindowStart: now,
+        avgTemp: !isNaN(tempVal) ? tempVal : 0,
+        avgHum: !isNaN(humVal) ? humVal : 0,
+        impactCount: isImpact ? 1 : 0,
+        gasAlerts: isGasAlert ? 1 : 0,
+        count: 1,
+      });
+
+      return newStats.save();
+    })
     .then(() => {
-      console.log("✅ Data inserted into MongoDB");
+      console.log(`Rolling stats updated for helmet ${data.id}`);
     })
     .catch((err) => {
-      console.error("❌ Failed to insert data into MongoDB:", err);
+      console.error("❌ Failed to process data:", err);
     });
 });
 
-// Handle errors
 device.on("error", (err) => {
   console.error("❌ AWS IoT Error:", err);
 });
-
-
-
-
-

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const cors = require('cors');
-const { registerWorker, deleteWorker, getAllWorkers , assignHelmet,getWorkersWithHelmets,} = require('../controllers/workerController');
+const { registerWorker, deleteWorker, getAllWorkers , assignHelmet, getWorkersWithHelmets,} = require('../controllers/workerController');
 
 // CORS middleware
 router.use(
