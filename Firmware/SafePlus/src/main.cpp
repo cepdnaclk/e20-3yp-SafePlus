@@ -1,19 +1,23 @@
-
 #include "sensors.h"
 #include <ArduinoJson.h>
 #include <Wire.h>
 #include "wifi_manager.h"
 #include "aws_manager.h"
+#include "fall_detection.h"
+GyroHistory gyroHistory;
 
-#define BUZZER_PIN 5
-#define BUTTON_PIN 33
+
+
+#define BUZZER_PIN 13
+#define BUTTON_PIN 32
+#define MQ2_POWER_PIN 27
+#define SIM800L_PIN 26 
 
 // AWS MQTT Setup
 const char* awsTopic = "helmet/data";
 unsigned long lastTimepublish = 0;
 unsigned long publishtimeThreshold = 2000;
 const char helmetID[] = "Helmet_1";
-
 
 void activateBuzzer() {
   Serial.println("BUZZER ON!");
@@ -67,16 +71,13 @@ void publishData() {
     float accMagnitude = sqrt(accX * accX + accY * accY + accZ * accZ);
     float gyroMagnitude = sqrt(gyroX * gyroX + gyroY * gyroY + gyroZ * gyroZ);
 
-    bool impactDetected = (accMagnitude > 2.0 || gyroMagnitude > 200.0);
-    if (isnan(data.temperature) || isnan(data.humidity)){
-        data.temperature = 25.5;
-        data.humidity = 48.6;
-    }
+bool impactDetected = detectFall(data, gyroHistory);
 
     char message[256];
+   
     snprintf(message, sizeof(message),
-        "{\"id\":\"%s\",\"tmp\":%.1f,\"hum\":%.1f,\"acc\":%.2f,\"gyr\":%.2f,\"bpm\":%.1f,\"loc\":[%.4f,%.4f],\"gas\":%.1f,\"btn\":%s,\"imp\":\"%s\"}",
-        helmetID, data.temperature, data.humidity, accMagnitude, gyroMagnitude, bpm,
+        "{\"id\":\"%s\",\"acc\":%.2f,\"gyr\":%.2f,\"bpm\":%.1f,\"loc\":[%.6f,%.6f],\"gas\":%.1f,\"btn\":%s,\"imp\":\"%s\"}",
+        helmetID, accMagnitude, gyroMagnitude, bpm,
         data.latitude, data.longitude, data.gasPPM,
         buttonPressed ? "true" : "false", impactDetected ? "impact" : "no");
 
@@ -105,27 +106,28 @@ void setup() {
     pinMode(BUZZER_PIN, OUTPUT);
     digitalWrite(BUZZER_PIN, LOW);
     pinMode(BUTTON_PIN, INPUT_PULLUP);
-  initHeartRateSensor();
-wifiInit();
-server.begin();
-awsInit();
+    pinMode(MQ2_POWER_PIN, OUTPUT);
+    digitalWrite(MQ2_POWER_PIN, LOW);
+    pinMode(SIM800L_PIN, OUTPUT);
+    digitalWrite(SIM800L_PIN,HIGH);
+    
 
-
-
+    initHeartRateSensor();
+    wifiInit();
+    server.begin();
+    awsInit();
 }
 
 void loop() {
-  wifiLoop();    // Handle WiFi connection & AP web server
+    wifiLoop();    // Handle WiFi connection & AP web server
 
-  if (isWiFiConnected()) {
-    if (!awsIsConnected()) {
-      awsConnect();  // Connect to AWS only if WiFi connected and not connected yet
+    if (isWiFiConnected()) {
+        if (!awsIsConnected()) {
+            awsConnect(); 
+        }
+        client.loop(); 
+        publishData();
     }
-    client.loop(); // Maintain MQTT connection
- publishData();
-}
-
-   
 
     if (Serial.available() > 0) {
         String input = Serial.readStringUntil('\n');

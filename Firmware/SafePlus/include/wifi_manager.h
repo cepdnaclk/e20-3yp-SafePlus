@@ -7,7 +7,7 @@
 #include <ArduinoJson.h>
 
 #define EEPROM_SIZE 512
-#define WIFI_LED_PIN 2
+#define WIFI_LED_PIN 18
 
 #define MAX_WIFI_CREDENTIALS 6
 #define EEPROM_BLOCK_SIZE 64
