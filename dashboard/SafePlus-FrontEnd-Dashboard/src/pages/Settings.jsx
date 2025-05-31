@@ -1,4 +1,4 @@
-import  { useState } from 'react';
+import { useState, useRef } from 'react';
 import Header from "../components/Header/Header";
 import { useNavigate } from 'react-router-dom';
 import {
@@ -7,6 +7,13 @@ import {
   Text,
   Icon,
   Button,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { MdLogout, MdSecurity } from 'react-icons/md';
 import { FaBell, FaSlidersH } from 'react-icons/fa';
@@ -18,7 +25,9 @@ import AdvancedSetting from '../components/settings/AdvancedSetting';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('account');
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef();
 
   const tabList = [
     { key: 'account', label: 'Account', icon: BiUserCircle },
@@ -28,28 +37,26 @@ const Settings = () => {
     { key: 'logout', label: 'logout', icon: MdLogout },
   ];
 
-  const handleLogout = () => {
-    // Clear localStorage or cookies if needed
+  const confirmLogout = () => {
     localStorage.removeItem('token');
-    // Redirect to login
     navigate('/login');
   };
 
   const renderContent = () => {
-  switch (activeTab) {
-    case 'account':
-      return <AccountDetails />;
-    case 'advanced':
-      return <AdvancedSetting />;
-    default:
-      return <Box p={4}>Coming Soon: {activeTab}</Box>;
-  }
-};
+    switch (activeTab) {
+      case 'account':
+        return <AccountDetails />;
+      case 'advanced':
+        return <AdvancedSetting />;
+      default:
+        return <Box p={4}>Coming Soon: {activeTab}</Box>;
+    }
+  };
+
   return (
     <>
       <Header />
       <div className="settings-container">
-        
         <div className="sidebar">
           <Text className="sidebar-title">Settings</Text>
           <VStack align="stretch" spacing={3}>
@@ -57,7 +64,7 @@ const Settings = () => {
               <Button
                 key={tab.key}
                 onClick={() =>
-                  tab.key === 'logout' ? handleLogout() : setActiveTab(tab.key)
+                  tab.key === 'logout' ? onOpen() : setActiveTab(tab.key)
                 }
                 className={`tab-button ${activeTab === tab.key ? 'active' : ''}`}
                 leftIcon={<Icon as={tab.icon} boxSize={5} />}
@@ -72,6 +79,34 @@ const Settings = () => {
           {renderContent()}
         </div>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <AlertDialog
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Logout
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure you want to log out?
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose}>
+                No
+              </Button>
+              <Button colorScheme="red" onClick={confirmLogout} ml={3}>
+                Yes
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </>
   );
 };
