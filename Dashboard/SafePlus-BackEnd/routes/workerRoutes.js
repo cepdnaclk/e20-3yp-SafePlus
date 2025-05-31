@@ -7,7 +7,9 @@ const { registerWorker, deleteWorker, getAllWorkers , assignHelmet,getWorkersWit
 router.use(
   cors({
     credentials: true,
-    origin: 'http://localhost:5173',
+    origin: ['http://localhost:5173',
+        'http://10.40.19.169:8000', ],// or your mobile app's origin if needed
+
   })
 );
 
@@ -17,5 +19,10 @@ router.delete('/:workerId', deleteWorker);
 router.put('/assignHelmet/:nic', assignHelmet);
 router.get('/', getAllWorkers); 
 router.get('/assigned', getWorkersWithHelmets);
+
+// Routes for mobile app
+router.post('/login', loginWorker);
+router.post('/change-password', changePassword);
+
 
 module.exports = router;

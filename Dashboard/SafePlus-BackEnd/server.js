@@ -16,9 +16,6 @@ const workerRoutes = require("./routes/workerRoutes");
 app.use("/api/workers", workerRoutes);
 
 // Authentication routes for the Mobile App
-const mobileRoutes = require("./routes/mobileRoutes");
-const { use } = require("react");
-app.use("/api/mobile", mobileRoutes);
 
 // MongoDB connection using Mongoose
 mongoose.connect(process.env.MONGO_URL, {

@@ -34,7 +34,12 @@ export default function WelcomeScreen({ navigation }) {
 
   const handleLogin = async () => {
     try {
-      const data = await login({ email: loginEmail, password: loginPassword });
+      console.log('Attempting login with email:', loginEmail);
+      if (!loginEmail || !loginPassword) {
+        alert('Please enter both email and password.');
+        return;
+      }
+      const data = await login({ email: loginEmail.trim().toLowerCase(), password: loginPassword });
       console.log('Login success:', data);
       if (data.userId) {
         setLoginEmail('');
