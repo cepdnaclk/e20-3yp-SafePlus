@@ -148,7 +148,7 @@ const loginWorker = async (req, res) => {
   }
 };
 
-// Change password-mobile application
+// Change password mobile application
 const changePassword = async (req, res) => {
   const { userId, currentPassword, newPassword } = req.body;
 
