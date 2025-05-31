@@ -1,4 +1,6 @@
-import "./WorkerCard.css"; // Make sure to import the CSS
+import { useEffect, useState } from "react";
+import "./WorkerCard.css";
+
 
 export default function WorkerCard({ worker, sensorData }) {
   return (
@@ -11,12 +13,10 @@ export default function WorkerCard({ worker, sensorData }) {
 
       {sensorData ? (
         <div className="sensor-section">
-          <p>🌡️ Temp: {sensorData.tmp} °C</p>
-          <p>💧 Humidity: {sensorData.hum} %</p>
-          <p>❤️ BPM: {sensorData.bpm}</p>
-          <p>📊 Acc: {sensorData.acc} g</p>
-          <p>🌀 Gyro: {sensorData.gyr} °/s</p>
-          <p>☢️ Gas: {sensorData.gas} ppm</p>
+          <p>BPM: {sensorData.bpm}</p>
+          <p>Acc: {sensorData.acc} g</p>
+          <p>Gyro: {sensorData.gyr} °/s</p>
+          <p>Gas: {sensorData.gas} ppm</p>
 
           <div className={`alert ${sensorData.imp === "impact" ? "alert-danger" : "alert-success"}`}>
             <strong>

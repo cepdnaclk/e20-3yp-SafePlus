@@ -4,8 +4,10 @@ const cors = require('cors');
 const {mongoose} = require('mongoose');
 const cookieParser = require('cookie-parser');
 require('./server'); // imports and starts server.js
+const requestIp = require('request-ip');
 
 const app = express();
+app.use(requestIp.mw());
 
 //database connection
 mongoose.connect(process.env.MONGO_URL)

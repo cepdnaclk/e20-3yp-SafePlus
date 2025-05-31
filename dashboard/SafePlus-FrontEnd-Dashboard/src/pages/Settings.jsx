@@ -22,6 +22,7 @@ import { BiUserCircle } from 'react-icons/bi';
 import AccountDetails from '../components/settings/AccountDetails';
 import '../styles/Settings.css';
 import AdvancedSetting from '../components/settings/AdvancedSetting';
+import SecuritySettings from '../components/settings/SecuritySettings';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('account');
@@ -46,6 +47,8 @@ const Settings = () => {
     switch (activeTab) {
       case 'account':
         return <AccountDetails />;
+      case 'security':
+      return <SecuritySettings />;
       case 'advanced':
         return <AdvancedSetting />;
       default:
