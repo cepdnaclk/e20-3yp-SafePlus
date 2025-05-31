@@ -129,7 +129,7 @@ const getWorkersWithHelmets = async (req, res) => {
 // Login function for mobile app
 const loginWorker = async (req, res) => {
   const { email, password } = req.body;
-
+  console.log('Login attempt with email:', email);
   try {
     const worker = await Worker.findOne({ email });
     if (!worker) return res.status(400).json({ message: "User not found" });

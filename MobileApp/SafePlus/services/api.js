@@ -1,21 +1,7 @@
-const BASE_URL = 'http://10.30.0.231:8000/api/mobile'; // replace with your IP
+const BASE_URL = 'http://10.40.19.169:8000/api/workers'; // replace with your IP
 
-export const signup = async ({ username, email, password }) => {
-  print('Signing up with:', { username, email, password });
-  try {
-    const response = await fetch(`${BASE_URL}/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, email, password }),
-    });
 
-    return await response.json();
-  } catch (error) {
-    console.error('Signup error:', error);
-    throw error;
-  }
-};
-
+// Api callfor mobile app login
 export const login = async ({ email, password }) => {
   try {
     const response = await fetch(`${BASE_URL}/login`, {
@@ -30,6 +16,7 @@ export const login = async ({ email, password }) => {
     throw error;
   }
 };
+
 export const fetchUserData = async (userId) => {
   console.log('Fetching user data for ID:', userId);
   try {
@@ -43,6 +30,7 @@ export const fetchUserData = async (userId) => {
   }
 };
 
+// Api call for changing password
 export const changePassword = async ({ email, newPassword }) => {
   try {
     const response = await fetch(`${BASE_URL}/change-password`, {

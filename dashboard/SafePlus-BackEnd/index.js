@@ -19,7 +19,6 @@ app.use(express.urlencoded({extended:false}))
 
 
 app.use('/', require('./routes/authRoutes'));
-app.use('/api/mobile', require('./routes/mobileRoutes'));
 app.use('/api/mobile/data', require('./routes/MobileData'));
 app.use('/api/workers', require('./routes/workerRoutes'));
 
