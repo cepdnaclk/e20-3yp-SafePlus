@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const HourlyStats = require("./models/HourlyStatModel");
 
 app.use(cors());
 app.use(express.json());
@@ -35,8 +36,7 @@ const device = awsIot.device({
   host: process.env.AWS_IOT_ENDPOINT,
 });
 
-// Load HourlyStats model once
-const HourlyStats = require("./models/HourlyStatModel");
+
 
 wss.on("connection", (ws) => {
   console.log("✅ Frontend connected to WebSocket Server");
