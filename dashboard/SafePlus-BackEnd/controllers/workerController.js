@@ -174,4 +174,6 @@ module.exports = {
   getAllWorkers,
   assignHelmet,
   getWorkersWithHelmets,
+  loginWorker,
+  changePassword
 };
