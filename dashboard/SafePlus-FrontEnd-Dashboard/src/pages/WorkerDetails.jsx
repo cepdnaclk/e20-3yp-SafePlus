@@ -5,7 +5,7 @@ import Header from '../components/Header/Header';
 import '../styles/WorkerDetails.css';
 import AssignHelmetForm from '../components/AssignHelmet/AssignHelmetForm';
 import ConfirmDeleteForm from '../components/ConfirmDelete/ConfirmDeleteForm';
-import { toast } from 'react-hot-toast'; // Assuming you're using react-toastify
+import { toast } from 'react-hot-toast'; 
 
 const WorkerDetails = () => {
   const [workers, setWorkers] = useState([]);

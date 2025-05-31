@@ -168,14 +168,10 @@ const changePassword = async (req, res) => {
   }
 };
 
-
-
 module.exports = {
   registerWorker,
   deleteWorker,
   getAllWorkers,
   assignHelmet,
   getWorkersWithHelmets,
-  loginWorker,
-  changePassword
 };

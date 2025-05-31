@@ -14,6 +14,7 @@ import { BiUserCircle } from 'react-icons/bi';
 
 import AccountDetails from '../components/settings/AccountDetails';
 import '../styles/Settings.css';
+import AdvancedSetting from '../components/settings/AdvancedSetting';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('account');
@@ -35,14 +36,20 @@ const Settings = () => {
   };
 
   const renderContent = () => {
-    if (activeTab === 'account') return <AccountDetails />;
-    return <Box p={4}>Coming Soon: {activeTab}</Box>;
-  };
-
+  switch (activeTab) {
+    case 'account':
+      return <AccountDetails />;
+    case 'advanced':
+      return <AdvancedSetting />;
+    default:
+      return <Box p={4}>Coming Soon: {activeTab}</Box>;
+  }
+};
   return (
     <>
       <Header />
       <div className="settings-container">
+        
         <div className="sidebar">
           <Text className="sidebar-title">Settings</Text>
           <VStack align="stretch" spacing={3}>

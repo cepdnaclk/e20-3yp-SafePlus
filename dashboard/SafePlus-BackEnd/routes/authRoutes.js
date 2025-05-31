@@ -1,5 +1,5 @@
 const express = require('express');
-const { test, register, login, getProfile,updateProfile, getProfilebyname } = require('../controllers/authController')
+const { test, register, login, getProfile,updateProfile, getProfilebyname, changePassword, deleteAccount } = require('../controllers/authController')
 const router = express.Router();
 const cors = require("cors");
 
@@ -16,6 +16,9 @@ router.post("/register", register);
 router.post("/login", login);
 router.get('/profile', getProfile);
 router.put('/profile', updateProfile);
-router.get('/profile/:username', getProfilebyname)
+router.get('/profile/:username', getProfilebyname);
+router.put('/change-password', changePassword);
+router.delete('/delete-account', deleteAccount);
+
 
 module.exports = router

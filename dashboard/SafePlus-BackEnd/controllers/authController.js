@@ -152,7 +152,58 @@ const getProfilebyname = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  try {
+    const { token } = req.cookies;
+    const { currentPassword, newPassword } = req.body;
 
+    if (!token) return res.status(401).json({ message: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Incorrect current password' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    await user.save();
+    res.status(200).json({ message: 'Password changed successfully' });
+
+  } catch (err) {
+    console.error('Change password error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+const deleteAccount = async (req, res) => {
+  try {
+    const { token } = req.cookies;
+
+    if (!token) return res.status(401).json({ message: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const deleted = await User.findByIdAndDelete(decoded.id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: 'User not found or already deleted' });
+    }
+
+    res.clearCookie('token'); // remove cookie
+    res.status(200).json({ message: 'Account deleted successfully' });
+  } catch (err) {
+    console.error('Delete account error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
 // Export all controllers
 module.exports = {
@@ -161,5 +212,7 @@ module.exports = {
   test,
   getProfile,
   updateProfile,
-  getProfilebyname
+  getProfilebyname,
+  changePassword,
+  deleteAccount
 };

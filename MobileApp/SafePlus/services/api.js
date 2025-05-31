@@ -1,4 +1,6 @@
-const BASE_URL = 'http://10.40.19.169:8000/api/workers'; // replace with your IP
+
+const BASE_URL = 'http://192.168.125.24:8000/api/mobile'; // replace with your IP
+
 
 
 // Api callfor mobile app login
