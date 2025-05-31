@@ -12,7 +12,8 @@ const workerSchema = new mongoose.Schema({
     type: String,
     default: () => new Date().toISOString().split('T')[0] 
   },
-  helmetId: { type: String, default: null }
+  helmetId: { type: String, default: null },
+  password: { type: String, required: true },
 
 }, { timestamps: true });
 

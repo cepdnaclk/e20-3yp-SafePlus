@@ -14,6 +14,7 @@ app.use(express.json());
 const workerRoutes = require("./routes/workerRoutes");
 app.use("/api/workers", workerRoutes);
 
+// Authentication routes for the Mobile App
 const mobileRoutes = require("./routes/mobileRoutes");
 app.use("/api/mobile", mobileRoutes);
 

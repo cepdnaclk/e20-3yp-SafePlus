@@ -1,8 +1,8 @@
 const User = require("../models/User");
+const LoginActivity = require('../models/LoginActivity');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const {hashPassword, comparePassword} = require('../helpers/auth')
-
 
 //signup endpoint
 const register = async (req, res) => {
@@ -60,32 +60,78 @@ const register = async (req, res) => {
 };
 
 //login end point
-const login = async (req,res) => {
+const login = async (req, res) => {
   try {
-    const {name, password} =req.body;
+    const ip = req.clientIp;
+    const { name, password } = req.body;
 
-    //check if user exist
-    const user = await User.findOne({name});
-    if (!user){
-      return res.json({
-        error: 'No User Found'
-      })
+    console.log("Login API hit");
+
+    const user = await User.findOne({ name });
+    if (!user) {
+      console.log("No user found");
+      return res.json({ error: 'No User Found' });
     }
-    //check password match
+
     const match = await comparePassword(password, user.password);
-    if(match ){
-      jwt.sign({email: user.email, id:user._id, name: user.name}, process.env.JWT_SECRET,{}, (err,token) =>{
-        if(err) throw err;
-        res.cookie('token', token).json(user)
-      })
+    if (!match) {
+      console.log("Password mismatch");
+      return res.json({ error: 'Password does not match' });
     }
-    if(!match){
-      res.json({
-        error: "Password do not match"
-      })
-    }
+
+    console.log("Credentials match. Signing token...");
+
+    jwt.sign(
+      { email: user.email, id: user._id, name: user.name },
+      process.env.JWT_SECRET,
+      {},
+      async (err, token) => {
+        if (err) {
+          console.error("JWT Sign error:", err);
+          return res.status(500).json({ error: "Token generation failed" });
+        }
+
+        console.log("JWT token generated. Logging activity...");
+
+        try {
+          await LoginActivity.create({
+            userId: user._id,
+            timestamp: new Date(),
+            ip: ip,
+            userAgent: req.headers['user-agent'],
+          });
+          console.log("Login activity recorded!");
+        } catch (err) {
+          console.error("Error recording login activity:", err);
+        }
+
+        res.cookie('token', token).json(user);
+      }
+    );
   } catch (error) {
-    console.log(error)
+    console.log("Unexpected error in login route:", error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+const getLoginActivities = async (req, res) => {
+  try {
+    const { token } = req.cookies;
+
+    if (!token) return res.status(401).json({ message: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    const activities = await LoginActivity.find({ userId })
+      .sort({ timestamp: -1 }) // Sort by most recent first
+      .limit(20); // Optional: limit to last 20 logins
+
+    res.status(200).json(activities);
+  } catch (err) {
+    console.error('Error fetching login activities:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -152,7 +198,58 @@ const getProfilebyname = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  try {
+    const { token } = req.cookies;
+    const { currentPassword, newPassword } = req.body;
 
+    if (!token) return res.status(401).json({ message: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Incorrect current password' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    await user.save();
+    res.status(200).json({ message: 'Password changed successfully' });
+
+  } catch (err) {
+    console.error('Change password error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+const deleteAccount = async (req, res) => {
+  try {
+    const { token } = req.cookies;
+
+    if (!token) return res.status(401).json({ message: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const deleted = await User.findByIdAndDelete(decoded.id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: 'User not found or already deleted' });
+    }
+
+    res.clearCookie('token'); // remove cookie
+    res.status(200).json({ message: 'Account deleted successfully' });
+  } catch (err) {
+    console.error('Delete account error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
 // Export all controllers
 module.exports = {
@@ -161,5 +258,8 @@ module.exports = {
   test,
   getProfile,
   updateProfile,
-  getProfilebyname
+  getProfilebyname,
+  changePassword,
+  deleteAccount,
+  getLoginActivities
 };
