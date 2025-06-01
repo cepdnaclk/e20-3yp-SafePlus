@@ -9,6 +9,8 @@ const helmetDataSchema = new mongoose.Schema({
   temp: { type: Number, required: true },
   hum: { type: Number, required: true },
   bpm: { type: Number, required: true },
+  alt: { type: Number, required: true },
+  floor: { type: Number, required: true },
   loc: { lat: { type: Number }, lng: { type: Number } },
   gas: { type: Number, required: true },
   btn: { type: Boolean, required: true },

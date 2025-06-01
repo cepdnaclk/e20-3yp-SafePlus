@@ -2,10 +2,11 @@ require("dotenv").config();
 const awsIot = require("aws-iot-device-sdk");
 const WebSocket = require("ws");
 const mongoose = require("mongoose");
-//const HelmetData = require("./models/sensorData");
+// const HelmetData = require("./models/sensorData");
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const HourlyStats = require("./models/HourlyStatModel");
 
 app.use(cors());
 app.use(express.json());
@@ -36,6 +37,8 @@ const device = awsIot.device({
   host: process.env.AWS_IOT_ENDPOINT,
 });
 
+
+
 wss.on("connection", (ws) => {
   //console.log("✅ Frontend connected to WebSocket Server");
   ws.send(JSON.stringify({ message: "Connected to WebSocket Server" }));
@@ -63,16 +66,19 @@ device.on("message", (topic, payload) => {
     }
   });
 
-  // Save to MongoDB
-  //const helmetData = new HelmetData({ ...data, userId: data.userId || 'defaultUserId' });
-
-  //helmetData.save()
-  //  .then(() => {
-  //    console.log("✅ Data inserted into MongoDB");
-
-  // rolling window
-  const HourlyStats = require("./models/HourlyStatModel");
+  // ROLLING STATS AGGREGATION
   const now = new Date();
+  const roundedHour = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    now.getHours(),
+    0,
+    0,
+    0
+  );
+  const hourValue = Math.floor(roundedHour.getTime() / (1000 * 60 * 60));
+
   const helmetId = data.id;
 
   HourlyStats.findOne({ helmetId }).sort({ hourWindowStart: -1 })
@@ -85,7 +91,7 @@ device.on("message", (topic, payload) => {
 
       if (lastStats) {
         const windowStart = new Date(lastStats.hourWindowStart);
-        const windowEnd = new Date(windowStart.getTime() + 60 * 60 * 1000); 
+        const windowEnd = new Date(windowStart.getTime() + 60 * 60 * 1000);
 
         if (now < windowEnd) {
           // Update existing stat
@@ -93,11 +99,11 @@ device.on("message", (topic, payload) => {
 
           if (!isNaN(tempVal)) {
             lastStats.avgTemp = ((lastStats.avgTemp || 0) * lastStats.count + tempVal) / newCount;
-            }
+          }
 
           if (!isNaN(humVal)) {
             lastStats.avgHum = ((lastStats.avgHum || 0) * lastStats.count + humVal) / newCount;
-            }
+          }
 
           lastStats.impactCount += isImpact ? 1 : 0;
           lastStats.gasAlertCount += isGasAlert ? 1 : 0;
@@ -110,7 +116,8 @@ device.on("message", (topic, payload) => {
       // Create new rolling window
       const newStats = new HourlyStats({
         helmetId,
-        hourWindowStart: now,
+        hour: hourValue,
+        hourWindowStart: roundedHour,
         avgTemp: !isNaN(tempVal) ? tempVal : 0,
         avgHum: !isNaN(humVal) ? humVal : 0,
         impactCount: isImpact ? 1 : 0,
@@ -121,7 +128,7 @@ device.on("message", (topic, payload) => {
       return newStats.save();
     })
     .then(() => {
-      console.log(`Rolling stats updated for helmet ${data.id}`);
+      console.log(`✅ Rolling stats updated for helmet ${data.id}`);
     })
     .catch((err) => {
       console.error("❌ Failed to process data:", err);
@@ -131,6 +138,5 @@ device.on("message", (topic, payload) => {
 
 // Handle errors
 
-device.on("error", (err) => {
-  console.error("❌ AWS IoT Error:", err);
-});
+
+// Handle errors
