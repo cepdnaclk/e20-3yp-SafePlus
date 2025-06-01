@@ -15,11 +15,6 @@ app.use(express.json());
 const workerRoutes = require("./routes/workerRoutes");
 app.use("/api/workers", workerRoutes);
   
-// Authentication routes for the Mobile App
-
-const mobileRoutes = require("./routes/mobileRoutes");
-app.use("/api/mobile", mobileRoutes);
-
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URL, {})
   .then(() => console.log("✅ MongoDB connected"))
@@ -46,14 +41,26 @@ wss.on("connection", (ws) => {
 });
 
 device.on("connect", () => {
-  //console.log("✅ Connected to AWS IoT Core");
+  console.log("✅ Connected to AWS IoT Core");
   device.subscribe("helmet/data", (err) => {
     if (err) {
       console.error("❌ Subscription failed:", err);
     } else {
-      //console.log("✅ Subscribed to topic: helmet/data");
+      console.log("✅ Subscribed to topic: helmet/data");
     }
   });
+});
+
+device.on("error", (err) => {
+  console.error("❌ AWS IoT Device Error:", err);
+});
+
+device.on("close", () => {
+  console.warn("⚠️ AWS IoT connection closed");
+});
+
+device.on("reconnect", () => {
+  console.log("🔁 Attempting to reconnect to AWS IoT...");
 });
 
 device.on("message", (topic, payload) => {
@@ -135,9 +142,3 @@ device.on("message", (topic, payload) => {
       console.error("❌ Failed to process data:", err);
     });
 });
-
-
-// Handle errors
-
-
-// Handle errors
