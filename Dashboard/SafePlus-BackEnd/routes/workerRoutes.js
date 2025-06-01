@@ -8,7 +8,7 @@ router.use(
   cors({
     credentials: true,
     origin: ['http://localhost:5173',
-        'http://10.30.8.182:8000', ],// or your mobile app's origin if needed
+        'http://192.168.8.161:8000', ],// or your mobile app's origin if needed
 
   })
 );

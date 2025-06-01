@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { LinearGradient } from 'expo-linear-gradient';
-
+import moment from 'moment';
 const screenWidth = Dimensions.get('window').width;
 
 export default function GraphCard({ title, data, colors, isSafe }) {
@@ -42,6 +42,11 @@ export default function GraphCard({ title, data, colors, isSafe }) {
             }}
             bezier
             style={styles.chart}
+            formatXLabel={(label) => {
+              if (!label) return '';
+              return moment(label).format('HH:mm');
+          }}
+            labelRotation={-45}  // Rotate labels by -45 degrees
           />
         </View>
       </LinearGradient>

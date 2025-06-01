@@ -34,9 +34,7 @@ export default function HomePage({ route, navigation }) {
     };
     const values = hourlyStats.map(d => d[key] ?? 0);
     const labels = hourlyStats.map(d =>
-      d.hourWindowStart
-        ? new Date(d.hourWindowStart).toLocaleTimeString().slice(0, 5)
-        : ''
+      d.hourlyWindowStart || '' // Use a default value if not availableS
     );
     const paddedValues = Array(Math.max(0, desiredLength - values.length)).fill(0).concat(values);
     const paddedLabels = Array(Math.max(0, desiredLength - labels.length)).fill('').concat(labels);
@@ -82,10 +80,14 @@ export default function HomePage({ route, navigation }) {
         <InfoCard title="Recommended Habits" colors={['#e0ffe0', '#ccffcc']} isSafe={true}>
           • Drink more water throughout the day
         </InfoCard>
-
-        <GraphCard title="Temperature and Humidity" data={tempHumidityData} colors={['#f5f5f5', '#e0e0e0']} />
-        <GraphCard title="Air Quality Alerts" data={airQualityData} colors={['#f0f0f0', '#dcdcdc']} />
-        <GraphCard title="Impacts" data={impactData} colors={['#f0f0f0', '#d9d9d9']} />
+        <InfoCard title="Safety Tips" colors={['#ffe0e0', '#ffcccc']} isSafe={false}>
+          • Always wear your helmet properly{'\n'}
+          • Avoid distractions while working</InfoCard>
+        console.log('Raw labels:', tempData.labels);
+        <GraphCard title="Temperature" data={tempData} />
+        <GraphCard title="Humidity" data={humidityData} />
+        <GraphCard title="Air Quality Alerts" data={airQualityData} />
+        <GraphCard title="Impacts" data={impactData} />
       </ScrollView>
 
       <NotificationPopup visible={showNotifications} onClose={() => setShowNotifications(false)} />

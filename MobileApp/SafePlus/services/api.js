@@ -1,5 +1,5 @@
 
-const BASE_URL = 'http://10.30.8.182:8000/api/workers'; // replace with your IP
+const BASE_URL = 'http://192.168.8.161:8000/api/workers'; // replace with your IP
 
 
 
@@ -53,7 +53,9 @@ export const changePassword = async ({ userId, newPassword }) => {
 
 // Fetch helmet data in hourly for the mobile app
 export const fetchHourlyStats = async (helmetId) => {
+  helmetId = "Helmet_1"; 
   try {
+    console.log('Fetching hourly stats for helmet ID:', helmetId);
     const response = await fetch(`${BASE_URL}/hourly-stats/${helmetId}`);
     if (!response.ok) throw new Error('Failed to fetch hourly stats');
     return await response.json();
