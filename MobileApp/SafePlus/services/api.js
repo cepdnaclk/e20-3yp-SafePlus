@@ -1,5 +1,5 @@
 
-const BASE_URL = 'http://10.30.8.182:8000/api/workers'; // replace with your IP
+const BASE_URL = 'http://192.168.8.161:8000/api/workers'; // replace with your IP
 
 
 
@@ -51,16 +51,16 @@ export const changePassword = async ({ userId, newPassword }) => {
   }
 };
 
-// Fetch helmet data for the mobile app
-export const fetchHelmetData = async (userId) => {
-  const HelmetId = "Helmet_1";
+// Fetch helmet data in hourly for the mobile app
+export const fetchHourlyStats = async (helmetId) => {
+  helmetId = "Helmet_1"; 
   try {
-    
-    const response = await fetch(`${BASE_URL}/fetchHelmetData${HelmetId}`);
-    if (!response.ok) throw new Error('Failed to fetch helmet data');
+    console.log('Fetching hourly stats for helmet ID:', helmetId);
+    const response = await fetch(`${BASE_URL}/hourly-stats/${helmetId}`);
+    if (!response.ok) throw new Error('Failed to fetch hourly stats');
     return await response.json();
   } catch (error) {
-    console.error('Fetch helmet data error:', error);
+    console.error('Fetch hourly stats error:', error);
     throw error;
   }
 };
