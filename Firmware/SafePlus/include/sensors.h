@@ -10,6 +10,9 @@ typedef struct {
     float temperature, humidity;
     float h3lis_ax, h3lis_ay, h3lis_az;
     float gasPPM;
+    float altitude;
+    int floorLevel;
+
 } SensorData;
 
 void initSensors();
