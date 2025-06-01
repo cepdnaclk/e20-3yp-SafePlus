@@ -11,6 +11,6 @@ const hourlyStatsSchema = new mongoose.Schema({
   count: { type: Number, default: 0 },   
 }, { timestamps: true });
 
-hourlyStatsSchema.index({ helmetId: 1, hour: 1 }, { unique: true });
+hourlyStatsSchema.index({ helmetId: 1, hourWindowStart: 1 }, { unique: true });
 
 module.exports = mongoose.model("HourlyStatModel", hourlyStatsSchema);
