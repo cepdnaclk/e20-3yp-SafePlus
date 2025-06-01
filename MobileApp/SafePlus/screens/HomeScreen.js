@@ -3,53 +3,62 @@ import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import NotificationPopup from '../components/NotificationPopup';
 import GraphCard from '../components/GraphCard';
 import InfoCard from '../components/InfoCard';
-import { LinearGradient } from 'expo-linear-gradient';
 import styles from '../styles/HomeScreen';
-import { fetchUserData } from '../services/api'; 
+import { fetchHourlyStats } from '../services/api'; // <-- use the new API function
 
 export default function HomePage({ route, navigation }) {
   const { user } = route.params || {};
   const [showNotifications, setShowNotifications] = useState(false);
-  const [sensorData, setSensorData] = useState([]);
+  const [hourlyStats, setHourlyStats] = useState([]);
+
+  // Replace this with how you get the helmetId for the user
+  const helmetId = user?.helmetId || 'your-default-helmet-id';
 
   useEffect(() => {
-    if (user?.userId) {
-      console.log("Fetching data for user:", user.userId);
-      fetchUserData(user.userId)
-        .then(data => setSensorData(data))
-        .catch(error => console.error("Failed to load sensor data:", error));
+    if (helmetId) {
+      fetchHourlyStats(helmetId)
+        .then(data => {
+          // If your API returns a single object, wrap it in an array for consistency
+          setHourlyStats(Array.isArray(data) ? data : [data]);
+        })
+        .catch(error => console.error("Failed to load hourly stats:", error));
     }
-  }, [user]);
+  }, [helmetId]);
 
+  // Extract graph data from hourlyStats
   const extractGraphData = (key) => {
-    const desiredLength = 20; // 24 hours
-    if (!sensorData || sensorData.length === 0) return { labels: Array(desiredLength).fill(''),
-      values: Array(desiredLength).fill(0),};
-    const values = sensorData.map(d => d[key]);
-  const labels = sensorData.map(d => new Date(d.timestamp).toLocaleTimeString().slice(0, 5));
-
-  const paddedValues = Array(Math.max(0, desiredLength - values.length)).fill(0).concat(values);
-  const paddedLabels = Array(Math.max(0, desiredLength - labels.length)).fill('').concat(labels);
-
-  return {
-    labels: paddedLabels,
-    values: paddedValues,
+    const desiredLength = 20;
+    if (!hourlyStats || hourlyStats.length === 0) return {
+      labels: Array(desiredLength).fill(''),
+      values: Array(desiredLength).fill(0),
+    };
+    const values = hourlyStats.map(d => d[key] ?? 0);
+    const labels = hourlyStats.map(d =>
+      d.hourWindowStart
+        ? new Date(d.hourWindowStart).toLocaleTimeString().slice(0, 5)
+        : ''
+    );
+    const paddedValues = Array(Math.max(0, desiredLength - values.length)).fill(0).concat(values);
+    const paddedLabels = Array(Math.max(0, desiredLength - labels.length)).fill('').concat(labels);
+    return {
+      labels: paddedLabels,
+      values: paddedValues,
     };
   };
 
-  const heartRateData = extractGraphData("heart_rate");
-  const tempData = extractGraphData("temperature");
-  const humidityData = extractGraphData("humidity");
-  const airQualityData = extractGraphData("gasvalues");
+  const tempData = extractGraphData("avgTemp");
+  const humidityData = extractGraphData("avgHum");
+  const airQualityData = extractGraphData("gasAlertCount");
+  const impactData = extractGraphData("impactCount");
 
-  // Merge temp and humidity for a single graph
+  // Example: Merge temp and humidity for a single graph
   const tempHumidityData = {
     labels: tempData.labels,
-    values: tempData.values.map((temp, index) => (temp + humidityData.values[index]) / 2),
+    values: tempData.values.map((temp, idx) => (temp + humidityData.values[idx]) / 2),
   };
 
   return (
-     <View style={[styles.container, { backgroundColor: '#fff6e5' }]}>
+    <View style={[styles.container, { backgroundColor: '#FFF6E5' }]}>
       <TouchableOpacity style={styles.accountIcon} onPress={() => navigation.navigate('Account')}>
         <Text style={styles.icon}>👤</Text>
       </TouchableOpacity>
@@ -66,7 +75,7 @@ export default function HomePage({ route, navigation }) {
         <InfoCard title="Daily Summary" colors={['#e0ffe0', '#ccffcc']} isSafe={true}>
           • Working Hours: 8{'\n'}
           • Emergencies: No{'\n'}
-          • Head Impacts: No{'\n'}
+          • Head Impacts: {impactData.values.reduce((a, b) => a + b, 0)}{'\n'}
           • Medical Situations: No
         </InfoCard>
 
@@ -74,9 +83,9 @@ export default function HomePage({ route, navigation }) {
           • Drink more water throughout the day
         </InfoCard>
 
-        <GraphCard title="Heart Rate" data={heartRateData} colors={['#f0f0f0', '#d9d9d9']} />
-        <GraphCard title="Temperature and Humidity" data={tempHumidityData} colors={['#f5f5f5', '#e0e0e0']} isSafe={Math.max(...tempHumidityData.values) < 30} />
-        <GraphCard title="Air Quality Level" data={airQualityData} colors={['#f0f0f0', '#dcdcdc']} isSafe={Math.max(...airQualityData.values) < 80} />
+        <GraphCard title="Temperature and Humidity" data={tempHumidityData} colors={['#f5f5f5', '#e0e0e0']} />
+        <GraphCard title="Air Quality Alerts" data={airQualityData} colors={['#f0f0f0', '#dcdcdc']} />
+        <GraphCard title="Impacts" data={impactData} colors={['#f0f0f0', '#d9d9d9']} />
       </ScrollView>
 
       <NotificationPopup visible={showNotifications} onClose={() => setShowNotifications(false)} />

@@ -15,9 +15,8 @@ const workerRoutes = require("./routes/workerRoutes");
 app.use("/api/workers", workerRoutes);
   
 // Authentication routes for the Mobile App
-
-const mobileRoutes = require("./routes/mobileRoutes");
-app.use("/api/mobile", mobileRoutes);
+const hourlyStatsRoutes = require('./routes/MobileData');
+app.use('/api/workers/hourly-stats', hourlyStatsRoutes);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URL, {})
@@ -55,7 +54,7 @@ device.on("connect", () => {
 
 device.on("message", (topic, payload) => {
   const data = JSON.parse(payload.toString());
-  console.log(`📩 Data received from topic "${topic}":`, data);
+  //console.log(`📩 Data received from topic "${topic}":`, data);
 
   // Broadcast to WebSocket clients
   wss.clients.forEach((client) => {
@@ -101,7 +100,7 @@ device.on("message", (topic, payload) => {
             }
 
           lastStats.impactCount += isImpact ? 1 : 0;
-          lastStats.gasAlerts += isGasAlert ? 1 : 0;
+          lastStats.gasAlertCount += isGasAlert ? 1 : 0;
           lastStats.count = newCount;
 
           return lastStats.save();
@@ -115,7 +114,7 @@ device.on("message", (topic, payload) => {
         avgTemp: !isNaN(tempVal) ? tempVal : 0,
         avgHum: !isNaN(humVal) ? humVal : 0,
         impactCount: isImpact ? 1 : 0,
-        gasAlerts: isGasAlert ? 1 : 0,
+        gasAlertCount: isGasAlert ? 1 : 0,
         count: 1,
       });
 
