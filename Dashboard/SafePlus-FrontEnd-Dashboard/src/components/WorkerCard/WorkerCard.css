@@ -1,22 +1,23 @@
 .worker-card {
   background-color: #eeeeee;
-  border-left: 6px solid #b7b100;
   border-radius: 12px;
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
   padding: 1.2rem;
   width: 280px;
-  font-family: "sans-serif", Tahoma, Geneva, Verdana, sans-serif;
+  height: 400px;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   transition: transform 0.2s ease-in-out;
 }
 
 .worker-card:hover {
-  transform: translateY(-1px);
+  background-color: #e8e8dd;
 }
 
 .worker-name {
   color: #3b3a03;
   margin: 0 0 0.5rem;
   font-size: 1.2rem;
+  text-align: center;
 }
 
 .sensor-section {
@@ -48,5 +49,4 @@
 .loading {
   color: #888;
   margin-top: 10px;
-  font-style: italic;
 }
