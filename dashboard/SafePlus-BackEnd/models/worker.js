@@ -14,6 +14,7 @@ const workerSchema = new mongoose.Schema({
   },
   helmetId: { type: String, default: null },
   password: { type: String, required: true },
+  mustChangePassword: { type: Boolean, default: true },
 
 }, { timestamps: true });
 

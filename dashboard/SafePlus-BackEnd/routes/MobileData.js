@@ -3,12 +3,12 @@ const router = express.Router();
 const HelmetData = require('../models/sensorData'); // or HelmetData.js
 //const sampleData = require('../mockData.js'); // Importing mock data
 // Example route: get all sensor data for a user by time range
-router.get('/:userId', async (req, res) => {
-  const { userId } = req.params;
+router.get('/:helmetID', async (req, res) => {
+  const { helmetID } = req.params;
 
   try {
     // Find latest 50 sensor records for the user (if stored with userId)
-    const data = await HelmetData.find({ userId }).sort({ timestamp: -1 }).limit(50);
+    const data = await HelmetData.find({ id:helmetID }).sort({ timestamp: -1 }).limit(50);
 
     res.json(data);
   } catch (error) {

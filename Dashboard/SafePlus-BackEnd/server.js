@@ -14,8 +14,9 @@ app.use(express.json());
 // Authentication routes
 const workerRoutes = require("./routes/workerRoutes");
 app.use("/api/workers", workerRoutes);
-
+  
 // Authentication routes for the Mobile App
+
 const mobileRoutes = require("./routes/mobileRoutes");
 app.use("/api/mobile", mobileRoutes);
 
@@ -23,6 +24,7 @@ app.use("/api/mobile", mobileRoutes);
 mongoose.connect(process.env.MONGO_URL, {})
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
+
 
 // WebSocket server
 const wss = new WebSocket.Server({ port: 8085 });
@@ -39,17 +41,17 @@ const device = awsIot.device({
 
 
 wss.on("connection", (ws) => {
-  console.log("✅ Frontend connected to WebSocket Server");
+  //console.log("✅ Frontend connected to WebSocket Server");
   ws.send(JSON.stringify({ message: "Connected to WebSocket Server" }));
 });
 
 device.on("connect", () => {
-  console.log("✅ Connected to AWS IoT Core");
+  //console.log("✅ Connected to AWS IoT Core");
   device.subscribe("helmet/data", (err) => {
     if (err) {
       console.error("❌ Subscription failed:", err);
     } else {
-      console.log("✅ Subscribed to topic: helmet/data");
+      //console.log("✅ Subscribed to topic: helmet/data");
     }
   });
 });
@@ -133,3 +135,9 @@ device.on("message", (topic, payload) => {
       console.error("❌ Failed to process data:", err);
     });
 });
+
+
+// Handle errors
+
+
+// Handle errors

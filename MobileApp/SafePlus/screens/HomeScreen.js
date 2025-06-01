@@ -49,7 +49,7 @@ export default function HomePage({ route, navigation }) {
   };
 
   return (
-    <LinearGradient colors={['#FFFFFF', '#D8D47D']} style={styles.container}>
+     <View style={[styles.container, { backgroundColor: '#fff6e5' }]}>
       <TouchableOpacity style={styles.accountIcon} onPress={() => navigation.navigate('Account')}>
         <Text style={styles.icon}>👤</Text>
       </TouchableOpacity>
@@ -80,6 +80,6 @@ export default function HomePage({ route, navigation }) {
       </ScrollView>
 
       <NotificationPopup visible={showNotifications} onClose={() => setShowNotifications(false)} />
-    </LinearGradient>
+    </View>
   );
 }
