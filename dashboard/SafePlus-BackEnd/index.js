@@ -19,29 +19,28 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
-// ✅ MongoDB Connection
+// MongoDB Connection
 mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.log("❌ MongoDB connection failed", err));
 
-// ✅ Routes
-app.use('/', require('./routes/authRoutes'));
+// Routes
+app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/mobile/data', require('./routes/mobileData'));
 app.use('/api/workers', require('./routes/workerRoutes'));
 app.use('/api/workers/hourly-stats', require('./routes/mobileData'));
+app.use('/api/user', require('./routes/twoFactorRoutes'));
 
-// ✅ Start HTTP Server
+// Start HTTP Server
 const port = 8000;
 app.listen(port, () => {
   console.log(`✅ Server is running on port ${port}`);
 });
 
-
-
-// ✅ WebSocket Setup
+// WebSocket Setup
 const wss = new WebSocket.Server({ port: 8085 });
 
-// ✅ AWS IoT Setup
+// AWS IoT Setup
 const device = awsIot.device({
   keyPath: process.env.PRIVATE_KEY_PATH,
   certPath: process.env.CERTIFICATE_PATH,
@@ -57,17 +56,9 @@ wss.on("connection", (ws) => {
 
 
 device.on("connect", () => {
-  device.subscribe("helmet/data", (err,granted) => {
-    if (err) {
-      console.error("❌ AWS subscription error:", err);
-    }//else{
-     // console.log('✅ Subscribed:', granted);
-    //}
+  device.subscribe("helmet/data", (err) => {
+    if (err) console.error("❌ AWS subscription error:", err);
   });
-});
-
-device.on('error', function (error) {
-  console.error('❌ AWS IoT error occurred:', error);
 });
 
 device.on("message", (topic, payload) => {
@@ -86,7 +77,7 @@ device.on("message", (topic, payload) => {
 
   HourlyStats.findOne({ helmetId }).sort({ hourWindowStart: -1 })
     .then(lastStats => {
-      const isImpact = data.imp === "impact";
+      const isImpact = data.imp === "yes";
       const isGasAlert = data.gas > 300;
       const tempVal = Number(data.temp);
       const humVal = Number(data.hum);

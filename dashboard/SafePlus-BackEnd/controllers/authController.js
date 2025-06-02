@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const LoginActivity = require('../models/LoginActivity');
+const speakeasy = require("speakeasy");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const {hashPassword, comparePassword} = require('../helpers/auth')
@@ -78,6 +79,14 @@ const login = async (req, res) => {
       console.log("Password mismatch");
       return res.json({ error: 'Password does not match' });
     }
+    if (user.is2FAEnabled) {
+      console.log("2FA enabled. Waiting for TOTP verification...");
+      return res.json({
+        requires2FA: true,
+        userId: user._id,
+        name: user.name,
+      });
+    }
 
     console.log("Credentials match. Signing token...");
 
@@ -105,12 +114,83 @@ const login = async (req, res) => {
           console.error("Error recording login activity:", err);
         }
 
-        res.cookie('token', token).json(user);
+        res.cookie('token', token).json({
+          token,
+          username: user.name, 
+        });
       }
     );
   } catch (error) {
     console.log("Unexpected error in login route:", error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const verify2FA = async (req, res) => {
+  try {
+    const ip = req.clientIp;
+    const { userId, totpCode } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (!user.is2FAEnabled || !user.twoFASecret) {
+      return res.status(400).json({ error: "2FA not enabled for this user" });
+    }
+    console.log("2FA secret in DB:", user.twoFASecret);
+
+    const expectedCode = speakeasy.totp({
+      secret: user.twoFASecret,
+      encoding: "base32",
+    });
+    console.log("Expected TOTP:", expectedCode);
+    console.log("User Entered TOTP:", totpCode);
+
+    console.log("Checking TOTP:", totpCode.trim(), "Secret:", user.twoFASecret);
+
+
+    // ✅ Verify TOTP code
+    const isValid = speakeasy.totp.verify({
+      secret: user.twoFASecret,
+      encoding: "base32",
+      token: totpCode.trim(),
+      token: totpCode,
+      window: 4, // allows ±30s clock drift
+    });
+
+    if (!isValid) {
+      return res.status(400).json({ error: "Invalid or expired 2FA code" });
+    }
+
+    jwt.sign(
+      { email: user.email, id: user._id, name: user.name },
+      process.env.JWT_SECRET,
+      {},
+      async (err, token) => {
+        if (err) {
+          console.error("JWT Sign error:", err);
+          return res.status(500).json({ error: "Token generation failed" });
+        }
+
+        await LoginActivity.create({
+          userId: user._id,
+          timestamp: new Date(),
+          ip: ip,
+          userAgent: req.headers['user-agent'],
+        });
+
+        res.cookie("token", token).json({
+          success: true,
+          token,
+          username: user.name,
+        });
+      }
+    );
+  } catch (err) {
+    console.error("Error in /verify-2fa:", err);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -261,5 +341,6 @@ module.exports = {
   getProfilebyname,
   changePassword,
   deleteAccount,
-  getLoginActivities
+  getLoginActivities,
+  verify2FA
 };

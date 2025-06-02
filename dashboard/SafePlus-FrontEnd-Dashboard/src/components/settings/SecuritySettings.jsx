@@ -1,11 +1,8 @@
 import {
   Box,
   Heading,
-  VStack,
   Divider,
   Text,
-  Switch,
-  Flex,
   Table,
   Thead,
   Tbody,
@@ -16,47 +13,35 @@ import {
 import '../../styles/Settings.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import TwoFactorSettings from './TwoFactorSettings'; // Adjust path as needed
 
 const SecuritySettings = () => {
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
+  const [loginHistory, setLoginHistory] = useState([]);
 
-  const handle2FAToggle = () => {
-    setIs2FAEnabled(prev => !prev);
-  };
+  useEffect(() => {
+    const fetchLoginActivity = async () => {
+      try {
+        const res = await axios.get('/api/auth/login-activities', {
+          withCredentials: true,
+        });
+        setLoginHistory(res.data);
+      } catch (err) {
+        console.error('Error fetching login activity:', err);
+      }
+    };
 
-const [loginHistory, setLoginHistory] = useState([]);
-
-useEffect(() => {
-  const fetchLoginActivity = async () => {
-    try {
-      const res = await axios.get('http://localhost:8000/login-activities', {
-        withCredentials: true,
-      });
-      setLoginHistory(res.data);
-    } catch (err) {
-      console.error('Error fetching login activity:', err);
-    }
-  };
-
-  fetchLoginActivity();
-}, []);
-
+    fetchLoginActivity();
+  }, []);
 
   return (
     <Box className="account-box">
       <Heading size="md" className="account-heading">Security Settings</Heading>
       <Divider className="account-divider" />
 
-      {/* Two-Factor Auth Section */}
-      <VStack spacing={4} align="stretch" mt={2} mb={6}>
-        <Text fontWeight="medium">Two-Factor Authentication (2FA)</Text>
-        <Flex align="center" justify="space-between">
-          <Text fontSize="sm" color="gray.600">
-            Add an extra layer of security to your account.
-          </Text>
-          <Switch colorScheme="teal" isChecked={is2FAEnabled} onChange={handle2FAToggle} />
-        </Flex>
-      </VStack>
+      {/* Two-Factor Authentication Settings */}
+      <Box mt={4} mb={6}>
+        <TwoFactorSettings />
+      </Box>
 
       <Divider className="account-divider" />
 
