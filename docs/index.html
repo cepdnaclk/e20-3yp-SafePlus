@@ -1,270 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Remix Icon for decorative icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Your CSS file (to be added later) -->
+    <link rel="stylesheet" href="css/style.css" />
     <title>Safe Plus - Smart Safety Helmet</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        /* Custom Styles */
-        body {
-            font-family: 'Poppins', sans-serif;
-            line-height: 1.8;
-            margin: 0;
-            padding: 0;
-            background-color: #121212;
-            color: #f1c40f;
-            text-align: center;
-        }
-        h1, h2, h3 {
-            color: #f1c40f;
-            font-weight: 600;
-        }
-        a {
-            color: #f1c40f;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-        }
-        .container {
-            max-width: 90%;
-            margin: 20px auto;
-            background: #222;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
-        }
-        .welcome-section {
-            position: relative;
-            text-align: center;
-        }
-        .welcome-section img {
-            width: 100%;
-            height: auto;
-            opacity: 0.8;
-        }
-        .welcome-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 5rem;
-            font-weight: bold;
-            color: black;
-            text-shadow: 3px 3px 10px rgba(255, 255, 255, 0.5);
-        }
-        /* Sticky Top Navigation Bar */
-        .navbar {
-            position: sticky;
-            top: 0;
-            background: #000;
-            padding: 15px 0;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-        }
-        .navbar img {
-            height: 40px;
-            margin-right: 10px;
-        }
-        .navbar ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            gap: 20px;
-        }
-        .navbar ul li {
-            display: inline;
-        }
-        .navbar ul li a {
-            color: #f1c40f;
-            padding: 10px 15px;
-            border-radius: 5px;
-            transition: background 0.3s ease;
-            font-weight: bold;
-        }
-        .navbar ul li a:hover {
-            background: #f1c40f;
-            color: #121212;
-        }
-        .container {
-            padding-top: 100px; /* Adjusted padding to prevent hiding behind navbar */
-        }
-        /* Section Titles */
-        .section-title {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .section-title h2 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        .section-title .line {
-            width: 60px;
-            height: 4px;
-            background: #f1c40f;
-            margin: 0 auto 20px;
-            border-radius: 2px;
-        }
-        /* Introduction Text */
-        .intro-text {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            text-align: justify;
-            margin: 0 auto;
-            max-width: 800px;
-        }
-        /* Team Members */
-        .team-member {
-            margin-bottom: 15px;
-            padding: 10px;
-            background: #333;
-            border-radius: 8px;
-            display: inline-block;
-            width: 45%;
-            margin: 10px;
-        }
-        .team-member a {
-            color: #f1c40f;
-        }
-        /* Links */
-        .links {
-            list-style: none;
-            padding: 0;
-        }
-        .links li {
-            margin-bottom: 10px;
-        }
-        .links li a {
-            display: inline-block;
-            padding: 10px 15px;
-            background: #f1c40f;
-            color: #121212;
-            border-radius: 5px;
-            transition: background 0.3s ease;
-        }
-        .links li a:hover {
-            background: #c29d0b;
-        }
-        /* Fix Navigation Offset */
-        :target::before {
-            content: "";
-            display: block;
-            height: 100px; /* Height of the navbar */
-            margin: -100px 0 0; /* Negative margin to offset */
-        }
-    </style>
-</head>
-<body>
-    <!-- Sticky Top Navigation Bar -->
-    <nav class="navbar">
-        <img src="./images/logo.webp" alt="Safe Plus Logo">
-        <ul>
-            <li><a href="#introduction">Introduction</a></li>
-            <li><a href="#solution-architecture">Solution Architecture</a></li>
-            <li><a href="#data-flow">Data Flow</a></li>
-            <li><a href="#detailed-budget">Detailed Budget</a></li>
-            <li><a href="#hardware-and-software-designs">Hardware & Software</a></li>
-            <li><a href="#testing">Testing</a></li>
-            <li><a href="#conclusion">Conclusion</a></li>
-            <li><a href="#team">Team</a></li>
-            <li><a href="#links">Links</a></li>
+  </head>
+  <body>
+    <!-- HEADER SECTION -->
+    <header>
+      <!-- LOGO -->
+      <a href="#" class="logo">
+        <span>SAFE PLUS</span>
+        <img class="logo-image" src="./images/logo.webp" alt="Safe Plus Logo" />
+      </a>
+      <!-- NAVIGATION BAR -->
+      <nav class="main-nav">
+        <ul class="main-nav-list">
+          <li><a class="main-nav-link" href="#home">Home</a></li>
+          <li><a class="main-nav-link" href="#introduction">Introduction</a></li>
+          <li>
+            <a class="main-nav-link" href="#solution-architecture">Architecture</a>
+          </li>
+          <li><a class="main-nav-link" href="#data-flow">Data Flow</a></li>
+          <li><a class="main-nav-link" href="#detailed-budget">Budget</a></li>
+          <li><a class="main-nav-link" href="#testing">Testing</a></li>
+          <li><a class="main-nav-link" href="#team">Team</a></li>
+          <li><a class="main-nav-link" href="#links">Links</a></li>
         </ul>
-    </nav>
-    
-    <!-- Welcome Section -->
-    <div class="welcome-section">
-        <img src="./images/cover.jpg" alt="Welcome Image">
-        <div class="welcome-text">Welcome to Safe Plus</div>
-    </div>
+      </nav>
+      <!-- Mobile Navigation Toggle Button -->
+      <button class="mobile-nav-toggle">
+        <i class="ri-menu-line"></i>
+      </button>
+    </header>
 
-    <div class="container">
-        <div class="section-title">
-            <h1>Safe Plus - Smart Safety Helmet</h1>
-            <div class="line"></div>
+    <main>
+      <!-- HERO SECTION -->
+      <section id="home" class="section-hero">
+        <div class="hero-box">
+          <!-- HERO TEXT -->
+          <div class="hero-text-box">
+            <h1>Smart Safety Helmet</h1>
+            <h2>Elevating Industrial Safety</h2>
+            <p>
+              Empowering workers with real-time hazard detection and emergency alerts,
+              Safe Plus integrates advanced sensor technology to keep you safe in hazardous environments.
+            </p>
+            <a href="#project-overview" class="cta-button">Watch Demo</a>
+          </div>
+          <!-- HERO IMAGE -->
+          <div class="hero-image-box">
+            <img class="hero-image" src="./images/cover.jpg" alt="Safe Plus Helmet" />
+          </div>
         </div>
+      </section>
 
-        <video id="introVideo" width="80%" autoplay muted controls>
-            <source src="./images/Product Documentation Video.mp4" type="video/mp4">
+      <!-- PROJECT OVERVIEW VIDEO SECTION -->
+      <section id="project-overview" class="section-project-overview">
+        <div class="section-header">
+          <h1>PROJECT OVERVIEW</h1>
+          <div class="underline"></div>
+        </div>
+        <p>
+          Discover how Safe Plus revolutionizes industrial safety by integrating smart sensor technology
+          with protective headgear. Monitor hazards, detect impacts, and automatically alert emergency contacts.
+        </p>
+        <div class="project-video-container">
+          <video class="project-video" controls poster="./images/project-overview-thumbnail.jpg">
+            <source src="./assets/videos/safeplus_overview.mp4" type="video/mp4" />
             Your browser does not support the video tag.
-        </video>
-        
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                const video = document.getElementById("introVideo");
-        
-                // Wait for user interaction
-                document.body.addEventListener("click", () => {
-                    video.muted = false; // Unmute the video
-                    video.play(); // Play the video
-                }, { once: true }); // Ensure it only runs once
-            });
-        </script>
+          </video>
+        </div>
+        <div class="project-overview-features">
+          <div class="overview-feature">
+            <i class="ri-shield-keyhole-line ri-2x"></i>
+            <h3>Real-Time Monitoring</h3>
+            <p>Instant hazard detection and impact sensing</p>
+          </div>
+          <div class="overview-feature">
+            <i class="ri-alert-line ri-2x"></i>
+            <h3>Emergency Alerts</h3>
+            <p>Automated notifications for quick response</p>
+          </div>
+          <div class="overview-feature">
+            <i class="ri-sound-wave-line ri-2x"></i>
+            <h3>Seamless Connectivity</h3>
+            <p>Wireless integration for continuous communication</p>
+          </div>
+        </div>
+      </section>
 
-        <!-- Introduction -->
-        <div class="section-title">
-            <h2 id="introduction">Introduction</h2>
-            <div class="line"></div>
+      <!-- INTRODUCTION SECTION -->
+      <section id="introduction" class="section-introduction">
+        <div class="section-header">
+          <h1>INTRODUCTION</h1>
+          <div class="underline"></div>
         </div>
-        <div class="intro-text">
-            Industrial workplaces, such as construction sites, factories, and mining zones, show significant safety risks to workers due to environmental hazards, heavy machinery, and unpredictable conditions. Every year, thousands of accidents occur due to falls, exposure to toxic gases, and collisions with moving equipment. 
-            These incidents not only lead to injuries and fatalities but also result in financial losses for companies due to medical costs, downtime, and legal repercussions.
-            <br><br>
-            To address these challenges, Safe Plus introduces an advanced smart safety helmet that integrates real-time monitoring, impact detection, and emergency alert systems. By providing cutting-edge sensor technology and wireless communication, Safe Plus ensures worker safety through immediate hazard detection, automated alerts, and connectivity with supervisors.
+        <div class="intro-content">
+          <p>
+            Industrial workplaces—construction sites, factories, and mining zones—face significant challenges
+            due to heavy machinery, hazardous environments, and unpredictable conditions. Daily, accidents
+            result in injuries, fatalities, and huge financial losses.
+          </p>
+          <p>
+            Safe Plus is designed to tackle these challenges by merging innovative sensor technology with wireless
+            connectivity. Our smart safety helmet continuously monitors environmental conditions, detects impacts,
+            and triggers emergency alerts, ensuring immediate response and enhanced worker safety.
+          </p>
         </div>
+      </section>
 
-        <!-- Solution Architecture -->
-        <div class="section-title">
-            <h2 id="solution-architecture">Solution Architecture</h2>
-            <div class="line"></div>
+      <!-- SOLUTION ARCHITECTURE SECTION -->
+      <section id="solution-architecture" class="section-solution-architecture">
+        <div class="section-header">
+          <h1>SOLUTION ARCHITECTURE</h1>
+          <div class="underline"></div>
         </div>
-        <img src="./images/architecture.png" alt="Solution Architecture">
+        <div class="sol-arch-img-container">
+          <img class="solution-architecture-img" src="./images/architecture.png" alt="Solution Architecture Diagram" />
+        </div>
+      </section>
 
-        <!-- Data Flow -->
-        <div class="section-title">
-            <h2 id="data-flow">Data Flow</h2>
-            <div class="line"></div>
+      <!-- DATA FLOW SECTION -->
+      <section id="data-flow" class="section-data-flow">
+        <div class="section-header">
+          <h1>DATA FLOW</h1>
+          <div class="underline"></div>
         </div>
-        <img src="./images/datafow.jpg" alt="Data Flow">
+        <div class="data-flow-img-container">
+          <img class="data-flow-img" src="./images/dataflow.jpg" alt="Data Flow Diagram" />
+        </div>
+      </section>
 
-        <!-- Detailed Budget -->
-        <div class="section-title">
-            <h2 id="detailed-budget">Detailed Budget</h2>
-            <div class="line"></div>
+      <!-- BUDGET SECTION -->
+      <section id="detailed-budget" class="section-budget">
+        <div class="section-header">
+          <h1>BUDGET</h1>
+          <div class="underline"></div>
         </div>
-        <img src="./images/budget.png" alt="Detailed Budget">
+        <div class="budget-img-container">
+          <img class="budget-img" src="./images/budget.png" alt="Budget Breakdown" />
+        </div>
+      </section>
 
-        <!-- Team -->
-        <div class="section-title">
-            <h2 id="team">Team</h2>
-            <div class="line"></div>
+      <!-- TESTING SECTION -->
+      <section id="testing" class="section-testing">
+        <div class="section-header">
+          <h1>TESTING</h1>
+          <div class="underline"></div>
         </div>
-        <div class="team-member"><strong>e20346</strong>: Samarakoon S.M.P.H. <a href="mailto:e20346@eng.pdn.ac.lk">[email]</a></div>
-        <div class="team-member"><strong>e20378</strong>: Siriwardane I.A.U. <a href="mailto:e20378@eng.pdn.ac.lk">[email]</a></div>
-        <div class="team-member"><strong>e20419</strong>: Wakkumbura M.M.S.S. <a href="mailto:e20419@eng.pdn.ac.lk">[email]</a></div>
-        <div class="team-member"><strong>e20439</strong>: Wickramasinghe J.M.W.G.R.L. <a href="mailto:e20439@eng.pdn.ac.lk">[email]</a></div>
+        <div class="testing-content">
+          <div class="testing-card">
+            <i class="ri-test-tube-line ri-3x"></i>
+            <h3>Impact Testing</h3>
+            <p>Reliable impact detection for accurate emergency alerts</p>
+          </div>
+          <div class="testing-card">
+            <i class="ri-user-voice-line ri-3x"></i>
+            <h3>User Feedback</h3>
+            <p>Insights from real-world trials in challenging environments</p>
+          </div>
+          <div class="testing-card">
+            <i class="ri-speed-line ri-3x"></i>
+            <h3>Performance Testing</h3>
+            <p>Ensuring fast response times and sensor accuracy</p>
+          </div>
+          <div class="testing-card">
+            <i class="ri-device-line ri-3x"></i>
+            <h3>Compatibility Testing</h3>
+            <p>Validating functionality across multiple devices and conditions</p>
+          </div>
+        </div>
+      </section>
 
-        <!-- Links -->
-        <div class="section-title">
-            <h2 id="links">Links</h2>
-            <div class="line"></div>
+      <!-- TEAM SECTION -->
+      <section id="team" class="section-team">
+        <div class="team-section-container">
+          <div class="section-header">
+            <h2>TEAM MEMBERS</h2>
+            <div class="underline"></div>
+          </div>
+          <div class="card-container">
+            <div class="team-card">
+              <div class="img-wrapper">
+                <img class="team-img" src="./images/team/e20346.jpg" alt="Samarakoon S.M.P.H." />
+              </div>
+              <p class="name">Samarakoon S.M.P.H.</p>
+              <p class="reg-no">E/20346</p>
+              <a href="mailto:e20346@eng.pdn.ac.lk" class="contact-link">Email</a>
+            </div>
+            <div class="team-card">
+              <div class="img-wrapper">
+                <img class="team-img" src="./images/team/e20378.jpg" alt="Siriwardane I.A.U." />
+              </div>
+              <p class="name">Siriwardane I.A.U.</p>
+              <p class="reg-no">E/20378</p>
+              <a href="mailto:e20378@eng.pdn.ac.lk" class="contact-link">Email</a>
+            </div>
+            <div class="team-card">
+              <div class="img-wrapper">
+                <img class="team-img" src="./images/team/e20419.jpg" alt="Wakkumbura M.M.S.S." />
+              </div>
+              <p class="name">Wakkumbura M.M.S.S.</p>
+              <p class="reg-no">E/20419</p>
+              <a href="mailto:e20419@eng.pdn.ac.lk" class="contact-link">Email</a>
+            </div>
+            <div class="team-card">
+              <div class="img-wrapper">
+                <img class="team-img" src="./images/team/e20439.jpg" alt="Wickramasinghe J.M.W.G.R.L." />
+              </div>
+              <p class="name">Wickramasinghe J.M.W.G.R.L.</p>
+              <p class="reg-no">E/20439</p>
+              <a href="mailto:e20439@eng.pdn.ac.lk" class="contact-link">Email</a>
+            </div>
+          </div>
         </div>
-        <ul class="links">
+      </section>
+
+      <!-- USEFUL LINKS SECTION -->
+      <section id="links" class="section-links">
+        <div class="section-header">
+          <h1>USEFUL LINKS</h1>
+          <div class="underline"></div>
+        </div>
+        <div class="links-container">
+          <ul class="links-list">
             <li><a href="https://github.com/cepdnaclk/{{ page.repository-name }}" target="_blank">Project Repository</a></li>
             <li><a href="https://cepdnaclk.github.io/{{ page.repository-name }}" target="_blank">Project Page</a></li>
             <li><a href="http://www.ce.pdn.ac.lk/" target="_blank">Department of Computer Engineering</a></li>
             <li><a href="https://eng.pdn.ac.lk/" target="_blank">University of Peradeniya</a></li>
-        </ul>
-    </div>
-</body>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER SECTION -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <span>SAFE PLUS</span>
+          <p>Ensuring Safety with Smart Technology</p>
+        </div>
+        <div class="footer-links">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#project-overview">Demo</a></li>
+            <li><a href="#team">Team</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h3>Contact Us</h3>
+          <p><i class="ri-map-pin-line"></i> Department of Computer Engineering, Faculty of Engineering, University of Peradeniya</p>
+          <p><i class="ri-mail-line"></i> safeplus@eng.pdn.ac.lk</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Safe Plus - All Rights Reserved</p>
+      </div>
+    </footer>
+
+    <script src="./javascript/script.js"></script>
+  </body>
 </html>
