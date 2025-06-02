@@ -10,9 +10,10 @@ const HourlyStats = require('./models/HourlyStatModel');
 
 const app = express();
 app.use(cors({
-  origin: 'http://localhost:5173',   
-  credentials: true                 
+  origin: 'http://localhost:5173',
+  credentials: true
 }));
+
 app.use(requestIp.mw());
 app.use(express.json());
 app.use(cookieParser());
@@ -51,6 +52,8 @@ const device = awsIot.device({
 wss.on("connection", (ws) => {
   ws.send(JSON.stringify({ message: "Connected to WebSocket Server" }));
 });
+
+
 
 device.on("connect", () => {
   device.subscribe("helmet/data", (err) => {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Header from "../components/Header/Header";
 import HelmetMap from "../MapComp/HelmetMap";
@@ -8,6 +8,9 @@ export default function LiveData() {
   const [helmetSensorMap, setHelmetSensorMap] = useState({});
   const [helmetLocations, setHelmetLocations] = useState({});
   const [assignedWorkers, setAssignedWorkers] = useState([]);
+  const [selectedHelmetId, setSelectedHelmetId] = useState(null); // For overlay
+
+  const ws = useRef(null);
 
   // Fetch assigned workers
   useEffect(() => {
@@ -21,11 +24,11 @@ export default function LiveData() {
 
   // WebSocket: Listen for real-time helmet data
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8085");
+    ws.current = new WebSocket("ws://localhost:8085");
 
-    ws.onopen = () => console.log("✅ WS connected");
+    ws.current.onopen = () => console.log("✅ WS connected");
 
-    ws.onmessage = (evt) => {
+    ws.current.onmessage = (evt) => {
       try {
         const data = JSON.parse(evt.data);
         console.log("📩 New data:", data);
@@ -48,10 +51,11 @@ export default function LiveData() {
       }
     };
 
-    ws.onclose = () => console.log("❌ WS closed");
+    ws.current.onclose = () => console.log("❌ WS closed");
+
     return () => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.close();
+      if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+        ws.current.close();
       }
     };
   }, []);
@@ -76,6 +80,7 @@ export default function LiveData() {
               key={worker.helmetId}
               worker={worker}
               sensorData={helmetSensorMap[worker.helmetId]}
+              onClick={() => setSelectedHelmetId(worker.helmetId)} 
             />
           ))}
         </div>
