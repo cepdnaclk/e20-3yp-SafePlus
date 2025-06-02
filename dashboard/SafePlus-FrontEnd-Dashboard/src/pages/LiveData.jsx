@@ -3,13 +3,13 @@ import axios from "axios";
 import Header from "../components/Header/Header";
 import HelmetMap from "../MapComp/HelmetMap";
 import WorkerCard from "../components/WorkerCard/WorkerCard";
+import { HighlightProvider } from "../context/HighlightContext"; // import context provider
 
 export default function LiveData() {
   const [helmetSensorMap, setHelmetSensorMap] = useState({});
   const [helmetLocations, setHelmetLocations] = useState({});
   const [assignedWorkers, setAssignedWorkers] = useState([]);
-  const [selectedHelmetId, setSelectedHelmetId] = useState(null); // For overlay
-
+  const [selectedHelmetId, setSelectedHelmetId] = useState(null);
   const ws = useRef(null);
 
   // Fetch assigned workers
@@ -61,41 +61,44 @@ export default function LiveData() {
   }, []);
 
   return (
-    <div>
-      <Header />
-      <div style={{ display: "flex", gap: "1rem", padding: "1rem" }}>
-        {/* Worker Cards */}
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "1rem",
-            overflowY: "auto",
-            maxHeight: "80vh",
-          }}
-        >
-          {assignedWorkers.map((worker) => (
-            <WorkerCard
-              key={worker.helmetId}
-              worker={worker}
-              sensorData={helmetSensorMap[worker.helmetId]}
-              onClick={() => setSelectedHelmetId(worker.helmetId)} 
-            />
-          ))}
-        </div>
+    <HighlightProvider>
+      <div>
+        <Header />
+        <div style={{ display: "flex", gap: "1rem", padding: "1rem" }}>
+          {/* Worker Cards */}
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "1rem",
+              overflowY: "auto",
+              maxHeight: "80vh",
+            }}
+          >
+            {assignedWorkers.map((worker) => (
+              <WorkerCard
+                key={worker.helmetId}
+                worker={worker}
+                sensorData={helmetSensorMap[worker.helmetId]}
+                onClick={() => setSelectedHelmetId(worker.helmetId)}
+                // removed onLocationClick prop as context handles it now
+              />
+            ))}
+          </div>
 
-        {/* Map */}
-        <div
-          style={{
-            flex: 1,
-            borderRadius: "8px",
-            overflow: "hidden",
-          }}
-        >
-          <HelmetMap helmetLocations={helmetLocations} zoom={8} />
+          {/* Map */}
+          <div
+            style={{
+              flex: 1,
+              borderRadius: "8px",
+              overflow: "hidden",
+            }}
+          >
+            <HelmetMap helmetLocations={helmetLocations} zoom={13} />
+          </div>
         </div>
       </div>
-    </div>
+    </HighlightProvider>
   );
 }

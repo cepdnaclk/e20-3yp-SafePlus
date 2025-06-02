@@ -1,9 +1,11 @@
 import { useState, useRef } from "react";
+import { useHighlight } from "../../context/HighlightContext";  // import hook
 import "./WorkerCard.css";
 
 export default function WorkerCard({ worker, sensorData, onClick }) {
   const [showOverlay, setShowOverlay] = useState(false);
   const cardRef = useRef(null);
+  const { setHighlightedId } = useHighlight();
 
   const handleCardClick = () => {
     setShowOverlay(true);
@@ -28,8 +30,19 @@ export default function WorkerCard({ worker, sensorData, onClick }) {
         style={{ cursor: "pointer" }}
       >
         <div className="worker-header">
-          <h3>{worker.name} {worker.id}</h3>
-          <p className="worker-location">📍 Location</p>
+          <h3>
+            {worker.name} {worker.id}
+          </h3>
+          <p
+            className="worker-location"
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log("📍 Location clicked for", worker.id);
+              setHighlightedId(worker.helmetId); // update context state here
+            }}
+          >
+            📍 Location
+          </p>
         </div>
 
         {sensorData ? (
@@ -42,7 +55,11 @@ export default function WorkerCard({ worker, sensorData, onClick }) {
               <img src="/icons/gas.png" alt="Gas" />
               <span>{sensorData.gas > 300 ? "Alert" : "Safe"}</span>
             </div>
-            <div className={`sensor-item ${sensorData.imp === "impact" ? "alert" : ""}`}>
+            <div
+              className={`sensor-item ${
+                sensorData.imp === "impact" ? "alert" : ""
+              }`}
+            >
               <img src="/icons/impact.jpg" alt="Impact" />
               <span>{sensorData.imp === "impact" ? "Alert" : "Safe"}</span>
             </div>
@@ -59,11 +76,19 @@ export default function WorkerCard({ worker, sensorData, onClick }) {
       {showOverlay && (
         <div className="overlay-container">
           <div className="overlay-box">
-            <button className="close-button" onClick={closeOverlay}>✖</button>
+            <button className="close-button" onClick={closeOverlay}>
+              ✖
+            </button>
             <h2>{worker.name}</h2>
-            <p><strong>NIC:</strong> {worker.nic}</p>
-            <p><strong>Impact:</strong> {sensorData?.imp}</p>
-            <p><strong>Gas:</strong> {sensorData?.gas} ppm</p>
+            <p>
+              <strong>NIC:</strong> {worker.nic}
+            </p>
+            <p>
+              <strong>Impact:</strong> {sensorData?.imp}
+            </p>
+            <p>
+              <strong>Gas:</strong> {sensorData?.gas} ppm
+            </p>
           </div>
         </div>
       )}
