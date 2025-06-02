@@ -17,6 +17,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 import { toast } from 'react-hot-toast';
 import '../../styles/Settings.css';
 
@@ -32,6 +33,8 @@ const AdvancedSetting = () => {
     password: '',
   });
 
+  const navigate = useNavigate();
+  
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleChange = (e) => {
@@ -52,7 +55,7 @@ const AdvancedSetting = () => {
 
     try {
       const res = await axios.put(
-        'http://localhost:8000/change-password',
+        '/api/auth//change-password',
         { currentPassword, newPassword },
         { withCredentials: true }
       );
@@ -76,7 +79,7 @@ const AdvancedSetting = () => {
     }
 
     try {
-      const res = await axios.delete('http://localhost:8000/delete-account', {
+      const res = await axios.delete('/api/auth/delete-account', {
         data: { username, password },
         withCredentials: true,
       });
@@ -84,7 +87,7 @@ const AdvancedSetting = () => {
       if (res.status === 200) {
         toast.success('Account deleted');
         localStorage.removeItem('token');
-        window.location.href = '/login'; // or use navigate
+        navigate("/login"); // or use navigate
       }
     } catch (err) {
       console.error(err);
