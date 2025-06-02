@@ -46,15 +46,23 @@ bool checkButtonPress() {
     lastState = currentState;
     return false;
 }
-
 void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print("Message received from AWS topic: ");
     Serial.println(topic);
+
     String message;
-    for (unsigned int i = 0; i < length; i++) message += (char)payload[i];
+    for (unsigned int i = 0; i < length; i++) {
+        message += (char)payload[i];
+    }
+
     Serial.println("Message: " + message);
-    if (message == "ALERT") activateBuzzer();
+
+    if (message == "ALERT") {
+        activateBuzzer();
+    }
+    handleIncomingCommand(message);
 }
+
 
 float readBatteryVoltage() {
     int raw = analogRead(BATTERY_ADC_PIN);
@@ -88,7 +96,7 @@ String collectSensorDataAsJson(bool& buttonPressed, bool& impactDetected) {
 
     if (data.gasPPM > 900) {
         Serial.println("High gas detected! Activating buzzer...");
-        activateBuzzer();
+       // activateBuzzer();
     }
 
     char message[256];
@@ -108,7 +116,7 @@ void publishData() {
 
     unsigned long now = millis();
     if (buttonPressed || impactDetected || (now - lastTimePublish > publishThreshold)) {
-        if (impactDetected) activateBuzzer();
+        if (impactDetected); //activateBuzzer();
         awsPublish(awsTopic, json.c_str());
         lastTimePublish = now;
     }
@@ -152,18 +160,24 @@ void setup() {
     analogReadResolution(12); 
     pinMode(BATTERY_ADC_PIN, INPUT);
 
+    
     wifiInit();
     awsInit();
     initSensors();
+    client.setCallback(callback);
     initHeartRateSensor();
     server.begin();
+    
 }
 
 void loop() {
     wifiLoop();
-    handleNetworkSwitching();
+    //handleNetworkSwitching();
     if (isWiFiConnected()) {
-        if (!awsIsConnected()) awsConnect();
+        if (!awsIsConnected()){
+            awsConnect();
+            client.subscribe("helmet/alert");
+        } 
         client.loop();
         publishData();
     } else if (usingSIM800L) {

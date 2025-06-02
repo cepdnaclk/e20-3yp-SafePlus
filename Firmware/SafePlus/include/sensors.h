@@ -19,5 +19,6 @@ void initSensors();
 SensorData collectSensorData();
 void initHeartRateSensor();
 float getHeartRate();
+void handleIncomingCommand(String payload) ;
 
 #endif

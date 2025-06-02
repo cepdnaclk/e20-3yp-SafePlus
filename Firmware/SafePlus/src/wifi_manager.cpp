@@ -13,7 +13,7 @@ bool wifiConnected = false;
 bool wifiStable = false;
 
 unsigned long wifiConnectStartTime = 0;
-const unsigned long wifiConnectTimeout = 15000; // 15 sec per SSID attempt
+const unsigned long wifiConnectTimeout = 5000; // 5 sec per SSID attempt
 
 int nextIndexToWrite = 0;
 
@@ -69,38 +69,50 @@ void startAP() {
 
 void handleWifiConfig() {
   if (server.method() == HTTP_POST) {
-    StaticJsonDocument<256> doc;
-    DeserializationError error = deserializeJson(doc, server.arg("plain"));
-    if (error) {
-      server.send(400, "application/json", "{\"status\":\"Invalid JSON\"}");
-      return;
+    String ssid;
+    String password;
+
+    // Try parsing as JSON
+    if (server.hasArg("plain")) {
+      StaticJsonDocument<256> doc;
+      DeserializationError error = deserializeJson(doc, server.arg("plain"));
+
+      if (!error) {
+        ssid = doc["ssid"].as<String>();
+        password = doc["password"].as<String>();
+      }
     }
 
-    const char* newSsid = doc["ssid"];
-    const char* newPassword = doc["password"];
+    if (ssid.length() == 0 && server.hasArg("ssid")) {
+      ssid = server.arg("ssid");
+      password = server.arg("password");
+    }
 
-    if (strlen(newSsid) == 0) {
+    if (ssid.length() == 0) {
       server.send(400, "application/json", "{\"status\":\"SSID cannot be empty\"}");
       return;
     }
 
-    addNewCredential(newSsid, newPassword);
+    addNewCredential(ssid.c_str(), password.c_str());
 
     server.send(200, "application/json", "{\"status\":\"OK\"}");
     delay(1000);
     ESP.restart();
   } else {
+    // Serve the HTML form
     server.send(200, "text/html", R"rawliteral(
       <!DOCTYPE html><html><body>
       <h3>Enter WiFi Credentials</h3>
       <form method="POST" action="/wifi">
-      SSID: <input name="ssid"><br>
-      Password: <input name="password"><br>
-      <input type="submit" value="Submit">
+        SSID: <input name="ssid"><br>
+        Password: <input name="password"><br>
+        <input type="submit" value="Submit">
       </form>
-      </body></html>)rawliteral");
+      </body></html>
+    )rawliteral");
   }
 }
+
 
 void tryNextWiFiCredential() {
   if (currentCredentialIndex >= MAX_WIFI_CREDENTIALS) {
@@ -125,7 +137,7 @@ void tryNextWiFiCredential() {
 
 void wifiInit() {
   EEPROM.begin(EEPROM_SIZE);
-  // clearEEPROM();
+  //clearEEPROM();
   readCredentialsFromEEPROM();
   pinMode(WIFI_LED_PIN, OUTPUT);
   startAP();
