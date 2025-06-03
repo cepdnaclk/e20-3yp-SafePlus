@@ -11,6 +11,7 @@ router.get('/', (req, res) => {
 router.get('/:helmetId', async (req, res) => {
   console.log('📥 Fetching hourly stats for helmet:', req.params.helmetId);
   const { helmetId } = req.params;
+  console.log('Helmet ID:', helmetId);
   try {
     const stats = await HourlyStats.find({ helmetId })
       .sort({ hourWindowStart: -1 })

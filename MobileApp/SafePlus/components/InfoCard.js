@@ -1,40 +1,36 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 
-export default function InfoCard({ title, children, isSafe = true, colors }) {
-  const borderColor = isSafe ? '#80e27e' : '#ef5350'; // green or red
-
+export default function InfoCard({ title, children }) {
   return (
-    <View style={[styles.outerBorder, { borderColor }]}>
-      <LinearGradient colors={colors} style={styles.card}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.text}>{children}</Text>
-      </LinearGradient>
+    <View style={styles.card}>
+      <Text style={styles.title}>{title}</Text>
+      <View style={styles.content}>{children}</View> {/* NEW: wrap children in a View */}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  outerBorder: {
-    borderWidth: 3,
-    borderRadius: 16,
-    marginVertical: 12,
-    padding: 2,
-  },
   card: {
-    borderRadius: 12,
-    padding: 15,
+    backgroundColor: 'white',
+    marginHorizontal: 16,
+    borderRadius: 16,
+    padding: 16,
+    marginVertical: 10,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
     color: '#333',
+    textAlign: 'center',
   },
-  text: {
-    fontSize: 14,
-    color: '#555',
+  content: {
+    // Optional padding or alignment
   },
 });

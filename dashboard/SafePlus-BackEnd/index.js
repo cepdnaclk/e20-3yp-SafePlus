@@ -22,9 +22,9 @@ mongoose.connect(process.env.MONGO_URL)
 
 // ✅ Routes
 app.use('/', require('./routes/authRoutes'));
-app.use('/api/mobile/data', require('./routes/mobileData'));
+//app.use('/api/mobile/data', require('./routes/MobileData'));
 app.use('/api/workers', require('./routes/workerRoutes'));
-app.use('/api/workers/hourly-stats', require('./routes/mobileData'));
+app.use('/api/workers/hourly-stats', require('./routes/MobileData'));
 
 // ✅ Start HTTP Server
 const port = 8000;
@@ -49,10 +49,24 @@ wss.on("connection", (ws) => {
 });
 
 device.on("connect", () => {
+    console.log("✅ Connected to AWS IoT");
   device.subscribe("helmet/data", (err) => {
-    if (err) console.error("❌ AWS subscription error:", err);
+    if (err) {console.error("❌ AWS subscription error:", err);}
+    else {console.log("✅ Subscribed to helmet/data topic");}
   });
 });
+device.on("error", (error) => {
+  console.error("❌ AWS IoT error:", error);
+}
+);
+device.on("close", () => {
+  console.log("❌ AWS IoT connection closed");
+});
+device.on("offline", () => {
+  console.log("❌ AWS IoT device is offline");
+});
+device.on("reconnect", () => {
+  console.log("✅ AWS IoT device reconnected");});
 
 device.on("message", (topic, payload) => {
   const data = JSON.parse(payload.toString());
