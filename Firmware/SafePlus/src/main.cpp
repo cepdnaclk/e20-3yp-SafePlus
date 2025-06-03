@@ -1,140 +1,292 @@
-
-#include "aws_mqtt.h"
 #include "sensors.h"
 #include <ArduinoJson.h>
-#define BUZZER_PIN 5
-#define BUTTON_PIN 33
+#include <Wire.h>
+#include "wifi_manager.h"
+#include "aws_manager.h"
+#include "fall_detection.h"
+#include "sim800l_manager.h"
 
-// AWS MQTT Setup
+GyroHistory gyroHistory;
+AccelHistory accHistory;
+
+// ------------------------ Pin Definitions ------------------------
+#define BUZZER_PIN 13
+#define BUTTON_PIN 32
+#define MQ2_POWER_PIN 27
+#define SIM800L_PIN 26
+#define BATTERY_ADC_PIN 35 
+
+// ------------------------ Constants & Globals ---------------------
 const char* awsTopic = "helmet/data";
-unsigned long lastTimepublish = 0;
-unsigned long publishtimeThreshold = 2000;
+const char* helmetID = "Helmet_1";
+unsigned long lastTimePublish = 0;
+unsigned long publishThreshold = 2000;
+bool usingSIM800L = false;
+const float MAX_BATTERY_VOLTAGE = 4.2;
+const float MIN_BATTERY_VOLTAGE = 3.0;
+const float VOLTAGE_DIVIDER_RATIO = 2.0;
 
+// ------------------------ Utility Functions -----------------------
 void activateBuzzer() {
-  Serial.println("BUZZER ON!");
-  digitalWrite(BUZZER_PIN, HIGH);  
-  delay(1000);                     
-  digitalWrite(BUZZER_PIN, LOW);   
+    Serial.println("BUZZER ON!");
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(1000);
+    digitalWrite(BUZZER_PIN, LOW);
 }
+void sosPattern() {
+  // S: dot-dot-dot
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(200);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(200);
+  }
+  delay(400);
+  // O: dash-dash-dash
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(600);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(200);
+  }
+  delay(400);
+  // S: dot-dot-dot
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(200);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(200);
+  }
+}
+
+void gasAlertPattern() {
+  for (int i = 0; i < 10; i++) {  // Beep 10 times quickly
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(100);  // short beep
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(100);  // short pause
+  }
+
+  delay(1000); // pause before repeating (optional)
+}
+
+
+void doubleBeep() {
+  for (int i = 0; i < 5; i++) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(150);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(150);
+  }
+}
+
+
+
 bool checkButtonPress() {
-    static bool lastButtonState = HIGH;
-    bool buttonState = digitalRead(BUTTON_PIN);
+    static bool lastState = HIGH;
+    static bool latched = false;
+    static unsigned long latchStartTime = 0;
 
-    if (buttonState == LOW && lastButtonState == HIGH) {  // Detect button press
-        Serial.println("Button Pressed! Sending message...");
-        activateBuzzer();  
-        // Create JSON message
-        StaticJsonDocument<100> doc;
-        doc["button_pushed"] = true;
+    bool currentState = digitalRead(BUTTON_PIN);
 
-        char message[100];
-        serializeJson(doc, message);
+    // Button just pressed
+    if (currentState == LOW && lastState == HIGH) {
+        activateBuzzer();
+        Serial.println("Button Pressed! Starting 10s latch...");
+        latchStartTime = millis();
+        latched = true;
+    }
+
+    // Handle latch duration
+    if (latched && (millis() - latchStartTime < 10000)) {
+        lastState = currentState;
         return true;
     }
 
-    lastButtonState = buttonState;  // Update last state
+    // Latch expired
+    latched = false;
+    lastState = currentState;
     return false;
 }
+
 void callback(char* topic, byte* payload, unsigned int length) {
-    Serial.print("Message received from AWS on topic: ");
+    Serial.print("Message received from AWS topic: ");
     Serial.println(topic);
-    
+
     // Convert payload to string
     String message;
     for (unsigned int i = 0; i < length; i++) {
         message += (char)payload[i];
     }
+
     Serial.println("Message: " + message);
-    StaticJsonDocument<256> doc;
-    const char* aws_message = doc["message"];
-    Serial.println(" aws message: " + String(aws_message));
 
-    // Check if the message is "ALERT" to turn on the buzzer
-    if (message == "ALERT") {
-        activateBuzzer();
+    // Parse JSON
+    StaticJsonDocument<200> doc;
+    DeserializationError error = deserializeJson(doc, message);
+
+    if (error) {
+        Serial.print("deserializeJson() failed: ");
+        Serial.println(error.c_str());
+        return;
     }
+
+    // Check if alert field is present and equals "ALERT"
+    const char* alert = doc["alert"];
+    if (alert && String(alert) == "ALERT") {
+        sosPattern();
+    }
+
+    // Optionally handle other incoming commands
+    handleIncomingCommand(message);
 }
 
-void setup() {
-    Serial.begin(115200);
-    Serial.println("ESP32 Starting...");
-    initSensors();
-     pinMode(BUZZER_PIN,OUTPUT);
-     digitalWrite(BUZZER_PIN,LOW);
-    pinMode(BUTTON_PIN, INPUT_PULLUP);
-    initAWS();
-    client.setCallback(callback);  // Set AWS IoT message callback
-    client.subscribe("helmet/message"); 
+float readBatteryVoltage() {
+    int raw = analogRead(BATTERY_ADC_PIN);
+    float voltage = (raw / 4095.0) * 3.3;             // ADC to volts (based on 3.3V ref)
+    return voltage * VOLTAGE_DIVIDER_RATIO;          // Scale up due to voltage divider
+}
+
+int getBatteryPercentage() {
+    float voltage = readBatteryVoltage();
+    voltage = constrain(voltage, MIN_BATTERY_VOLTAGE, MAX_BATTERY_VOLTAGE);
+    int percentage = (int)(((voltage - MIN_BATTERY_VOLTAGE) /
+                            (MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE)) * 100.0);
+    return constrain(percentage, 0, 100);
 }
 
 
-void publishData() {
+// ------------------------ Data Collection & Publishing -----------------------
+String collectSensorDataAsJson(bool& buttonPressed, bool& impactDetected,bool& fallDetected, bool& gasDetected) {
     SensorData data = collectSensorData();
-    bool buttonPressed = checkButtonPress();
+    float bpm = HeartRateFromIR(); // Use the fake heart rate estimation
+    int battery = getBatteryPercentage();
 
-    float accX = data.ax / 16384.0;  
-    float accY = data.ay / 16384.0;
-    float accZ = data.az / 16384.0;
+    float accX = data.ax / 16384.0, accY = data.ay / 16384.0, accZ = data.az / 16384.0;
+    float gyroX = data.gx / 131.0, gyroY = data.gy / 131.0, gyroZ = data.gz / 131.0;
 
-    float gyroX = data.gx / 131.0;   
-    float gyroY = data.gy / 131.0;
-    float gyroZ = data.gz / 131.0;
+    float accMag = sqrt(accX * accX + accY * accY + accZ * accZ);
+    float gyroMag = sqrt(gyroX * gyroX + gyroY * gyroY + gyroZ * gyroZ);
 
-    float accMagnitude = sqrt(accX * accX + accY * accY + accZ * accZ);
-    float gyroMagnitude = sqrt(gyroX * gyroX + gyroY * gyroY + gyroZ * gyroZ);
+    fallDetected = detectFall(data, gyroHistory, accHistory);
+    buttonPressed = checkButtonPress();
+    String gasType = data.gasType;
+    Serial.print("Gas Type: ");
+    Serial.println(gasType);
+    gasDetected = !(gasType == "Safe" || gasType == "Warming" || gasType == "No Motion");
 
-    bool impactDetected = (accMagnitude > 2.0 || gyroMagnitude > 200.0);
+    String impactType = detectImpactWithH3LIS(data.h3lis_ax, data.h3lis_ay, data.h3lis_az);
+    impactDetected = (impactType != "no");
 
-    float bpm = (data.irValue < 50000) ? 0 : data.irValue / 1000.0;
+
 
     char message[256];
     snprintf(message, sizeof(message),
-        "{\"temperature\": %.2f, \"humidity\": %.2f, \"acc_magnitude\": %.2f, \"gyro_magnitude\": %.2f, \"heart_rate\": %.2f, \"location\": {\"lat\": %.6f, \"lng\": %.6f}, \"gasvalues\": %.2f, \"button\": %s, \"impact\": \"%s\"}",
-        data.temperature, data.humidity, accMagnitude, gyroMagnitude, bpm, data.latitude, data.longitude, data.gasPPM,
-        buttonPressed ? "true" : "false", impactDetected ? "impact" : "no impact");
+        "{\"id\":\"%s\",\"temp\":%.1f,\"hum\":%.1f,\"acc\":%.2f,\"gyr\":%.2f,\"bpm\":%.1f,\"loc\":[%.6f,%.6f],\"gas\":%.1f,\"typ\":\"%s\",\"btn\":%s,\"imp\":\"%s\",\"fall\":%s,\"floor\":%d,\"alt\":%.1f}",
+        helmetID, data.temperature, data.humidity, accMag, gyroMag, bpm,
+        data.latitude, data.longitude, data.gasPPM,data.gasType.c_str(),
+        buttonPressed ? "true" : "false", impactType.c_str(),
+        fallDetected ? "true" : "false",
+        data.floorLevel, data.altitude);
 
-    // High gas detection logic
-    if (data.gasPPM > 900) {  // Adjust threshold based on testing
-        Serial.println("High gas detected! Activating buzzer...");
-        activateBuzzer();
-    }
+    return String(message);
+}
 
-    // ** Publish Data to AWS IoT **
-    unsigned publishnow = millis();
-    if (buttonPressed||impactDetected)
-    {
-        if (impactDetected)
-        {
-            activateBuzzer();
+
+
+void publishData() {
+    bool buttonPressed = false, impactDetected = false, fallDetected = false ,gasDetected = false;
+    String json = collectSensorDataAsJson(buttonPressed, impactDetected, fallDetected , gasDetected);
+
+
+    unsigned long now = millis();
+    if (buttonPressed || impactDetected || fallDetected || (now - lastTimePublish > publishThreshold)|| gasDetected) {
+        Serial.println("Publishing data to AWS...");
+        if (gasDetected) {
+            Serial.println("Gas detected! Activating buzzer...");
+            gasAlertPattern();
         }
+
+        if (buttonPressed) {
+            Serial.println("Button pressed! Activating buzzer...");
+          
+        }
+        if (impactDetected); //activateBuzzer();
+        awsPublish(awsTopic, json.c_str());
+        lastTimePublish = now;
         
-        publishMessage(awsTopic, message);
-        lastTimepublish = publishnow;
     }
-    else {
-        if (publishnow - lastTimepublish > publishtimeThreshold) {
-            publishMessage(awsTopic, message);
-            lastTimepublish = publishnow;
+}
+
+// ------------------------ Network Switching -----------------------
+void handleNetworkSwitching() {
+    static unsigned long lastCheck = 0;
+    if (millis() - lastCheck < 5000) return;
+    lastCheck = millis();
+
+    if (isWiFiConnected()) {
+        if (usingSIM800L) {
+            sim800PowerOff();
+            usingSIM800L = false;
+            Serial.println("WiFi restored. Switched back to WiFi + MQTT.");
+        }
+    } else {
+        if (!usingSIM800L) {
+            Serial.println("WiFi lost. Switching to SIM800L.");
+            sim800PowerOn();
+            delay(3000);
+            sim800Init();
+            usingSIM800L = true;
         }
     }
 }
 
+// ------------------------ Setup & Loop -----------------------
+void setup() {
+    Serial.begin(115200);
+    Serial.println("ESP32 Starting...");
+
+    pinMode(BUZZER_PIN, OUTPUT);
+    pinMode(BUTTON_PIN, INPUT_PULLUP);
+    pinMode(MQ2_POWER_PIN, OUTPUT);
+    pinMode(SIM800L_PIN, OUTPUT);
+    digitalWrite(BUZZER_PIN, LOW);
+    digitalWrite(MQ2_POWER_PIN, LOW);
+    digitalWrite(SIM800L_PIN, HIGH);
+    analogReadResolution(12); 
+    pinMode(BATTERY_ADC_PIN, INPUT);
+
+    
+    wifiInit();
+    awsInit();
+    initSensors();
+    client.setCallback(callback);
+    initHeartRateSensor();
+    server.begin();
+    
+}
 
 void loop() {
-    if (!client.connected()) {
-        connectAWS();
-        client.subscribe("helemt/message");
+    wifiLoop();
+    //handleNetworkSwitching();
+    if (isWiFiConnected()) {
+        if (!awsIsConnected()){
+            awsConnect();
+            client.subscribe("helmet/alert");
+        } 
+        client.loop();
+        publishData();
+    } else if (usingSIM800L) {
+        bool btn = false, impact = false, fall = false, gas = false;
+        String payload = collectSensorDataAsJson(btn, impact, fall, gas);
+        sendDataToLambda(payload);  // SIM800L HTTP POST
     }
-    client.loop();
-    publishData();
-    
-    if(Serial.available()>0){
-      String input = Serial.readStringUntil('\n');
-      input.trim();
-      if (input == "ALERT"){
-        activateBuzzer();
-      }
-    }
-    delay(100);
-}
 
+    if (Serial.available() > 0) {
+        String input = Serial.readStringUntil('\n');
+        input.trim();
+        if (input == "ALERT") sosPattern();
+    }
+
+    delay(10);  // Smooth loop
+}
