@@ -139,17 +139,12 @@ const verify2FA = async (req, res) => {
     if (!user.is2FAEnabled || !user.twoFASecret) {
       return res.status(400).json({ error: "2FA not enabled for this user" });
     }
-    console.log("2FA secret in DB:", user.twoFASecret);
 
     const expectedCode = speakeasy.totp({
       secret: user.twoFASecret,
       encoding: "base32",
     });
-    console.log("Expected TOTP:", expectedCode);
-    console.log("User Entered TOTP:", totpCode);
-
-    console.log("Checking TOTP:", totpCode.trim(), "Secret:", user.twoFASecret);
-
+    
 
     // ✅ Verify TOTP code
     const isValid = speakeasy.totp.verify({
