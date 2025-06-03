@@ -26,7 +26,7 @@ mongoose.connect(process.env.MONGO_URL)
 // Routes
 
 app.use('/api/user', require('./routes/twoFactorRoutes'));
-app.use('/', require('./routes/authRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/workers', require('./routes/workerRoutes'));
 app.use('/api/workers/hourly-stats', require('./routes/MobileData'));
 
