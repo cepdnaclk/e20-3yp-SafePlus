@@ -14,7 +14,7 @@ import Settings from "./pages/Settings";
 import { NotificationProvider } from "./context/NotificationContext";
 
 
-axios.defaults.baseURL =  'http://localhost:8000'
+axios.defaults.baseURL =  'https://e20-3yp-safeplus.onrender.com'
 axios.defaults.withCredentials= true
 
 const App = () => {
