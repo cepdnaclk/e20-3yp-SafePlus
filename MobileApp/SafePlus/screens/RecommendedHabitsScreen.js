@@ -23,7 +23,7 @@ export default function RecommendedHabitsScreen() {
     <SafeAreaView style={styles.safeArea}>
     <ScrollView contentContainerStyle={stylesNotification.content}>
       {notifications.length === 0 ? (
-        <InfoCard title="No Notifications" colors={['#e0e0e0', '#f5f5f5']} isSafe={true}>
+        <InfoCard title="No Notifications"  isSafe={true}>
           <Text>No new notifications for today.</Text>
         </InfoCard>
       ) : (
@@ -31,10 +31,12 @@ export default function RecommendedHabitsScreen() {
           <InfoCard
             key={idx}
             title="Notification"
-            colors={n.type === 'impact' ? ['#ffe0e0', '#ffcccc'] : ['#fffbe0', '#fff7cc']}
-            isSafe={n.type !== 'impact'}
+            colors={n.type === 'impact' || n.type =='emergency'? ['#ffe0e0', '#ffcccc'] : ['#fffbe0', '#fff7cc']}
+            isSafe={n.type !== 'impact'&& n.type !== 'emergency'}
           >
-            <Text style={{ color: n.type === 'impact' ? 'red' : undefined }}>{n.message}</Text>
+            <Text>{n.message}</Text>
+            <View style={{ height: 12 }} /> {/* Spacer */}
+
             <Button title="Delete" color="#b71c1c" onPress={() => deleteNotification(n.id)} />
 
           </InfoCard>

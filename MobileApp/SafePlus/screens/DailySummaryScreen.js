@@ -11,8 +11,9 @@ function getDateString(date) {
 
 export default function DailySummaryScreen() {
   const { user, hourlyStats } = React.useContext(UserContext);
-
-  // Get today's and yesterday's date strings
+  console.log('user.helmetID:', user?.helmetID);
+  console.log('hourlyStats helmetIds:', hourlyStats.map(d => d.helmetId));  // Get today's and yesterday's date strings
+  console.log('hourlyStats:', hourlyStats);
   const today = new Date();
   const todayStr = getDateString(today);
   const yesterday = new Date(today);
@@ -21,10 +22,12 @@ export default function DailySummaryScreen() {
 
   // Filter stats for today and yesterday
   const todayStats = hourlyStats.filter(
-    d => d.hourWindowStart && d.hourWindowStart.split('T')[0] === todayStr
+    d => d.hourWindowStart && d.hourWindowStart.split('T')[0] === todayStr&&
+    d.helmetId === user?.helmetID
   );
   const yesterdayStats = hourlyStats.filter(
-    d => d.hourWindowStart && d.hourWindowStart.split('T')[0] === yesterdayStr
+    d => d.hourWindowStart && d.hourWindowStart.split('T')[0] === yesterdayStr&&
+    d.helmetId === user?.helmetID
   );
 
   // Helper to calculate summary
@@ -42,65 +45,65 @@ export default function DailySummaryScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content}>
-        <InfoCard title="Today's Summary" colors={['#e0ffe0', '#ccffcc']} isSafe={true}>
+        <InfoCard title="Today's Summary"  isSafe={true}>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>📅 Date: </Text>
-            {todayStr}
+            <Text>{todayStr}</Text>
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>🪖 Helmet ID: </Text>
-            {user?.helmetID || 'Not assigned'}
+            <Text>{user?.helmetID || 'Not assigned'}</Text>
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>⏰ Working Hours: </Text>
-            {todaySummary.workingHours} hours
+            <Text>{todaySummary.workingHours} hours</Text>
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>⚠️ Emergencies: </Text>
-            {todaySummary.totalImpact > 0 ? 'Yes' : 'No'}
+            <Text>{todaySummary.totalImpact > 0 ? 'Yes' : 'No'}</Text>
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>🪖 Head Impacts: </Text>
-            {todaySummary.totalImpact}
+            <Text>{todaySummary.totalImpact}</Text>
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>💨 Gas Alerts: </Text>
-            {todaySummary.totalGas}
+            <Text>{todaySummary.totalGas}</Text>
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>🚑 Medical Situations: </Text>
-            {todaySummary.totalMedicalSituations}
+            <Text>{todaySummary.totalMedicalSituations}</Text>
           </Text>
         </InfoCard>
 
-        <InfoCard title="Yesterday's Summary" colors={['#e3f2fd', '#bbdefb']} isSafe={true}>
+        <InfoCard title="Yesterday's Summary" colors={['#fef6e4']} isSafe={true}>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>📅 Date: </Text>
-            {yesterdayStr}
+            <Text>{yesterdayStr}</Text>
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>🪖 Helmet ID: </Text>
-            {user?.helmetID || 'Not assigned'}
+            <Text>{user?.helmetID || 'Not assigned'}</Text>
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>⏰ Working Hours: </Text>
-            {yesterdaySummary.workingHours} hours
+            <Text>{yesterdaySummary.workingHours} hours</Text>
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>⚠️ Emergencies: </Text>
-            {yesterdaySummary.totalImpact > 0 ? 'Yes' : 'No'}
+            <Text>{yesterdaySummary.totalImpact > 0 ? 'Yes' : 'No'}</Text>
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>🪖 Head Impacts: </Text>
-            {yesterdaySummary.totalImpact}
+            <Text>{yesterdaySummary.totalImpact}</Text>
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>💨 Gas Alerts: </Text>
-            {yesterdaySummary.totalGas}
+            <Text>{yesterdaySummary.totalGas}</Text>
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>🚑 Medical Situations: </Text>
-            {yesterdaySummary.totalMedicalSituations}
+            <Text>{yesterdaySummary.totalMedicalSituations}</Text>
           </Text>
         </InfoCard>
       </ScrollView>
