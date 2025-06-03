@@ -1,5 +1,5 @@
 
-const BASE_URL = 'http://192.168.8.161:8000/api/workers'; // replace with your IP
+const BASE_URL = 'http://10.40.19.196:8000/api/workers'; // replace with your IP
 
 
 
@@ -53,7 +53,10 @@ export const changePassword = async ({ userId, newPassword }) => {
 
 // Fetch helmet data in hourly for the mobile app
 export const fetchHourlyStats = async (helmetId) => {
-  helmetId = "Helmet_1"; 
+  //helmetId = "Helmet_1";
+ // console.log('helmetID :', ) 
+ helmetId = helmetId || "Helmet_1"; // Default to Helmet_1 if no ID is provided
+  console.log('Fetching hourly stats for helmet ID:', helmetId);
   try {
     console.log('Fetching hourly stats for helmet ID:', helmetId);
     const response = await fetch(`${BASE_URL}/hourly-stats/${helmetId}`);
@@ -64,3 +67,7 @@ export const fetchHourlyStats = async (helmetId) => {
     throw error;
   }
 };
+
+import axios from 'axios';
+
+

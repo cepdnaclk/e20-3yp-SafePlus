@@ -147,7 +147,8 @@ const loginWorker = async (req, res) => {
       userId: worker._id,
       username: worker.name,
       email: worker.email,
-      mustChangePassword: worker.mustChangePassword || false
+      mustChangePassword: worker.mustChangePassword || false,
+      helmetID : worker.helmetId || null
     });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
