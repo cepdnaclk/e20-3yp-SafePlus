@@ -27,7 +27,7 @@ export const UserProvider = ({ children }) => {
     const today = new Date().toISOString().split('T')[0];
     let high = 0, moderate = 0, impact = 0;
     hourlyStats.forEach(e => {
-      if (e.hourWindowStart?.split('T')[0] === today) {
+      if (e.hourWindowStart?.split('T')[0] === today&&e.helmetId === user?.helmetID) {
         const tempF = (e.avgTemp * 9) / 5 + 32;
         const hi =
           -42.379 + 2.04901523 * tempF + 10.14333127 * e.avgHum
@@ -56,14 +56,18 @@ export const UserProvider = ({ children }) => {
       });
     }
     if (impact > 0) {
-      newNotifications.push({
-        id: 'impact',
-        message: `🚑 Severe head impact detected! Please seek medical attention immediately.`
-      });
+  newNotifications.push({
+    id: 'impact',
+    type: 'emergency', // you can use this in your UI for styling
+    message: `🚨 SEVERE HEAD IMPACT DETECTED! 🚨\n\nYou may be at risk of concussion or other serious injury. 
+    Symptoms can include dizziness, headache, confusion, nausea, or loss of consciousness. 
+    Please seek immediate medical attention and do not continue working until cleared by a professional.`
+  });
+
     }
     setNotifications(newNotifications);
     setUnread(newNotifications.length > 0); // Mark as unread if there are notifications
-  }, [hourlyStats]);
+  }, [hourlyStats, user?.helmetID]);
 
   // Function to mark notifications as read
   const markNotificationsRead = () => setUnread(false);
