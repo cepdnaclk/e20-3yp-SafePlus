@@ -15,7 +15,7 @@ const helmetDataSchema = new mongoose.Schema({
   gas: { type: Number, required: true },
   typ: { type: String, required: true },
   btn: { type: String, required: true },
-
+  fall: {type: String, required: true },
   imp: { type: String, required: true }, 
 });
 

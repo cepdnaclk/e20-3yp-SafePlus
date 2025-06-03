@@ -4,7 +4,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 16px 20px;
   width: 200px;
-  height: 250px ;
+  height: 325px ;
   font-family: 'Segoe UI', sans-serif;
   color: #333;
   transition: transform 0.2s ease;
@@ -136,4 +136,21 @@
   background-color: #f5c6cb;
 }
 
+.sos-button {
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: red;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  color: white;
+  font-weight: bold;
+  transition: background 0.2s; 
+}
+
+.sos-button:hover {
+  background-color: darkred;
+}
 
