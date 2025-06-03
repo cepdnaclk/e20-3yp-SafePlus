@@ -7,7 +7,8 @@ const { registerWorker, deleteWorker, getAllWorkers , assignHelmet, getWorkersWi
 router.use(
   cors({
     origin: true, // Allows any origin temporarily
-    credentials: true,
+    credentials: true,// or your mobile app's origin if needed
+
   })
 );
 
