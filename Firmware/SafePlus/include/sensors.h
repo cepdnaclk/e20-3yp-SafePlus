@@ -21,5 +21,6 @@ SensorData collectSensorData();
 void initHeartRateSensor();
 float getHeartRate();
 void handleIncomingCommand(String payload) ;
+float HeartRateFromIR() ;
 
 #endif

@@ -145,6 +145,25 @@ float getHeartRate() {
     return beatAvg;
 }
 
+// Fake heart rate estimation based on IR value
+// Returns a value between 60 and 100 bpm
+float HeartRateFromIR() {
+    long irValue = particleSensor.getIR();
+    Serial.print("IR Value: ");
+    Serial.println(irValue);
+    if (irValue < 50000) return 0; // No finger detected
+    // Map IR value (50000–100000) to heart rate (60–100 bpm)
+
+    float minIR = 60000.0;
+    float maxIR = 100000.0;
+    int  minHR = 60.0;
+    int  maxHR = 100.0;
+
+    irValue = constrain(irValue, minIR, maxIR);
+    int bpm = minHR + (maxHR - minHR) * ((irValue - minIR) / (maxIR - minIR));
+    return bpm;
+}
+
 void saveH3lisCalibration() {
     Preferences prefs;
     prefs.begin("h3lis_cal", false);

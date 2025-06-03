@@ -59,6 +59,18 @@ void sosPattern() {
   }
 }
 
+void gasAlertPattern() {
+  for (int i = 0; i < 10; i++) {  // Beep 10 times quickly
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(100);  // short beep
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(100);  // short pause
+  }
+
+  delay(1000); // pause before repeating (optional)
+}
+
+
 void doubleBeep() {
   for (int i = 0; i < 5; i++) {
     digitalWrite(BUZZER_PIN, HIGH);
@@ -79,6 +91,7 @@ bool checkButtonPress() {
 
     // Button just pressed
     if (currentState == LOW && lastState == HIGH) {
+        activateBuzzer();
         Serial.println("Button Pressed! Starting 10s latch...");
         latchStartTime = millis();
         latched = true;
@@ -100,6 +113,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print("Message received from AWS topic: ");
     Serial.println(topic);
 
+    // Convert payload to string
     String message;
     for (unsigned int i = 0; i < length; i++) {
         message += (char)payload[i];
@@ -107,12 +121,25 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
     Serial.println("Message: " + message);
 
-    if (message == "ALERT") {
+    // Parse JSON
+    StaticJsonDocument<200> doc;
+    DeserializationError error = deserializeJson(doc, message);
+
+    if (error) {
+        Serial.print("deserializeJson() failed: ");
+        Serial.println(error.c_str());
+        return;
+    }
+
+    // Check if alert field is present and equals "ALERT"
+    const char* alert = doc["alert"];
+    if (alert && String(alert) == "ALERT") {
         sosPattern();
     }
+
+    // Optionally handle other incoming commands
     handleIncomingCommand(message);
 }
-
 
 float readBatteryVoltage() {
     int raw = analogRead(BATTERY_ADC_PIN);
@@ -130,9 +157,9 @@ int getBatteryPercentage() {
 
 
 // ------------------------ Data Collection & Publishing -----------------------
-String collectSensorDataAsJson(bool& buttonPressed, bool& impactDetected,bool& fallDetected) {
+String collectSensorDataAsJson(bool& buttonPressed, bool& impactDetected,bool& fallDetected, bool& gasDetected) {
     SensorData data = collectSensorData();
-    float bpm = getHeartRate();
+    float bpm = HeartRateFromIR(); // Use the fake heart rate estimation
     int battery = getBatteryPercentage();
 
     float accX = data.ax / 16384.0, accY = data.ay / 16384.0, accZ = data.az / 16384.0;
@@ -144,6 +171,9 @@ String collectSensorDataAsJson(bool& buttonPressed, bool& impactDetected,bool& f
     fallDetected = detectFall(data, gyroHistory, accHistory);
     buttonPressed = checkButtonPress();
     String gasType = data.gasType;
+    Serial.print("Gas Type: ");
+    Serial.println(gasType);
+    gasDetected = !(gasType == "Safe" || gasType == "Warming" || gasType == "No Motion");
 
     String impactType = detectImpactWithH3LIS(data.h3lis_ax, data.h3lis_ay, data.h3lis_az);
     impactDetected = (impactType != "no");
@@ -165,15 +195,18 @@ String collectSensorDataAsJson(bool& buttonPressed, bool& impactDetected,bool& f
 
 
 void publishData() {
-    bool buttonPressed = false, impactDetected = false, fallDetected = false;
-    String json = collectSensorDataAsJson(buttonPressed, impactDetected, fallDetected);
+    bool buttonPressed = false, impactDetected = false, fallDetected = false ,gasDetected = false;
+    String json = collectSensorDataAsJson(buttonPressed, impactDetected, fallDetected , gasDetected);
 
 
     unsigned long now = millis();
-    if (buttonPressed || impactDetected || fallDetected || (now - lastTimePublish > publishThreshold)) {
+    if (buttonPressed || impactDetected || fallDetected || (now - lastTimePublish > publishThreshold)|| gasDetected) {
         Serial.println("Publishing data to AWS...");
-        Serial.println(impactDetected ? "Impact detected!" : "No impact detected.");
-        Serial.println(fallDetected ? "Fall detected!" : "No fall detected.");
+        if (gasDetected) {
+            Serial.println("Gas detected! Activating buzzer...");
+            gasAlertPattern();
+        }
+
         if (buttonPressed) {
             Serial.println("Button pressed! Activating buzzer...");
           
@@ -244,8 +277,8 @@ void loop() {
         client.loop();
         publishData();
     } else if (usingSIM800L) {
-        bool btn = false, impact = false, fall = false;
-        String payload = collectSensorDataAsJson(btn, impact, fall);
+        bool btn = false, impact = false, fall = false, gas = false;
+        String payload = collectSensorDataAsJson(btn, impact, fall, gas);
         sendDataToLambda(payload);  // SIM800L HTTP POST
     }
 

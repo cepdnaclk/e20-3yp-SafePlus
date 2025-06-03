@@ -85,7 +85,7 @@ bool detectFall(const SensorData& data, GyroHistory& gyroHist, AccelHistory& acc
     
 
     // Return true only if strong evidence
-    return (votes >= 5);  // must satisfy at least 5/8 features
+    return (votes >= 4);  // must satisfy at least 5/8 features
 }
 
 String detectImpactWithH3LIS(float ax, float ay, float az) {
@@ -93,9 +93,9 @@ String detectImpactWithH3LIS(float ax, float ay, float az) {
 
     if (magnitude >= 8.0) {
         return "severe";
-    } else if (magnitude >= 4.0) {
+    } else if (magnitude >= 5.0) {
         return "moderate";
-    } else if (magnitude >= 2.0) {
+    } else if (magnitude >= 3.0) {
         return "mild";
     } else {
         return "no";
