@@ -37,7 +37,6 @@ app.listen(port, () => {
   console.log(`✅ Server is running on port ${port}`);
 });
 
-// WebSocket Setup
 const wss = new WebSocket.Server({ port: 8085 });
 
 // AWS IoT Setup
@@ -75,6 +74,10 @@ device.on("offline", () => {
 device.on("reconnect", () => {
   console.log("✅ AWS IoT device reconnected");});
 
+device.on('error', function (error) {
+  console.error('❌ AWS IoT error occurred:', error);
+});
+
 device.on("message", (topic, payload) => {
   const data = JSON.parse(payload.toString());
   const now = new Date();
@@ -91,7 +94,7 @@ device.on("message", (topic, payload) => {
 
   HourlyStats.findOne({ helmetId }).sort({ hourWindowStart: -1 })
     .then(lastStats => {
-      const isImpact = data.imp === "yes";
+      const isImpact = data.imp === "impact";
       const isGasAlert = data.gas > 300;
       const tempVal = Number(data.temp);
       const humVal = Number(data.hum);
