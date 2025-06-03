@@ -12,6 +12,7 @@ typedef struct {
     float gasPPM;
     float altitude;
     int floorLevel;
+    String gasType;
 
 } SensorData;
 

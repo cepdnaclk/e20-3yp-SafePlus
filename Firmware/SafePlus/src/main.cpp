@@ -7,6 +7,7 @@
 #include "sim800l_manager.h"
 
 GyroHistory gyroHistory;
+AccelHistory accHistory;
 
 // ------------------------ Pin Definitions ------------------------
 #define BUZZER_PIN 13
@@ -32,20 +33,69 @@ void activateBuzzer() {
     delay(1000);
     digitalWrite(BUZZER_PIN, LOW);
 }
+void sosPattern() {
+  // S: dot-dot-dot
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(200);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(200);
+  }
+  delay(400);
+  // O: dash-dash-dash
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(600);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(200);
+  }
+  delay(400);
+  // S: dot-dot-dot
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(200);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(200);
+  }
+}
+
+void doubleBeep() {
+  for (int i = 0; i < 5; i++) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(150);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(150);
+  }
+}
+
+
 
 bool checkButtonPress() {
     static bool lastState = HIGH;
+    static bool latched = false;
+    static unsigned long latchStartTime = 0;
+
     bool currentState = digitalRead(BUTTON_PIN);
 
+    // Button just pressed
     if (currentState == LOW && lastState == HIGH) {
-        Serial.println("Button Pressed! Sending message...");
+        Serial.println("Button Pressed! Starting 10s latch...");
+        latchStartTime = millis();
+        latched = true;
+    }
+
+    // Handle latch duration
+    if (latched && (millis() - latchStartTime < 10000)) {
         lastState = currentState;
         return true;
     }
 
+    // Latch expired
+    latched = false;
     lastState = currentState;
     return false;
 }
+
 void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print("Message received from AWS topic: ");
     Serial.println(topic);
@@ -58,7 +108,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.println("Message: " + message);
 
     if (message == "ALERT") {
-        activateBuzzer();
+        sosPattern();
     }
     handleIncomingCommand(message);
 }
@@ -80,7 +130,7 @@ int getBatteryPercentage() {
 
 
 // ------------------------ Data Collection & Publishing -----------------------
-String collectSensorDataAsJson(bool& buttonPressed, bool& impactDetected) {
+String collectSensorDataAsJson(bool& buttonPressed, bool& impactDetected,bool& fallDetected) {
     SensorData data = collectSensorData();
     float bpm = getHeartRate();
     int battery = getBatteryPercentage();
@@ -91,34 +141,47 @@ String collectSensorDataAsJson(bool& buttonPressed, bool& impactDetected) {
     float accMag = sqrt(accX * accX + accY * accY + accZ * accZ);
     float gyroMag = sqrt(gyroX * gyroX + gyroY * gyroY + gyroZ * gyroZ);
 
-    impactDetected = detectFall(data, gyroHistory);
+    fallDetected = detectFall(data, gyroHistory, accHistory);
     buttonPressed = checkButtonPress();
+    String gasType = data.gasType;
 
-    if (data.gasPPM > 900) {
-        Serial.println("High gas detected! Activating buzzer...");
-       // activateBuzzer();
-    }
+    String impactType = detectImpactWithH3LIS(data.h3lis_ax, data.h3lis_ay, data.h3lis_az);
+    impactDetected = (impactType != "no");
+
+
 
     char message[256];
     snprintf(message, sizeof(message),
-        "{\"id\":\"%s\",\"temp\":%.1f,\"hum\":%.1f,\"acc\":%.2f,\"gyr\":%.2f,\"bpm\":%.1f,\"loc\":[%.6f,%.6f],\"gas\":%.1f,\"btn\":%s,\"imp\":\"%s\",\"floor\":%d,\"alt\":%.1f}",
+        "{\"id\":\"%s\",\"temp\":%.1f,\"hum\":%.1f,\"acc\":%.2f,\"gyr\":%.2f,\"bpm\":%.1f,\"loc\":[%.6f,%.6f],\"gas\":%.1f,\"typ\":\"%s\",\"btn\":%s,\"imp\":\"%s\",\"fall\":%s,\"floor\":%d,\"alt\":%.1f}",
         helmetID, data.temperature, data.humidity, accMag, gyroMag, bpm,
-        data.latitude, data.longitude, data.gasPPM,
-        buttonPressed ? "true" : "false", impactDetected ? "impact" : "no",
+        data.latitude, data.longitude, data.gasPPM,data.gasType.c_str(),
+        buttonPressed ? "true" : "false", impactType.c_str(),
+        fallDetected ? "true" : "false",
         data.floorLevel, data.altitude);
 
     return String(message);
 }
 
+
+
 void publishData() {
-    bool buttonPressed = false, impactDetected = false;
-    String json = collectSensorDataAsJson(buttonPressed, impactDetected);
+    bool buttonPressed = false, impactDetected = false, fallDetected = false;
+    String json = collectSensorDataAsJson(buttonPressed, impactDetected, fallDetected);
+
 
     unsigned long now = millis();
-    if (buttonPressed || impactDetected || (now - lastTimePublish > publishThreshold)) {
+    if (buttonPressed || impactDetected || fallDetected || (now - lastTimePublish > publishThreshold)) {
+        Serial.println("Publishing data to AWS...");
+        Serial.println(impactDetected ? "Impact detected!" : "No impact detected.");
+        Serial.println(fallDetected ? "Fall detected!" : "No fall detected.");
+        if (buttonPressed) {
+            Serial.println("Button pressed! Activating buzzer...");
+          
+        }
         if (impactDetected); //activateBuzzer();
         awsPublish(awsTopic, json.c_str());
         lastTimePublish = now;
+        
     }
 }
 
@@ -181,15 +244,15 @@ void loop() {
         client.loop();
         publishData();
     } else if (usingSIM800L) {
-        bool btn = false, impact = false;
-        String payload = collectSensorDataAsJson(btn, impact);
+        bool btn = false, impact = false, fall = false;
+        String payload = collectSensorDataAsJson(btn, impact, fall);
         sendDataToLambda(payload);  // SIM800L HTTP POST
     }
 
     if (Serial.available() > 0) {
         String input = Serial.readStringUntil('\n');
         input.trim();
-        if (input == "ALERT") activateBuzzer();
+        if (input == "ALERT") sosPattern();
     }
 
     delay(10);  // Smooth loop

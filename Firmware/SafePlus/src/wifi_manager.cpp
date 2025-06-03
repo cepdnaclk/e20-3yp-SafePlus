@@ -178,6 +178,7 @@ void wifiLoop() {
     // Fast blink LED while trying to connect
     if (currentMillis - previousMillis >= fastBlinkInterval) {
       previousMillis = currentMillis;
+      Serial.println("Blinking LED for WiFi connection...");
       ledState = !ledState;
       digitalWrite(WIFI_LED_PIN, ledState);
     }

@@ -8,6 +8,7 @@
 #include <DHT.h>
 #include <Adafruit_BMP280.h>
 #include <Preferences.h>
+#include "MPU6050Calibration.h"
 
 
 
@@ -25,6 +26,11 @@
 #define VCC                5.0
 #define ADC_RESOLUTION     4095.0
 #define SEA_LEVEL_PRESSURE_HPA 1013.25
+#define CALIBRATION_SAMPLES 100
+
+float offsetX = 0;
+float offsetY = 0;
+float offsetZ = 0;
 
 // Objects
 MPU6050 mpu;
@@ -59,6 +65,9 @@ const unsigned long MQ2_WARMUP_TIME = 30000UL;
 const unsigned long MQ2_READING_DURATION = 3*60*1000UL;         
 bool mq2IsPowered = false;
 float mq2LatestGasPPM = 0.0;
+unsigned long lastMotionDetectedTime = 0;
+const unsigned long MQ2_MIN_ON_DURATION = 2 * 60 * 1000UL;  // 2 minutes
+
 
 
 // Curves for gas calculations
@@ -106,7 +115,7 @@ void initHeartRateSensor() {
     }
 
     particleSensor.setup();
-    particleSensor.setPulseAmplitudeIR(0x30);
+    particleSensor.setPulseAmplitudeIR(0x2A);
     particleSensor.setPulseAmplitudeRed(0x0A);
     Serial.println("MAX30102 Initialized.");
 }
@@ -136,6 +145,60 @@ float getHeartRate() {
     return beatAvg;
 }
 
+void saveH3lisCalibration() {
+    Preferences prefs;
+    prefs.begin("h3lis_cal", false);
+    prefs.putFloat("offsetX", offsetX);
+    prefs.putFloat("offsetY", offsetY);
+    prefs.putFloat("offsetZ", offsetZ);
+    prefs.end();
+    Serial.println("H3LIS200DL calibration saved to flash.");
+}
+
+void calibrateH3lisSensor() {
+  float sumX = 0, sumY = 0, sumZ = 0;
+  for (int i = 0; i < CALIBRATION_SAMPLES; i++) {
+    sumX += h3lis.readAccX();
+    sumY += h3lis.readAccY();
+    sumZ += h3lis.readAccZ();
+    delay(10);
+  }
+  offsetX = sumX / CALIBRATION_SAMPLES;
+  offsetY = sumY / CALIBRATION_SAMPLES;
+  offsetZ = sumZ / CALIBRATION_SAMPLES;
+  
+  Serial.println("Calibration offsets:");
+  Serial.print("offsetX = "); Serial.println(offsetX, 5);
+  Serial.print("offsetY = "); Serial.println(offsetY, 5);
+  Serial.print("offsetZ = "); Serial.println(offsetZ, 5);
+
+  saveH3lisCalibration();
+}
+
+bool loadH3lisCalibration() {
+    Preferences prefs;
+    prefs.begin("h3lis_cal", true); // Read-only
+    if (prefs.isKey("offsetX") && prefs.isKey("offsetY") && prefs.isKey("offsetZ")) {
+        offsetX = prefs.getFloat("offsetX", 0.0);
+        offsetY = prefs.getFloat("offsetY", 0.0);
+        offsetZ = prefs.getFloat("offsetZ", 0.0);
+        prefs.end();
+        Serial.println("H3LIS200DL calibration loaded from flash:");
+        Serial.print("offsetX = "); Serial.println(offsetX, 5);
+        Serial.print("offsetY = "); Serial.println(offsetY, 5);
+        Serial.print("offsetZ = "); Serial.println(offsetZ, 5);
+        return true;
+    }
+    prefs.end();
+    Serial.println("No H3LIS200DL calibration found in flash.");
+    return false;
+}
+
+
+
+
+
+
 void initSensors() {
     Wire.begin(21, 22);
 
@@ -143,6 +206,10 @@ void initSensors() {
     mpu.initialize();
     if (!mpu.testConnection()) Serial.println("MPU6050 failed!");
     else Serial.println("MPU6050 OK.");
+
+    //calibrateMPU(); // only once for initial calibration
+    // Or comment above after calibration and do this on normal runs:
+    loadMPUCalibration();
 
     // GPS
     gpsSerial.begin(GPS_BAUD, SERIAL_8N1, RXD2, TXD2);
@@ -155,13 +222,20 @@ void initSensors() {
     }
     h3lis.setRange(DFRobot_LIS::eH3lis200dl_100g);
     h3lis.setAcquireRate(DFRobot_LIS::eNormal_50HZ);
+    Serial.println("H3LIS200DL OK.");
+    //calibrateH3lisSensor();
+     if (!loadH3lisCalibration()) {
+        Serial.println("Calibrating H3LIS200DL...");
+        calibrateH3lisSensor(); // Calibrate and save offsets if none found
+    }
+
 
     // MQ2
     pinMode(MQ2_POWER_PIN, OUTPUT);
     digitalWrite(MQ2_POWER_PIN, LOW);
     Serial.println("Calibrating MQ2...");
-    R0 = calibrateMQ2();
-    // R0 = 26.88;
+    //R0 = calibrateMQ2();
+    R0 = 39.58;
     Serial.print("R0 = "); Serial.println(R0);
     mq2Calibrated = true;
 
@@ -213,13 +287,14 @@ SensorData collectSensorData() {
     SensorData data;
 
     // MPU6050
-    mpu.getAcceleration(&data.ax, &data.ay, &data.az);
-    mpu.getRotation(&data.gx, &data.gy, &data.gz);
+    mpu.getMotion6(&data.ax, &data.ay, &data.az, &data.gx, &data.gy, &data.gz);
+    applyMPUOffsets(data.ax, data.ay, data.az, data.gx, data.gy, data.gz);
+
 
     // H3LIS
-    data.h3lis_ax = h3lis.readAccX();
-    data.h3lis_ay = h3lis.readAccY();
-    data.h3lis_az = h3lis.readAccZ();
+    data.h3lis_ax = h3lis.readAccX() - offsetX;
+    data.h3lis_ay = h3lis.readAccY() - offsetY;
+    data.h3lis_az = h3lis.readAccZ() - offsetZ;
 
     // GPS
     while (gpsSerial.available()) {
@@ -241,41 +316,64 @@ SensorData collectSensorData() {
                          pow(data.gy / 131.0, 2) +
                          pow(data.gz / 131.0, 2));
 
-unsigned long now = millis();
 
-    // Check if it's time to power ON the MQ2 heater
-    if (!mq2IsPowered && (now - mq2LastPowerOnTime >= MQ2_POWER_ON_INTERVAL || mq2LastPowerOnTime == 0)) {
-        digitalWrite(MQ2_POWER_PIN, LOW);  
+    const float MOTION_ACCEL_THRESHOLD = 1.05;
+    const float MOTION_GYRO_THRESHOLD  = 5.0;  
+    bool motionDetected = (accMag > MOTION_ACCEL_THRESHOLD) || (gyroMag > MOTION_GYRO_THRESHOLD);
+
+   unsigned long now = millis();
+
+if (motionDetected) {
+    lastMotionDetectedTime = now;  // Update last motion time
+
+    if (!mq2IsPowered) {
+        digitalWrite(MQ2_POWER_PIN, LOW); // Power ON
         mq2IsPowered = true;
         mq2LastPowerOnTime = now;
-        Serial.println("MQ2 heater powered ON");
+        Serial.println("MQ2 heater powered ON (motion detected)");
+    }
+}
+
+// Keep MQ2 powered for at least 2 minutes since last motion
+if (mq2IsPowered) {
+    if (now - mq2LastPowerOnTime >= MQ2_WARMUP_TIME) {
+        float rs = getSensorResistanceRaw();
+        float ratio = rs / R0;
+
+        float lpgPPM   = getGasPPM(ratio, LPGCurve);
+        float coPPM    = getGasPPM(ratio, COCurve);
+        float smokePPM = getGasPPM(ratio, SmokeCurve);
+        mq2LatestGasPPM = max(lpgPPM, max(coPPM, smokePPM));
+
+        if (mq2LatestGasPPM == lpgPPM && lpgPPM > 100.0) {
+            data.gasType = "LPG";
+        }
+        else if (mq2LatestGasPPM == coPPM && coPPM > 35.0) {
+            data.gasType = "CO";
+        }
+        else if (mq2LatestGasPPM == smokePPM && smokePPM > 300.0) {
+            data.gasType = "Smoke";
+        }
+        else {
+            data.gasType = "Safe";
+        }
+    } else {
+        data.gasType = "Warming";
+        mq2LatestGasPPM = 0.0;
     }
 
-    // If MQ2 is powered, check warm-up and reading window
-    if (mq2IsPowered) {
-        unsigned long poweredDuration = now - mq2LastPowerOnTime;
-
-        if (poweredDuration >= MQ2_WARMUP_TIME && poweredDuration <= (MQ2_WARMUP_TIME + MQ2_READING_DURATION)) {
-            // Warmed up - take readings now
-
-            float rs = getSensorResistanceRaw();
-            float ratio = rs / R0;
-
-            float lpgPPM = getGasPPM(ratio, LPGCurve);
-            float coPPM = getGasPPM(ratio, COCurve);
-            float smokePPM = getGasPPM(ratio, SmokeCurve);
-
-            mq2LatestGasPPM = max(lpgPPM, max(coPPM, smokePPM));
-            mq2LastReadTime = now;
-        }
-
-        if (poweredDuration > (MQ2_WARMUP_TIME + MQ2_READING_DURATION)) {
-            digitalWrite(MQ2_POWER_PIN, HIGH); 
-            mq2IsPowered = false;
-            Serial.println("MQ2 heater powered OFF");
-        }
+    // Turn off MQ2 only if 2 minutes passed since last motion
+    if (now - lastMotionDetectedTime > MQ2_MIN_ON_DURATION) {
+        digitalWrite(MQ2_POWER_PIN, HIGH); // Power OFF
+        mq2IsPowered = false;
+        Serial.println("MQ2 heater powered OFF (2 mins after last motion)");
     }
+} else {
+    data.gasType = "No Motion";
+    mq2LatestGasPPM = 0.0;
+}
     data.gasPPM = mq2LatestGasPPM;
+
 
 
     // DHT22
