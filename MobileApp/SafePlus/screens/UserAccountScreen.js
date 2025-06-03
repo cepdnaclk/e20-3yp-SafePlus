@@ -11,6 +11,7 @@ export default function UserAccountScreen() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  // Function to handle password change
   const handleChangePassword = () => {
     console.log('Attempting to change password for user:', user.userId);
     if (!oldPassword || !newPassword || !confirmPassword) {
@@ -35,6 +36,7 @@ export default function UserAccountScreen() {
       });
   };
 
+  // Function to handle logout
   const handleLogout = () => {
     Alert.alert(
       'Log Out',

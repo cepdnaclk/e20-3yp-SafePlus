@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export default function InfoCard({ title, children }) {
+export default function InfoCard({ title, children ,colors}) {
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: colors?.[0] || 'white' }]}>
       <Text style={styles.title}>{title}</Text>
       <View style={styles.content}>{children}</View> {/* NEW: wrap children in a View */}
     </View>
