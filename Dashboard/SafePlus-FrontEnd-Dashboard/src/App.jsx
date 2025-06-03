@@ -11,12 +11,15 @@ import {Toaster} from 'react-hot-toast'
 import { UserContextProvider } from "../context/userContext";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
+import { NotificationProvider } from "./context/NotificationContext";
+
 
 axios.defaults.baseURL =  'http://localhost:8000'
 axios.defaults.withCredentials= true
 
 const App = () => {
   return (
+    <NotificationProvider>
     <UserContextProvider>
     <ChakraProvider>
       <Toaster position="top-middle" toastOptions={{duration:4000}}/>
@@ -40,6 +43,7 @@ const App = () => {
       </Router>
     </ChakraProvider>
     </UserContextProvider>
+    </NotificationProvider>
   );
 };
 

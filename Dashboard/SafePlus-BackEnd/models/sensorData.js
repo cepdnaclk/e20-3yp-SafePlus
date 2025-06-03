@@ -13,7 +13,8 @@ const helmetDataSchema = new mongoose.Schema({
   floor: { type: Number, required: true },
   loc: { lat: { type: Number }, lng: { type: Number } },
   gas: { type: Number, required: true },
-  btn: { type: Boolean, required: true },
+  typ: { type: String, required: true },
+  btn: { type: String, required: true },
 
   imp: { type: String, required: true }, 
 });

@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 
 const hourlyStatsSchema = new mongoose.Schema({
   helmetId: { type: String, required: true },
-  hour: { type: Date, required: true},
   hourWindowStart: { type: Date, required: true},
+  hour: { type: Date, required: true},
   avgTemp: { type: Number, default: 0 },  
   avgHum: { type: Number, default: 0 },   
   impactCount: { type: Number, default: 0 }, 

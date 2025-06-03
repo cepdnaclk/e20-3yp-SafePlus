@@ -9,6 +9,7 @@ export default function LiveData() {
   const [helmetSensorMap, setHelmetSensorMap] = useState({});
   const [helmetLocations, setHelmetLocations] = useState({});
   const [assignedWorkers, setAssignedWorkers] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [selectedHelmetId, setSelectedHelmetId] = useState(null);
   const ws = useRef(null);
 
@@ -21,6 +22,16 @@ export default function LiveData() {
         console.error("❌ Failed to fetch assigned workers", err)
       );
   }, []);
+
+  const sendNotification = ({ id, message, onClick, remove }) => {
+    if (remove) {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+      return;
+    }
+    if (!notifications.some(n => n.id === id)) {
+      setNotifications(prev => [...prev, { id, message, onClick }]);
+    }
+  };
 
   // WebSocket: Listen for real-time helmet data
   useEffect(() => {
@@ -65,6 +76,20 @@ export default function LiveData() {
       <div>
         <Header />
         <div style={{ display: "flex", gap: "1rem", padding: "1rem" }}>
+          <div className="notification-panel">
+            {notifications.map(n => (
+              <div
+                key={n.id}
+                className="notification"
+                onClick={() => n.onClick?.()}
+              >
+                {n.message}
+              </div>
+            ))}
+            </div>
+          
+          
+          
           {/* Worker Cards */}
           <div
             style={{
@@ -81,6 +106,7 @@ export default function LiveData() {
                 key={worker.helmetId}
                 worker={worker}
                 sensorData={helmetSensorMap[worker.helmetId]}
+                sendNotification={sendNotification}
                 onClick={() => setSelectedHelmetId(worker.helmetId)}
                 // removed onLocationClick prop as context handles it now
               />
