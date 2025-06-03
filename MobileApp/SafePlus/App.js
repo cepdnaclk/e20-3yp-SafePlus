@@ -1,19 +1,33 @@
-import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import LoginScreen from "./LoginScreen";
-import HomeScreen from "./HomeScreen";
-import IotCoreComponent from "./SensorOutputs";
-const Stack = createStackNavigator();
+import React, { useContext } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import LoginScreen from './screens/LogInScreen';
+import MainTabNavigator from './MainTabNavigator';
+import { UserProvider, UserContext } from './context/UserContext';
+
+const Stack = createNativeStackNavigator();
+
+function RootNavigator() {
+  const { user } = useContext(UserContext);
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {user ? (
+          <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+        ) : (
+          <Stack.Screen name="Login" component={LoginScreen} />
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Data" component={IotCoreComponent}/>
-      </Stack.Navigator>
-    </NavigationContainer>
+    console.log('App.js loaded'),
+    <UserProvider>
+      <RootNavigator />
+    </UserProvider>
   );
 }

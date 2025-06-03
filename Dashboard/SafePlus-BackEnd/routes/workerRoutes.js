@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const cors = require('cors');
-const { registerWorker, deleteWorker, getAllWorkers , assignHelmet,getWorkersWithHelmets,} = require('../controllers/workerController');
+const { registerWorker, deleteWorker, getAllWorkers , assignHelmet, getWorkersWithHelmets,loginWorker,changePassword} = require('../controllers/workerController');
 
 // CORS middleware
 router.use(
   cors({
-    credentials: true,
-    origin: 'http://localhost:5173',
+    origin: true, // Allows any origin temporarily
+    credentials: true,// or your mobile app's origin if needed
+
   })
 );
 
@@ -17,5 +18,10 @@ router.delete('/:workerId', deleteWorker);
 router.put('/assignHelmet/:nic', assignHelmet);
 router.get('/', getAllWorkers); 
 router.get('/assigned', getWorkersWithHelmets);
+
+// Routes for mobile app
+router.post('/login', loginWorker);
+router.post('/change-password', changePassword);
+
 
 module.exports = router;

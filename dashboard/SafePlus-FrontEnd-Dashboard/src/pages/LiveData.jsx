@@ -1,13 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Header from "../components/Header/Header";
 import HelmetMap from "../MapComp/HelmetMap";
 import WorkerCard from "../components/WorkerCard/WorkerCard";
+import { HighlightProvider } from "../context/HighlightContext"; // import context provider
 
 export default function LiveData() {
   const [helmetSensorMap, setHelmetSensorMap] = useState({});
   const [helmetLocations, setHelmetLocations] = useState({});
   const [assignedWorkers, setAssignedWorkers] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [selectedHelmetId, setSelectedHelmetId] = useState(null);
+  const ws = useRef(null);
 
   // Fetch assigned workers
   useEffect(() => {
@@ -19,13 +23,23 @@ export default function LiveData() {
       );
   }, []);
 
+  const sendNotification = ({ id, message, onClick, remove }) => {
+    if (remove) {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+      return;
+    }
+    if (!notifications.some(n => n.id === id)) {
+      setNotifications(prev => [...prev, { id, message, onClick }]);
+    }
+  };
+
   // WebSocket: Listen for real-time helmet data
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8085");
+    ws.current = new WebSocket("ws://localhost:8085");
 
-    ws.onopen = () => console.log("✅ WS connected");
+    ws.current.onopen = () => console.log("✅ WS connected");
 
-    ws.onmessage = (evt) => {
+    ws.current.onmessage = (evt) => {
       try {
         const data = JSON.parse(evt.data);
         console.log("📩 New data:", data);
@@ -48,51 +62,69 @@ export default function LiveData() {
       }
     };
 
-    ws.onclose = () => console.log("❌ WS closed");
+    ws.current.onclose = () => console.log("❌ WS closed");
+
     return () => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.close();
+      if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+        ws.current.close();
       }
     };
   }, []);
 
   return (
-    <div>
-      <Header />
-      <h2 style={{ textAlign: "center", margin: "1rem 0" }}>Live Worker Feed</h2>
+    <HighlightProvider>
+      <div>
+        <Header />
+        <div style={{ display: "flex", gap: "1rem", padding: "1rem" }}>
+          <div className="notification-panel">
+            {notifications.map(n => (
+              <div
+                key={n.id}
+                className="notification"
+                onClick={() => n.onClick?.()}
+              >
+                {n.message}
+              </div>
+            ))}
+            </div>
+          
+          
+          
+          {/* Worker Cards */}
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "1rem",
+              overflowY: "auto",
+              maxHeight: "80vh",
+            }}
+          >
+            {assignedWorkers.map((worker) => (
+              <WorkerCard
+                key={worker.helmetId}
+                worker={worker}
+                sensorData={helmetSensorMap[worker.helmetId]}
+                sendNotification={sendNotification}
+                onClick={() => setSelectedHelmetId(worker.helmetId)}
+                // removed onLocationClick prop as context handles it now
+              />
+            ))}
+          </div>
 
-      <div style={{ display: "flex", gap: "1rem", padding: "1rem" }}>
-        {/* Worker Cards */}
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "1rem",
-            overflowY: "auto",
-            maxHeight: "80vh",
-          }}
-        >
-          {assignedWorkers.map((worker) => (
-            <WorkerCard
-              key={worker.helmetId}
-              worker={worker}
-              sensorData={helmetSensorMap[worker.helmetId]}
-            />
-          ))}
-        </div>
-
-        {/* Map */}
-        <div
-          style={{
-            flex: 1,
-            borderRadius: "8px",
-            overflow: "hidden",
-          }}
-        >
-          <HelmetMap helmetLocations={helmetLocations} zoom={8} />
+          {/* Map */}
+          <div
+            style={{
+              flex: 1,
+              borderRadius: "8px",
+              overflow: "hidden",
+            }}
+          >
+            <HelmetMap helmetLocations={helmetLocations} zoom={13} />
+          </div>
         </div>
       </div>
-    </div>
+    </HighlightProvider>
   );
 }

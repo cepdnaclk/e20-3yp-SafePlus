@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import WorkerCard from "../components/WorkerCard/WorkerCard";
 import axios from "axios";
 
@@ -10,14 +10,14 @@ export default function AssignedWorkersPage() {
   // Fetch assigned workers
   useEffect(() => {
     axios
-      .get("http://localhost:8001/api/workers/assigned")
+      .get("http://localhost:8000/api/workers/assigned")
       .then((res) => setWorkers(res.data))
       .catch((err) => console.error("Error fetching assigned workers:", err));
   }, []);
 
   // Connect to WebSocket for live sensor data
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8085");
+    const ws = new WebSocket("ws://localhost:8086");
 
     ws.onopen = () => console.log("✅ WebSocket connected");
     ws.onmessage = (event) => {
@@ -44,8 +44,6 @@ export default function AssignedWorkersPage() {
       const newData = {};
       workers.forEach((worker) => {
         newData[worker.helmetId] = {
-          tmp: (20 + Math.random() * 10).toFixed(1),
-          hum: (30 + Math.random() * 30).toFixed(1),
           bpm: Math.floor(60 + Math.random() * 40),
           acc: (Math.random() * 3).toFixed(2),
           gyr: (Math.random() * 180).toFixed(2),
