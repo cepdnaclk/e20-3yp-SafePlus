@@ -23,13 +23,13 @@ app.use(express.urlencoded({ extended: false }));
 mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.log("❌ MongoDB connection failed", err));
-
 // Routes
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/mobile/data', require('./routes/mobileData'));
-app.use('/api/workers', require('./routes/workerRoutes'));
-app.use('/api/workers/hourly-stats', require('./routes/mobileData'));
+
 app.use('/api/user', require('./routes/twoFactorRoutes'));
+app.use('/', require('./routes/authRoutes'));
+app.use('/api/workers', require('./routes/workerRoutes'));
+app.use('/api/workers/hourly-stats', require('./routes/MobileData'));
+
 
 // Start HTTP Server
 const port = 8000;
@@ -56,10 +56,24 @@ wss.on("connection", (ws) => {
 
 
 device.on("connect", () => {
+    console.log("✅ Connected to AWS IoT");
   device.subscribe("helmet/data", (err) => {
-    if (err) console.error("❌ AWS subscription error:", err);
+    if (err) {console.error("❌ AWS subscription error:", err);}
+    else {console.log("✅ Subscribed to helmet/data topic");}
   });
 });
+device.on("error", (error) => {
+  console.error("❌ AWS IoT error:", error);
+}
+);
+device.on("close", () => {
+  console.log("❌ AWS IoT connection closed");
+});
+device.on("offline", () => {
+  console.log("❌ AWS IoT device is offline");
+});
+device.on("reconnect", () => {
+  console.log("✅ AWS IoT device reconnected");});
 
 device.on("message", (topic, payload) => {
   const data = JSON.parse(payload.toString());

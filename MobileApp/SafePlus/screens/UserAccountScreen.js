@@ -1,44 +1,159 @@
-// screens/UserAccountPage.js
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import AddHelmetPopup from '../components/AddHelmetPopup.js';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, TouchableOpacity, Modal, TextInput, Alert, SafeAreaView, Image } from 'react-native';
 import styles from '../styles/UserAccountScreen.js';
-export default function UserAccountPage({ navigation }) {
-  const [showAddHelmet, setShowAddHelmet] = useState(false);
-  const helmets = ['Helmet 1', 'Helmet 2', 'Helmet 3'];
-  const { user } = route.params || {};
+import { UserContext } from '../context/UserContext.js';
+import { changePassword } from '../services/api.js';
+
+export default function UserAccountScreen() {
+  const { user, setUser } = React.useContext(UserContext);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleChangePassword = () => {
+    console.log('Attempting to change password for user:', user.userId);
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      Alert.alert('Error', 'Please fill all fields.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match.');
+      return;
+    }
+    changePassword({ userId: user.userId, newPassword })
+      .then(() => {
+        Alert.alert('Success', 'Password changed successfully!');
+        setShowPasswordModal(false);
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        console.log('Password changed successfully for user:', user.userId);
+      })
+      .catch((error) => {
+        Alert.alert('Error', error.message || 'Failed to change password.');
+      });
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Log Out',
+      'Are you sure you want to log out?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Log Out', style: 'destructive', onPress: () => setUser(null) }
+      ]
+    );
+  };
 
   return (
-    <LinearGradient
-          colors={['#FFFFFF', '#D8D47D']} // Example: Light teal gradient
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.container}
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: '#fef6e4', flex: 1 }]}>
+      <View style={[styles.container, { paddingTop: 24 }]}>
+        {/* User Avatar */}
+        <View style={{ alignItems: 'center', marginBottom: 16 }}>
+          <Image
+            source={require('../assets/user_avatar.png')}
+            style={{ width: 80, height: 80, borderRadius: 40, marginBottom: 8, backgroundColor: '#FFD966' }}
+            resizeMode="cover"
+          />
+          <Text style={[styles.title, { color: '#5d4b1f', fontSize: 22 }]}>User Account</Text>
+        </View>
+
+        {/* User Info Card */}
+        <View style={{
+          backgroundColor: '#fff',
+          borderRadius: 12,
+          padding: 18,
+          marginBottom: 18,
+          elevation: 3,
+          shadowColor: '#000',
+          shadowOpacity: 0.07,
+          shadowRadius: 4,
+        }}>
+          <Text style={[styles.email, { color: '#333', fontWeight: 'bold' }]}>Name:</Text>
+          <Text style={[styles.email, { color: '#5d4b1f', marginBottom: 8 }]}>{user?.username || 'Unknown'}</Text>
+          <Text style={[styles.email, { color: '#333', fontWeight: 'bold' }]}>Email:</Text>
+          <Text style={[styles.email, { color: '#5d4b1f', marginBottom: 8 }]}>{user?.email || 'Not available'}</Text>
+          <Text style={[styles.helmetNo, { color: '#333', fontWeight: 'bold' }]}>
+            Helmet Currently Using:
+          </Text>
+          <Text style={[styles.helmetNo, { color: '#5d4b1f' }]}>{user?.helmetID || 'None'}</Text>
+        </View>
+
+        {/* Divider */}
+        <View style={{ height: 1, backgroundColor: '#e0cfa9', marginVertical: 8 }} />
+
+        {/* Actions */}
+        <TouchableOpacity
+          style={[styles.button, { marginBottom: 8 }]}
+          onPress={() => setShowPasswordModal(true)}
+          activeOpacity={0.8}
         >
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Text>←</Text>
-      </TouchableOpacity>
-      <Text style={styles.title}>User: {user.userName}</Text>
-      
-      <Text style={styles.email}>Email: user1@gmail.com</Text>
-      <Text style={styles.helmetNo}>Helmet Currently Using: Helmet 1</Text>
+          <Text style={{ color: '#333', fontWeight: 'bold' }}>Change Password</Text>
+        </TouchableOpacity>
 
-      <View style={styles.helmetBox}>
-        <Text style={styles.subTitle}>Used Helmet IDs:</Text>
-        {helmets.map((helmet, index) => (
-          <Text key={index}>{helmet}</Text>
-        ))}
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: '#FFC000', marginTop: 8 }]}
+          onPress={handleLogout}
+          activeOpacity={0.8}
+        >
+          <Text style={{ color: '#333', fontWeight: 'bold' }}>Log Out</Text>
+        </TouchableOpacity>
+
+        {/* Change Password Modal */}
+        <Modal
+          visible={showPasswordModal}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowPasswordModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={[styles.subTitle, { color: '#333', marginBottom: 12 }]}>Change Password</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Old Password"
+                secureTextEntry
+                value={oldPassword}
+                onChangeText={setOldPassword}
+                placeholderTextColor="#999"
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="New Password"
+                secureTextEntry
+                value={newPassword}
+                onChangeText={setNewPassword}
+                placeholderTextColor="#999"
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Confirm New Password"
+                secureTextEntry
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                placeholderTextColor="#999"
+              />
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
+                <TouchableOpacity
+                  style={[styles.button, { flex: 1, marginRight: 8 }]}
+                  onPress={handleChangePassword}
+                  activeOpacity={0.8}
+                >
+                  <Text style={{ color: '#333', fontWeight: 'bold' }}>Change</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, { flex: 1, backgroundColor: '#eee' }]}
+                  onPress={() => setShowPasswordModal(false)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={{ color: '#333', fontWeight: 'bold' }}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
-
-      <TouchableOpacity style={styles.button} onPress={() => setShowAddHelmet(true)}>
-        <Text>Add a Helmet</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button}><Text>Change Currently Using Helmet ID</Text></TouchableOpacity>
-      <TouchableOpacity style={styles.button}><Text>See Your History</Text></TouchableOpacity>
-      <TouchableOpacity style={[styles.button, { backgroundColor: '#FFC000' }]}><Text>Log Out</Text></TouchableOpacity>
-
-      <AddHelmetPopup visible={showAddHelmet} onClose={() => setShowAddHelmet(false)} />
-    </LinearGradient>
+    </SafeAreaView>
   );
 }

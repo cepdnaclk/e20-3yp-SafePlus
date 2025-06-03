@@ -1,22 +1,23 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
-  StyleSheet,
   Modal,
   TextInput,
   ImageBackground,
 } from 'react-native';
-import styles from '../styles/WelcomeScreen';
+import styles from '../styles/LogInScreen';
 import { login, changePassword } from '../services/api';
+import { UserContext } from '../context/UserContext';
 
-export default function WelcomeScreen({ navigation }) {
+export default function LoginScreen() {
+  console.log('LoginScreen rendered');
   const [isModalVisible, setModalVisible] = React.useState(false);
-  const [isChangePasswordModalVisible, setChangePasswordModelVisible
+  const [isChangePasswordModalVisible, setChangePasswordModelVisible] = React.useState(false);
+  const { setUser } = useContext(UserContext);
 
-  ] = React.useState(false);
 
   // Login fields (email/password) and change password fields
   const [loginEmail, setLoginEmail] = React.useState('');
@@ -54,11 +55,14 @@ export default function WelcomeScreen({ navigation }) {
         setLoginPassword('');
         setModalVisible(false);
         console.log('User data:', data);
-        if (data.mustChangePassword) {
+        //if (data.mustChangePassword) {
+        if (false){
           setMustChangePassword(true);
           setChangePasswordModelVisible(true);
         }else {
-          navigation.navigate('Home', { user: data });
+          console.log('Navigating to Home with user data:', data);
+          setUser(data);
+          //navigation.replace('MainTabs'); 
         }
       } else {
         alert('Login failed. Email or password is incorrect.');
@@ -84,10 +88,13 @@ export default function WelcomeScreen({ navigation }) {
       alert('Password updated. You can now log in with your new password.');
       setChangePasswordModelVisible(false);
       setMustChangePassword(false);
-      navigation.navigate('Home', { user: { userId }});
-    } catch (err) {
-      console.error('Change password error:', err);
-      alert(err.message || 'Something went wrong. Please try again.');
+      console.log('Password change success:', data);
+      setUser(data);
+      //navigation.replace('MainTabs');
+            } 
+      catch (err) {
+        console.error('Change password error:', err);
+        alert(err.message || 'Something went wrong. Please try again.');
     }
   };
   // Skip button handler
@@ -95,7 +102,8 @@ export default function WelcomeScreen({ navigation }) {
     setChangePasswordModelVisible(false);
     setMustChangePassword(false);
     // Navigate to home or main screen
-    navigation.navigate('Home', { user: { userId: userData.userId } });
+    setUser(data);
+    //navigation.replace('MainTabs'); 
   };
 
   return (

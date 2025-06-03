@@ -1,60 +1,45 @@
-
 import { StyleSheet } from 'react-native';
-const styles = StyleSheet.create({
-  container: {
+
+export default StyleSheet.create({
+  safeArea: {
     flex: 1,
-    paddingTop: 80,
+    backgroundColor: '#fef6e4',
   },
-  welcome: {
+  container: {
+    padding: 20,
+    //alignItems: 'flex-start',
+  },
+  welcomeText: {
     fontSize: 30,
+    fontWeight: '600',
+    marginTop: 20,
+    marginBottom: 30,
     textAlign: 'center',
-    marginHorizontal: 20, // adds horizontal spacing
-    marginBottom: 50,
-    flexWrap: 'wrap',
+  },
+  highlight: {
+    color: '#2e7d32',
+    fontWeight: 'bold',
+  },
+  instructionsTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 10,
+    marginBottom:20,
+  },
+  instruction: {
+    fontSize: 16,
+    marginBottom: 8,
+    lineHeight: 24,
+  },
+  footerNote: {
+    marginTop: 20,
+    fontStyle: 'italic',
+    color: '#444',
   },
   bold: {
-    fontWeight: 'bold',
+  fontWeight: 'bold',
+  fontFamily: 'sans-serif-medium',
   },
-  content: {
-    paddingHorizontal: 20,
-    paddingBottom: 60,
-  },
-  card: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 12,
-    marginVertical: 10,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#333',
-  },
-  cardText: {
-    fontSize: 14,
-    color: '#555',
-  },
-  accountIcon: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    zIndex: 10,
-  },
-  notificationIcon: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-    zIndex: 10,
-  },
-  icon: {
-    fontSize: 20,
-  },
-});
-
-export default styles;
+  
+},
+);
