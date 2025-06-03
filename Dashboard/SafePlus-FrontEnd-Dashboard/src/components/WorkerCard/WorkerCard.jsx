@@ -1,44 +1,97 @@
-import { useEffect, useState } from "react";
+import { useState, useRef } from "react";
+import { useHighlight } from "../../context/HighlightContext";  // import hook
 import "./WorkerCard.css";
 
+export default function WorkerCard({ worker, sensorData, onClick }) {
+  const [showOverlay, setShowOverlay] = useState(false);
+  const cardRef = useRef(null);
+  const { setHighlightedId } = useHighlight();
 
-export default function WorkerCard({ worker, sensorData }) {
+  const handleCardClick = () => {
+    setShowOverlay(true);
+    onClick?.();
+  };
+
+  const closeOverlay = () => setShowOverlay(false);
+
+  const hasAlert =
+    sensorData &&
+    (sensorData.bpm > 120 ||
+      sensorData.gas > 300 ||
+      sensorData.imp === "impact" ||
+      sensorData.temp > 37);
+
   return (
-    <div className="worker-card">
-      <h3 className="worker-name">👷 {worker.name}</h3>
-      <p><strong>NIC:</strong> {worker.nic}</p>
-      <p><strong>Helmet ID:</strong> {worker.helmetId}</p>
-
-      <hr />
-
-      {sensorData ? (
-        <div className="sensor-section">
-          <p>BPM: {sensorData.bpm}</p>
-          <p>Acc: {sensorData.acc} g</p>
-          <p>Gyro: {sensorData.gyr} °/s</p>
-          <p>Gas: {sensorData.gas} ppm</p>
-
-          <div className={`alert ${sensorData.imp === "impact" ? "alert-danger" : "alert-success"}`}>
-            <strong>
-              {sensorData.imp === "impact" ? "🚨 Impact Detected" : "✅ No Impact"}
-            </strong>
-          </div>
-
-          <div className={`alert ${sensorData.gas > 900 ? "alert-danger" : "alert-success"}`}>
-            <strong>
-              {sensorData.gas > 900 ? "☠️ High Gas Level" : "✅ Gas Levels Normal"}
-            </strong>
-          </div>
-
-          {sensorData.btn && (
-            <div className="alert alert-danger">
-              <strong>🚨 SOS Alert!</strong>
-            </div>
-          )}
+    <>
+      <div
+        ref={cardRef}
+        className={`worker-card ${hasAlert ? "alert-outline" : ""}`}
+        onClick={handleCardClick}
+        style={{ cursor: "pointer" }}
+      >
+        <div className="worker-header">
+          <h3>
+            {worker.name} {worker.id}
+          </h3>
+          <p
+            className="worker-location"
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log("📍 Location clicked for", worker.id);
+              setHighlightedId(worker.helmetId); // update context state here
+            }}
+          >
+            📍 Location
+          </p>
         </div>
-      ) : (
-        <p className="loading">⏳ Awaiting data…</p>
+
+        {sensorData ? (
+          <div className="sensor-icons">
+            <div className={`sensor-item ${sensorData.bpm > 120 ? "alert" : ""}`}>
+              <img src="/icons/heart.png" alt="Heart" />
+              <span>{sensorData.bpm} bpm</span>
+            </div>
+            <div className={`sensor-item ${sensorData.gas > 300 ? "alert" : ""}`}>
+              <img src="/icons/gas.png" alt="Gas" />
+              <span>{sensorData.gas > 300 ? "Alert" : "Safe"}</span>
+            </div>
+            <div
+              className={`sensor-item ${
+                sensorData.imp === "impact" ? "alert" : ""
+              }`}
+            >
+              <img src="/icons/impact.jpg" alt="Impact" />
+              <span>{sensorData.imp === "impact" ? "Alert" : "Safe"}</span>
+            </div>
+            <div className={`sensor-item ${sensorData.temp > 37 ? "alert" : ""}`}>
+              <img src="/icons/temp.png" alt="Temperature" />
+              <span>{sensorData.temp} °C</span>
+            </div>
+          </div>
+        ) : (
+          <p className="loading">⏳ Awaiting data…</p>
+        )}
+      </div>
+
+      {showOverlay && (
+        <div className="overlay-container">
+          <div className="overlay-box">
+            <button className="close-button" onClick={closeOverlay}>
+              ✖
+            </button>
+            <h2>{worker.name}</h2>
+            <p>
+              <strong>NIC:</strong> {worker.nic}
+            </p>
+            <p>
+              <strong>Impact:</strong> {sensorData?.imp}
+            </p>
+            <p>
+              <strong>Gas:</strong> {sensorData?.gas} ppm
+            </p>
+          </div>
+        </div>
       )}
-    </div>
+    </>
   );
 }

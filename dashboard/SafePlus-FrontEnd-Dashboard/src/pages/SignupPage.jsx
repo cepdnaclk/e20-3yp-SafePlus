@@ -32,7 +32,7 @@ const SignupPage = () => {
     }
 
     try {
-      const res = await axios.post('/register', {fname, name, email, password });
+      const res = await axios.post('/api/auth/register', {fname, name, email, password });
       const data = res.data;
 
       if (data.error) {

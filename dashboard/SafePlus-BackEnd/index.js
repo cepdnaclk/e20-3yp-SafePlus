@@ -9,33 +9,38 @@ const WebSocket = require('ws');
 const HourlyStats = require('./models/HourlyStatModel');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+
 app.use(requestIp.mw());
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
-// ✅ MongoDB Connection
+// MongoDB Connection
 mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.log("❌ MongoDB connection failed", err));
+// Routes
 
-// ✅ Routes
+app.use('/api/user', require('./routes/twoFactorRoutes'));
 app.use('/', require('./routes/authRoutes'));
-//app.use('/api/mobile/data', require('./routes/MobileData'));
 app.use('/api/workers', require('./routes/workerRoutes'));
 app.use('/api/workers/hourly-stats', require('./routes/MobileData'));
 
-// ✅ Start HTTP Server
+
+// Start HTTP Server
 const port = 8000;
 app.listen(port, () => {
   console.log(`✅ Server is running on port ${port}`);
 });
 
-// ✅ WebSocket Setup
+// WebSocket Setup
 const wss = new WebSocket.Server({ port: 8085 });
 
-// ✅ AWS IoT Setup
+// AWS IoT Setup
 const device = awsIot.device({
   keyPath: process.env.PRIVATE_KEY_PATH,
   certPath: process.env.CERTIFICATE_PATH,
@@ -47,6 +52,8 @@ const device = awsIot.device({
 wss.on("connection", (ws) => {
   ws.send(JSON.stringify({ message: "Connected to WebSocket Server" }));
 });
+
+
 
 device.on("connect", () => {
     console.log("✅ Connected to AWS IoT");

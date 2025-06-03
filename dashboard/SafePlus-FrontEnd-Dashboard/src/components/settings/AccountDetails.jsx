@@ -32,7 +32,7 @@ const AccountDetails = () => {
     const fetchProfile = async () => {
       try {
         // Step 1: Get logged-in user via JWT cookie
-        const res = await axios.get("http://localhost:8000/profile", {
+        const res = await axios.get("/api/auth/profile", {
           withCredentials: true,
         });
 
@@ -41,7 +41,7 @@ const AccountDetails = () => {
 
           // Step 2: Fetch full profile using username
           const profileRes = await axios.get(
-            `http://localhost:8000/profile/${username}`
+            `/api/auth/profile/${username}`
           );
 
           const profile = profileRes?.data;
@@ -83,7 +83,7 @@ const AccountDetails = () => {
   const saveChanges = async () => {
     try {
       const res = await axios.put(
-        '/profile',
+        '/api/auth/profile',
         {
           fname: tempDetails.name,
           name: tempDetails.username,
