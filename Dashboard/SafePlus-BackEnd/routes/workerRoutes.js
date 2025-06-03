@@ -6,10 +6,8 @@ const { registerWorker, deleteWorker, getAllWorkers , assignHelmet, getWorkersWi
 // CORS middleware
 router.use(
   cors({
+    origin: true, // Allows any origin temporarily
     credentials: true,
-    origin: ['http://localhost:5173',
-        'http://10.30.8.182:8000', ],// or your mobile app's origin if needed
-
   })
 );
 
