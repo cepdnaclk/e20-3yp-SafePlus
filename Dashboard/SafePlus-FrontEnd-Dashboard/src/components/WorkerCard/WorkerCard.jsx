@@ -12,18 +12,16 @@ export default function WorkerCard({ worker, sensorData, onClick }) {
   const { setHighlightedId } = useHighlight();
   const { sendNotification } = useNotifications();
 
-  const gasAlertTypes = ["CO", "LPG", "Smoke"];
-  const impactAlertTypes = ["mild","moderate", "severe"];
+  const hasAlert = sensorData && (
+    sensorData.bpmStatus === "high" ||
+    sensorData.gasStatus === "danger" ||
+    sensorData.impactStatus === "warning" ||
+    sensorData.tempStatus === "danger" ||
+    sensorData.fallStatus === "detected" ||
+    sensorData.btn
+  );
 
-  const hasAlert =
-    sensorData &&
-    ((sensorData.bpm > 120 )||
-      gasAlertTypes.includes(sensorData.typ) ||
-      impactAlertTypes.includes(sensorData.imp) ||
-      sensorData.temp > 37 ||
-      sensorData.btn);
-
-  const currentAlertKey = hasAlert ? `${worker.id}-${sensorData?.bpm}-${sensorData?.typ}-${sensorData?.imp}-${sensorData?.temp}` : null;
+  const currentAlertKey = hasAlert ? `${worker.id}-${sensorData?.bpmStatus}-${sensorData?.gasStatus}-${sensorData?.impactStatus}-${sensorData?.tempStatus}` : null;
 
   useEffect(() => {
     if (hasAlert && currentAlertKey !== acknowledgedAlertKey) {
@@ -42,12 +40,6 @@ export default function WorkerCard({ worker, sensorData, onClick }) {
           }
         });
       }
-
-      //const timeout = setTimeout(() => {
-      //  setShowAlert(false);
-      //}, 10000);
-
-      //return () => clearTimeout(timeout);
     }
   }, [hasAlert, currentAlertKey, acknowledgedAlertKey, sendNotification, worker.id, worker.name]);
 
@@ -57,7 +49,6 @@ export default function WorkerCard({ worker, sensorData, onClick }) {
       setShowAlert(false);
     }
   }, [hasAlert]);
-
 
   const handleCardClick = () => {
     setShowOverlay(true);
@@ -109,42 +100,34 @@ export default function WorkerCard({ worker, sensorData, onClick }) {
 
         {sensorData ? (
           <div className="sensor-icons">
-            <div className={`sensor-item ${(sensorData.bpm > 120 ) ? "alert" : ""}`}>
+            <div className={`sensor-item ${sensorData.bpmStatus === "high" ? "alert" : ""}`}>
               <img src="/icons/heart.png" alt="Heart" />
               <span>{sensorData.bpm} bpm</span>
             </div>
-            <div className={`sensor-item ${gasAlertTypes.includes(sensorData.typ) ? "alert" : ""}`}>
+            <div className={`sensor-item ${sensorData.gasStatus === "danger" ? "alert" : ""}`}>
               <img src="/icons/gas.png" alt="Gas" />
-              <span>
-                {gasAlertTypes.includes(sensorData.typ)
-                  ? `${sensorData.gas} ppm - ${sensorData.typ}`
-                  : `${sensorData.gas} ppm - Safe`}
-              </span>
+              <span>{sensorData.gas} ppm</span>
             </div>
-            <div className={`sensor-item ${impactAlertTypes.includes(sensorData.imp) ? "alert" : ""}`}>
+            <div className={`sensor-item ${sensorData.impactStatus === "warning" ? "alert" : ""}`}>
               <img src="/icons/impact.jpg" alt="Impact" />
-              <span>{sensorData.imp === "no"
-                  ? `Safe`
-                  : `${sensorData.imp}`}</span>
+              <span>{sensorData.imp === "no" ? `Safe` : `${sensorData.imp}`}</span>
             </div>
-              <div className={`sensor-item ${sensorData.fall ? "alert" : ""}`}>
-                <img src="/icons/fall.png" alt="Fall" />
-                <span>{sensorData.fall
-                  ? `Fall detected`
-                  : `Safe`}</span>
-              </div>
-            <div className={`sensor-item ${sensorData.temp > 37 ? "alert" : ""}`}>
+            <div className={`sensor-item ${sensorData.fallStatus === "detected" ? "alert" : ""}`}>
+              <img src="/icons/fall.png" alt="Fall" />
+              <span>{sensorData.fall ? `Fall detected` : `Safe`}</span>
+            </div>
+            <div className={`sensor-item ${sensorData.tempStatus === "danger" ? "alert" : ""}`}>
               <img src="/icons/temp.png" alt="Temperature" />
               <span>{sensorData.temp} °C</span>
             </div>
             <button
               className="sos-button"
               onClick={(e) => {
-              e.stopPropagation(); // prevent overlay click
-              handleSOS();
-            }}
+                e.stopPropagation();
+                handleSOS();
+              }}
             >
-            🚨 Send SOS
+              🚨 Send SOS
             </button>
           </div>
         ) : (

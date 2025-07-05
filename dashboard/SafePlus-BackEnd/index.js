@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const awsIot = require('aws-iot-device-sdk');
 const WebSocket = require('ws');
 const HourlyStats = require('./models/HourlyStatModel');
+const evaluateSensorData = require('./utils/evaluateSensorData');
 
 const app = express();
 app.use(cors({
@@ -42,7 +43,7 @@ app.post('/api/sos', (req, res) => {
   });
 });
 
-
+const message = JSON.stringify()
 
 
 // Start HTTP Server
@@ -98,7 +99,8 @@ device.on('error', function (error) {
 });
 
 device.on("message", (topic, payload) => {
-  const data = JSON.parse(payload.toString());
+  const rawData = JSON.parse(payload.toString());
+  const data = evaluateSensorData(rawData);
   const now = new Date();
   const roundedHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0, 0, 0);
   const hourValue = Math.floor(roundedHour.getTime() / (1000 * 60 * 60));
