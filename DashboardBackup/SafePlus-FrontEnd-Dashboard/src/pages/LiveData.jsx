@@ -6,8 +6,8 @@ import WorkerCard from "../components/WorkerCard/WorkerCard";
 import { HighlightProvider } from "../context/HighlightContext"; // import context provider
 
 // Get API and WebSocket URLs from environment variables
-const API_URL = process.env.REACT_APP_API_URL;
-const WS_URL = process.env.REACT_APP_WS_URL;
+const API_URL = import.meta.env.VITE_API_URL;
+const WS_URL = import.meta.env.VITE_WS_URL;
 
 export default function LiveData() {
   const [helmetSensorMap, setHelmetSensorMap] = useState({});
