@@ -13,7 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import { NotificationProvider } from "./context/NotificationContext";
 
-
+console.log("Backend base URL:", import.meta.env.VITE_BACKEND_URL);
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 axios.defaults.withCredentials= true
 
