@@ -2,8 +2,8 @@ import  { useEffect, useState } from "react";
 import WorkerCard from "../components/WorkerCard/WorkerCard";
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_API_URL;
-const WS_URL = process.env.REACT_APP_WS_URL;
+const API_URL = import.meta.env.VITE_API_URL;
+const WS_URL = import.meta.env.VITE_WS_URL;
 
 export default function AssignedWorkersPage() {
   const [workers, setWorkers] = useState([]);
