@@ -21,9 +21,12 @@ app.use(cors({
       'https://686a95bbb955e90008219eb8--quiet-zabaione-c6e293.netlify.app'
     ];
 
-    if (allowedOrigins.includes(origin) || origin.endsWith('.safeplus.netlify.app')) {
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.endsWith('.netlify.app') // Allow all Netlify deploys
+    ) {
       callback(null, true);
-    } else {
+    }else {
       callback(new Error(`CORS policy: Origin ${origin} not allowed`));
     }
   },
