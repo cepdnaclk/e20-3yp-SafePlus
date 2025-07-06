@@ -51,6 +51,10 @@ app.listen(port, () => {
   console.log(`✅ Server is running on port ${port}`);
 });
 
+app.get('/', (req, res) => {
+  res.send('✅ SafePlus backend is running!');
+});
+
 const wss = new WebSocket.Server({ port: 8085 });
 
 // AWS IoT Setup
