@@ -10,13 +10,26 @@ const {
 const router = express.Router();
 const cors = require("cors");
 
+// Get allowed origins from environment variable
+const allowedOrigins = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(',').map(origin => origin.trim())
+  : [];
+
 // Middleware
 router.use(
   cors({
     credentials: true,
-    origin: 'http://localhost:5173'
+    origin: function(origin, callback) {
+      // Allow requests with no origin (like curl, Postman, etc.)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Not allowed by CORS'));
+    }
   })
 );
+
 
 // 2FA routes
 router.get('/2fa/status', get2FAStatus);
