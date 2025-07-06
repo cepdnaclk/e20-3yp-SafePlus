@@ -13,6 +13,8 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import '../../styles/Settings.css';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const AccountDetails = () => {
   const [details, setDetails] = useState({
     name: '',
@@ -32,18 +34,16 @@ const AccountDetails = () => {
     const fetchProfile = async () => {
       try {
         // Step 1: Get logged-in user via JWT cookie
-        const res = await axios.get("/api/auth/profile", {
-          withCredentials: true,
-        });
+        const res = await axios.get(`${API_URL}/api/auth/profile`, { withCredentials: true });
+
 
         if (res.data && res.data.name) {
           const username = res.data.name;
 
           // Step 2: Fetch full profile using username
-          const profileRes = await axios.get(
-            `/api/auth/profile/${username}`
-          );
-
+          const profileRes = await axios.get(`${API_URL}/api/auth/profile/${username}`, {
+            withCredentials: true,
+          });
           const profile = profileRes?.data;
 
           setDetails({
@@ -82,15 +82,11 @@ const AccountDetails = () => {
 
   const saveChanges = async () => {
     try {
-      const res = await axios.put(
-        '/api/auth/profile',
-        {
-          fname: tempDetails.name,
-          name: tempDetails.username,
-          email: tempDetails.email
-        },
-        { withCredentials: true }
-      );
+      const res = await axios.put(`${API_URL}/api/auth/profile`, {
+        fname: tempDetails.name,
+        name: tempDetails.username,
+        email: tempDetails.email,
+      }, { withCredentials: true });
 
       if (res.status === 200) {
         setDetails(tempDetails);
