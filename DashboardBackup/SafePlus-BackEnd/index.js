@@ -10,7 +10,22 @@ const HourlyStats = require('./models/HourlyStatModel');
 
 const app = express();
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like curl or Postman)
+    if (!origin) return callback(null, true);
+
+    // List of allowed exact origins
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'https://safeplus.netlify.app'
+    ];
+
+    if (allowedOrigins.includes(origin) || origin.endsWith('.safeplus.netlify.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS policy: Origin ${origin} not allowed`));
+    }
+  },
   credentials: true
 }));
 
