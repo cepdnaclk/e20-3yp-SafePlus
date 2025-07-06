@@ -1,7 +1,9 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-const apiUrl = 'http://localhost:8001';
+// Use environment variable for the API base URL
+const apiUrl = process.env.REACT_APP_API_URL;
+
 const RegisterWorkerForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -31,7 +33,7 @@ const RegisterWorkerForm = ({ onSuccess }) => {
 
       if (res.ok) {
         alert("✅ Worker registered!");
-        onSuccess(); 
+        if (onSuccess) onSuccess(); 
       } else {
         alert("❌ Error registering worker");
       }
