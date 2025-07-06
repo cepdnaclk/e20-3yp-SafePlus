@@ -17,7 +17,8 @@ app.use(cors({
     // List of allowed exact origins
     const allowedOrigins = [
       'http://localhost:5173',
-      'https://safeplus.netlify.app'
+      'https://safeplus.netlify.app',
+      'https://686a95bbb955e90008219eb8--quiet-zabaione-c6e293.netlify.app'
     ];
 
     if (allowedOrigins.includes(origin) || origin.endsWith('.safeplus.netlify.app')) {
