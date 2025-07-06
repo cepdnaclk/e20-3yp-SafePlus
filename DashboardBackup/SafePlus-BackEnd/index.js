@@ -8,6 +8,10 @@ const awsIot = require('aws-iot-device-sdk');
 const WebSocket = require('ws');
 const HourlyStats = require('./models/HourlyStatModel');
 
+
+console.log("JWT_SECRET:", process.env.JWT_SECRET ? "Exists" : "Missing");
+console.log("MONGO_URL:", process.env.MONGO_URL ? "Exists" : "Missing");
+
 const app = express();
 app.use(cors({
   origin: function(origin, callback) {
