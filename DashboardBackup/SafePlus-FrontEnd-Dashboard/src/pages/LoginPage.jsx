@@ -17,7 +17,7 @@ const LoginPage = () => {
 
   const navigate = useNavigate();
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  const API_URL = process.env.VITE_API_URL;
   console.log("API_URL:", API_URL); // <-- Add this!
 
 
