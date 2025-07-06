@@ -1,8 +1,7 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-// Use environment variable for the API base URL
-const apiUrl = process.env.REACT_APP_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 const RegisterWorkerForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -23,19 +22,21 @@ const RegisterWorkerForm = ({ onSuccess }) => {
     e.preventDefault();
 
     try {
-      const res = await fetch(`${apiUrl}/api/workers`, {
+      const res = await fetch(`${API_URL}/api/workers`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify(formData)
       });
 
       if (res.ok) {
         alert("✅ Worker registered!");
-        if (onSuccess) onSuccess(); 
+        if (onSuccess) onSuccess();
       } else {
-        alert("❌ Error registering worker");
+        const errorData = await res.json();
+        alert("❌ Error registering worker: " + (errorData.message || "Unknown error"));
       }
     } catch (error) {
       console.error("❌ Server error:", error);
@@ -52,6 +53,7 @@ const RegisterWorkerForm = ({ onSuccess }) => {
         value={formData.name}
         onChange={handleChange}
         required
+        aria-label="Full Name"
       /><br />
       <input
         type="text"
@@ -60,6 +62,7 @@ const RegisterWorkerForm = ({ onSuccess }) => {
         value={formData.nic}
         onChange={handleChange}
         required
+        aria-label="NIC Number"
       /><br />
       <input
         type="text"
@@ -68,6 +71,7 @@ const RegisterWorkerForm = ({ onSuccess }) => {
         value={formData.contact}
         onChange={handleChange}
         required
+        aria-label="Contact Number"
       /><br />
       <input
         type="text"
@@ -76,6 +80,7 @@ const RegisterWorkerForm = ({ onSuccess }) => {
         value={formData.address}
         onChange={handleChange}
         required
+        aria-label="Address"
       /><br />
       <button type="submit" style={{ marginTop: "10px" }}>✅ Submit</button>
     </form>
