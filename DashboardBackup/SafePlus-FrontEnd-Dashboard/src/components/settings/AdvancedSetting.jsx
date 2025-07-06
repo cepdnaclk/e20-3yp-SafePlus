@@ -21,6 +21,9 @@ import { useNavigate } from "react-router-dom";
 import { toast } from 'react-hot-toast';
 import '../../styles/Settings.css';
 
+// ✅ Use environment variable
+const API_URL = import.meta.env.VITE_API_URL;
+
 const AdvancedSetting = () => {
   const [passwords, setPasswords] = useState({
     currentPassword: '',
@@ -34,7 +37,6 @@ const AdvancedSetting = () => {
   });
 
   const navigate = useNavigate();
-  
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleChange = (e) => {
@@ -55,7 +57,7 @@ const AdvancedSetting = () => {
 
     try {
       const res = await axios.put(
-        '/api/auth//change-password',
+        `${API_URL}/api/auth/change-password`, // ✅ FIXED double slash too
         { currentPassword, newPassword },
         { withCredentials: true }
       );
@@ -79,7 +81,7 @@ const AdvancedSetting = () => {
     }
 
     try {
-      const res = await axios.delete('/api/auth/delete-account', {
+      const res = await axios.delete(`${API_URL}/api/auth/delete-account`, {
         data: { username, password },
         withCredentials: true,
       });
@@ -87,7 +89,7 @@ const AdvancedSetting = () => {
       if (res.status === 200) {
         toast.success('Account deleted');
         localStorage.removeItem('token');
-        navigate("/login"); // or use navigate
+        navigate("/login");
       }
     } catch (err) {
       console.error(err);
@@ -131,12 +133,8 @@ const AdvancedSetting = () => {
       <Divider my={6} />
 
       <Box mt={4}>
-        <Text fontWeight="medium" color="red.500">
-          Danger Zone
-        </Text>
-        <Button colorScheme="red" onClick={onOpen} mt={2}>
-          Delete Account
-        </Button>
+        <Text fontWeight="medium" color="red.500">Danger Zone</Text>
+        <Button colorScheme="red" onClick={onOpen} mt={2}>Delete Account</Button>
       </Box>
 
       {/* Delete Confirmation Modal */}
@@ -163,16 +161,8 @@ const AdvancedSetting = () => {
             />
           </ModalBody>
           <ModalFooter>
-            <Button onClick={onClose} mr={3}>
-              Cancel
-            </Button>
-            <Button
-              colorScheme="red"
-              onClick={() => {
-                handleConfirmDelete();
-                onClose();
-              }}
-            >
+            <Button onClick={onClose} mr={3}>Cancel</Button>
+            <Button colorScheme="red" onClick={() => { handleConfirmDelete(); onClose(); }}>
               Confirm Delete
             </Button>
           </ModalFooter>
