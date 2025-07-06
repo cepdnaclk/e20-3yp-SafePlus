@@ -14,6 +14,7 @@ const SignupPage = () => {
   });
 
   //const [error, setError] = useState("");
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,7 +33,7 @@ const SignupPage = () => {
     }
 
     try {
-      const res = await axios.post('/api/auth/register', {fname, name, email, password });
+      const res = await axios.post(`${API_URL}/api/auth/register`, {fname, name, email, password });
       const data = res.data;
 
       if (data.error) {
