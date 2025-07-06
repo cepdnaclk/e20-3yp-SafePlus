@@ -2,6 +2,9 @@ import  { useEffect, useState } from "react";
 import WorkerCard from "../components/WorkerCard/WorkerCard";
 import axios from "axios";
 
+const API_URL = process.env.REACT_APP_API_URL;
+const WS_URL = process.env.REACT_APP_WS_URL;
+
 export default function AssignedWorkersPage() {
   const [workers, setWorkers] = useState([]);
   const [sensorDataMap, setSensorDataMap] = useState({});
@@ -10,14 +13,14 @@ export default function AssignedWorkersPage() {
   // Fetch assigned workers
   useEffect(() => {
     axios
-      .get("http://localhost:8000/api/workers/assigned")
+      .get(`${API_URL}/api/workers/assigned`, { withCredentials: true })
       .then((res) => setWorkers(res.data))
       .catch((err) => console.error("Error fetching assigned workers:", err));
   }, []);
 
   // Connect to WebSocket for live sensor data
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8086");
+    const ws = new WebSocket(WS_URL);
 
     ws.onopen = () => console.log("✅ WebSocket connected");
     ws.onmessage = (event) => {
