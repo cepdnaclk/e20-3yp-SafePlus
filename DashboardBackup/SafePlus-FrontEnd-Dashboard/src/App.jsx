@@ -14,7 +14,7 @@ import Settings from "./pages/Settings";
 import { NotificationProvider } from "./context/NotificationContext";
 
 
-axios.defaults.baseURL =  'http://localhost:8000'
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 axios.defaults.withCredentials= true
 
 const App = () => {
