@@ -121,10 +121,16 @@ const login = async (req, res) => {
           console.error("Error recording login activity for user:", name, activityErr);
         }
 
-        res.cookie('token', token).json({
+        res.cookie('token', token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+          maxAge: 24 * 60 * 60 * 1000,
+        }).json({
           token,
           username: user.name,
         });
+
       }
     );
   } catch (error) {
