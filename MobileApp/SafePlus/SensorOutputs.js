@@ -5,7 +5,7 @@ const IotCoreComponent = () => {
   const [sensorData, setSensorData] = useState(null);
 
   useEffect(() => {
-    const ws = new WebSocket("ws://192.168.22.24:8084/"); // Change to your actual WebSocket server
+    const ws = new WebSocket("ws://192.168.22.24:8084/"); 
 
     ws.onopen = () => console.log("✅ Connected to WebSocket Server");
 

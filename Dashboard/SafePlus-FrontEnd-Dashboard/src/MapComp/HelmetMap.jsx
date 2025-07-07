@@ -31,7 +31,7 @@ export default function HelmetMap({ helmetLocations, zoom }) {
         key={id}
         position={loc}
         icon={id === highlightedId ? highlightedIcon : helmetIcon}
-      >
+      > 
         <Popup>
           Helmet ID: <strong>{id}</strong>
           <br />
