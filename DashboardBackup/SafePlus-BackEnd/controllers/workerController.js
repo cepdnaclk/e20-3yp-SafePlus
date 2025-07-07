@@ -51,28 +51,25 @@ const registerWorker = async (req, res) => {
 const deleteWorker = async (req, res) => {
   try {
     const { workerId } = req.params;
-    const { username, password } = req.body;
 
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password required' });
+    // Extract token from request (cookie or headers)
+    const token = req.cookies.token || req.headers['authorization'].split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ error: 'Authentication required' });
     }
 
-    // Lookup the admin by email (assuming email is the username)
-    const adminUser = await Worker.findOne({ email: username });
-    if (!adminUser) {
-      return res.status(401).json({ error: 'Invalid username' });
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { name } = decoded;
+
+    // Validate the worker's existence
+    const worker = await Worker.findById(workerId);
+    if (!worker) {
+      return res.status(404).json({ error: 'Worker not found' });
     }
 
-    const isMatch = await bcrypt.compare(password, adminUser.password);
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Incorrect password' });
-    }
-
-    // Prevent admin from deleting themselves
-    if (adminUser._id.toString() === workerId) {
-      return res.status(403).json({ error: 'Admins cannot delete their own account' });
-    }
-
+    // Proceed with deletion
     const deletedWorker = await Worker.findByIdAndDelete(workerId);
     if (!deletedWorker) {
       return res.status(404).json({ error: 'Worker not found' });
@@ -80,10 +77,11 @@ const deleteWorker = async (req, res) => {
 
     res.json({ message: 'Worker deleted successfully', worker: deletedWorker });
   } catch (err) {
-    console.error('Delete error:', err);
+    console.error(err);
     res.status(500).json({ error: 'Server Error' });
   }
 };
+
 
 // assign helmet to a worker
 const assignHelmet = async (req, res) => {
