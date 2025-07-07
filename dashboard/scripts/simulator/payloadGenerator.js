@@ -1,6 +1,6 @@
 function generateHelmetBatch(count) {
   const helmets = [];
-  for (let i = 0; i < count; i++) {
+  for (let i = 1; i < count; i++) {
     helmets.push({
       id: `Helmet_${(i + 1).toString()}`,
       bpm: randomInt(80, 140),
