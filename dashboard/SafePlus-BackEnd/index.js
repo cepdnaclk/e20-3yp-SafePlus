@@ -7,7 +7,6 @@ const mongoose = require('mongoose');
 const awsIot = require('aws-iot-device-sdk');
 const WebSocket = require('ws');
 const HourlyStats = require('./models/HourlyStatModel');
-const evaluateSensorData = require('./utils/evaluateSensorData');
 const Alert = require("./models/Alert");
 
 const app = express();
