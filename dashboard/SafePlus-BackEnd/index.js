@@ -8,6 +8,7 @@ const awsIot = require('aws-iot-device-sdk');
 const WebSocket = require('ws');
 const HourlyStats = require('./models/HourlyStatModel');
 const evaluateSensorData = require('./utils/evaluateSensorData');
+const Alert = require("./models/Alert");
 
 const app = express();
 app.use(cors({
@@ -30,6 +31,8 @@ app.use('/api/user', require('./routes/twoFactorRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/workers', require('./routes/workerRoutes'));
 app.use('/api/workers/hourly-stats', require('./routes/MobileData'));
+app.use("/api/alerts", require("./routes/alertRoutes"));
+
 app.post('/api/sos', (req, res) => {
   const { helmetId } = req.body;
   if (!helmetId) return res.status(400).json({ error: "Helmet ID required" });
@@ -106,6 +109,38 @@ device.on("message", (topic, payload) => {
   const hourValue = Math.floor(roundedHour.getTime() / (1000 * 60 * 60));
   const helmetId = data.id;
 
+    // Detect alerts
+  const alerts = [];
+
+  if (data.bpmStatus === "high") {
+    alerts.push({ type: "bpm", value: data.bpm });
+  }
+  if (data.gasStatus === "danger") {
+    alerts.push({ type: "gas", value: data.gas });
+  }
+  if (data.impactStatus === "warning") {
+    alerts.push({ type: "impact", value: data.imp });
+  }
+  if (data.tempStatus === "danger") {
+    alerts.push({ type: "temp", value: data.temp });
+  }
+  if (data.fallStatus === "detected") {
+    alerts.push({ type: "fall", value: data.fall });
+  }
+
+  // Save alerts to DB
+  alerts.forEach((alert) => {
+    const alertDoc = new Alert({
+      helmetId,
+      alertType: alert.type,
+      alertValue: alert.value,
+      alertTime: now,
+    });
+    alertDoc.save().catch((err) =>
+      console.error("❌ Failed to save alert:", err)
+    );
+  });
+
   // WebSocket broadcast
   wss.clients.forEach(client => {
     if (client.readyState === WebSocket.OPEN) {
@@ -155,7 +190,7 @@ device.on("message", (topic, payload) => {
 
 function haversineDistance([lat1, lon1], [lat2, lon2]) {
   const toRad = deg => (deg * Math.PI) / 180;
-  const R = 6371; // Earth radius in km
+  const R = 6371; 
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
   const a =
