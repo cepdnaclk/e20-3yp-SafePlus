@@ -5,7 +5,10 @@ import Header from '../components/Header/Header';
 import '../styles/WorkerDetails.css';
 import AssignHelmetForm from '../components/AssignHelmet/AssignHelmetForm';
 import ConfirmDeleteForm from '../components/ConfirmDelete/ConfirmDeleteForm';
-import { toast } from 'react-hot-toast'; 
+import { toast } from 'react-hot-toast';
+
+// Use environment variable for API base URL
+const API_URL = import.meta.env.VITE_API_URL;
 
 const WorkerDetails = () => {
   const [workers, setWorkers] = useState([]);
@@ -18,7 +21,7 @@ const WorkerDetails = () => {
 
   const fetchWorkers = async () => {
     try {
-      const res = await axios.get('/api/workers');
+      const res = await axios.get(`${API_URL}/api/workers`);
       setWorkers(res.data);
     } catch (err) {
       console.error('Failed to fetch workers:', err);
@@ -27,6 +30,7 @@ const WorkerDetails = () => {
 
   useEffect(() => {
     fetchWorkers();
+    // eslint-disable-next-line
   }, []);
 
   const totalPages = Math.ceil(workers.length / itemsPerPage);

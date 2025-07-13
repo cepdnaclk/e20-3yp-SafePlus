@@ -8,15 +8,8 @@ const {
 } = require('../controllers/twoFactorController');
 
 const router = express.Router();
-const cors = require("cors");
 
-// Middleware
-router.use(
-  cors({
-    credentials: true,
-    origin: 'http://localhost:5173'
-  })
-);
+
 
 // 2FA routes
 router.get('/2fa/status', get2FAStatus);

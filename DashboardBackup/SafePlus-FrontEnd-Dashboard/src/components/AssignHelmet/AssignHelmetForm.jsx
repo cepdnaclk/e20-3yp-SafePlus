@@ -3,13 +3,15 @@ import axios from 'axios';
 import './AssignHelmetForm.css';
 import PropTypes from 'prop-types';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const AssignHelmetForm = ({ onClose, onAssignSuccess }) => {
   const [workers, setWorkers] = useState([]);
   const [selectedNIC, setSelectedNIC] = useState('');
   const [helmetID, setHelmetID] = useState('');
 
   useEffect(() => {
-    axios.get('/api/workers')
+    axios.get(`${API_URL}/api/workers`, { withCredentials: true })
       .then(res => setWorkers(res.data))
       .catch(err => console.error('Error fetching workers:', err));
   }, []);
@@ -17,7 +19,11 @@ const AssignHelmetForm = ({ onClose, onAssignSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`/api/workers/assignHelmet/${selectedNIC}`, { helmetID });
+      await axios.put(
+        `${API_URL}/api/workers/assignHelmet/${selectedNIC}`,
+        { helmetID },
+        { withCredentials: true }
+      );
       onAssignSuccess();
       onClose();
     } catch (err) {

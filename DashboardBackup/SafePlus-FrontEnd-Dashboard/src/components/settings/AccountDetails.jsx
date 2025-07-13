@@ -13,6 +13,8 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import '../../styles/Settings.css';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const AccountDetails = () => {
   const [details, setDetails] = useState({
     name: '',
@@ -29,46 +31,34 @@ const AccountDetails = () => {
   const [tempDetails, setTempDetails] = useState(details);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        // Step 1: Get logged-in user via JWT cookie
-        const res = await axios.get("/api/auth/profile", {
-          withCredentials: true,
+  const fetchProfile = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/auth/profile`, { withCredentials: true });
+
+      if (res.data) {
+        setDetails({
+          name: res.data.fname || '',
+          username: res.data.name || '',
+          email: res.data.email || ''
         });
-
-        if (res.data && res.data.name) {
-          const username = res.data.name;
-
-          // Step 2: Fetch full profile using username
-          const profileRes = await axios.get(
-            `/api/auth/profile/${username}`
-          );
-
-          const profile = profileRes?.data;
-
-          setDetails({
-            name: profile.fname || '',
-            username: profile.name || '',
-            email: profile.email || ''
-          });
-
-          setTempDetails({
-            name: profile.fname || '',
-            username: profile.name || '',
-            email: profile.email || ''
-          });
-        } else {
-          console.log("Not logged in");
-          toast.error("Not logged in");
-        }
-      } catch (error) {
-        console.error('Failed to fetch profile', error);
-        toast.error("Failed to load account details");
+        setTempDetails({
+          name: res.data.fname || '',
+          username: res.data.name || '',
+          email: res.data.email || ''
+        });
+      } else {
+        console.log("Not logged in or no data");
+        toast.error("Not logged in");
       }
-    };
+    } catch (error) {
+      console.error('Failed to fetch profile', error);
+      toast.error("Failed to load account details");
+    }
+  };
 
-    fetchProfile();
-  }, []);
+  fetchProfile();
+}, []);
+
 
  
 
@@ -82,15 +72,11 @@ const AccountDetails = () => {
 
   const saveChanges = async () => {
     try {
-      const res = await axios.put(
-        '/api/auth/profile',
-        {
-          fname: tempDetails.name,
-          name: tempDetails.username,
-          email: tempDetails.email
-        },
-        { withCredentials: true }
-      );
+      const res = await axios.put(`${API_URL}/api/auth/profile`, {
+        fname: tempDetails.name,
+        name: tempDetails.username,
+        email: tempDetails.email,
+      }, { withCredentials: true });
 
       if (res.status === 200) {
         setDetails(tempDetails);

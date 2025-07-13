@@ -3,6 +3,7 @@ import { useHighlight } from "../../context/HighlightContext";
 import { useNotifications } from "../../context/NotificationContext";
 import "./WorkerCard.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
 export default function WorkerCard({ worker, sensorData, onClick }) {
   const [showOverlay, setShowOverlay] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -73,7 +74,7 @@ export default function WorkerCard({ worker, sensorData, onClick }) {
     if (!confirmed) return;
 
     try {
-      const res = await fetch("http://localhost:8000/api/sos", {
+      const res =await fetch(`${API_URL}/api/sos`,  {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ alert: "ALERT", helmetId: worker.helmetId }),

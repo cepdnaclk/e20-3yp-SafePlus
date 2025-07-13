@@ -5,6 +5,10 @@ import HelmetMap from "../MapComp/HelmetMap";
 import WorkerCard from "../components/WorkerCard/WorkerCard";
 import { HighlightProvider } from "../context/HighlightContext"; // import context provider
 
+// Get API and WebSocket URLs from environment variables
+const API_URL = import.meta.env.VITE_API_URL;
+const WS_URL = import.meta.env.VITE_WS_URL;
+
 export default function LiveData() {
   const [helmetSensorMap, setHelmetSensorMap] = useState({});
   const [helmetLocations, setHelmetLocations] = useState({});
@@ -14,14 +18,22 @@ export default function LiveData() {
   const ws = useRef(null);
 
   // Fetch assigned workers
-  useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/workers/assigned")
-      .then((res) => setAssignedWorkers(res.data))
-      .catch((err) =>
-        console.error("❌ Failed to fetch assigned workers", err)
-      );
-  }, []);
+useEffect(() => {
+  const fetchAssignedWorkers = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/workers/assigned`, {
+        withCredentials: true, 
+      });
+      console.log("✅ Assigned workers fetched:", res.data);
+      setAssignedWorkers(res.data);
+    } catch (err) {
+      console.error("❌ Failed to fetch assigned workers:", err.response?.data || err.message);
+    }
+  };
+
+  fetchAssignedWorkers();
+}, []);
+
 
   const sendNotification = ({ id, message, onClick, remove }) => {
     if (remove) {
@@ -35,7 +47,7 @@ export default function LiveData() {
 
   // WebSocket: Listen for real-time helmet data
   useEffect(() => {
-    ws.current = new WebSocket("ws://localhost:8085");
+    ws.current = new WebSocket(WS_URL);
 
     ws.current.onopen = () => console.log("✅ WS connected");
 
@@ -87,9 +99,6 @@ export default function LiveData() {
               </div>
             ))}
             </div>
-          
-          
-          
           {/* Worker Cards */}
           <div
             style={{
@@ -108,11 +117,9 @@ export default function LiveData() {
                 sensorData={helmetSensorMap[worker.helmetId]}
                 sendNotification={sendNotification}
                 onClick={() => setSelectedHelmetId(worker.helmetId)}
-                // removed onLocationClick prop as context handles it now
               />
             ))}
           </div>
-
           {/* Map */}
           <div
             style={{

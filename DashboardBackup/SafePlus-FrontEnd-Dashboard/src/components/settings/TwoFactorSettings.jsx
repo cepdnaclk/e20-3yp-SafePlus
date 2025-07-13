@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const TwoFactorSettings = () => {
   const [enabled, setEnabled] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
@@ -10,16 +12,15 @@ const TwoFactorSettings = () => {
   const [isVerifying, setIsVerifying] = useState(false);
 
   useEffect(() => {
-    axios.get('/api/user/2fa/status', { withCredentials: true })
+    axios.get(`${API_URL}/api/user/2fa/status`, { withCredentials: true })
       .then(res => setEnabled(res.data.enabled))
       .catch(err => console.error('Failed to fetch 2FA status:', err));
   }, []);
 
   const handleToggleChange = async () => {
     if (enabled) {
-      // Disable 2FA
       try {
-        await axios.post('/api/user/2fa/disable', {}, { withCredentials: true });
+        await axios.post(`${API_URL}/api/user/2fa/disable`, {}, { withCredentials: true });
         setEnabled(false);
         setQrCodeUrl('');
         setCode('');
@@ -29,9 +30,8 @@ const TwoFactorSettings = () => {
         toast.error('Failed to disable 2FA');
       }
     } else {
-      // Generate QR code for enabling 2FA
       try {
-        const res = await axios.post('/api/user/2fa/generate', {}, { withCredentials: true });
+        const res = await axios.post(`${API_URL}/api/user/2fa/generate`, {}, { withCredentials: true });
         setQrCodeUrl(res.data.qrCode);
         setShowSetup(true);
         toast.success('Scan the QR code using your authenticator app');
@@ -45,10 +45,10 @@ const TwoFactorSettings = () => {
   const handleVerifyCode = async () => {
     setIsVerifying(true);
     try {
-      const res = await axios.post('/api/user/2fa/verify', { code }, { withCredentials: true });
+      const res = await axios.post(`${API_URL}/api/user/2fa/verify`, { code }, { withCredentials: true });
 
       if (res.data.success) {
-        await axios.post('/api/user/2fa/enable', { code }, { withCredentials: true });
+        await axios.post(`${API_URL}/api/user/2fa/enable`, { code }, { withCredentials: true });
         setEnabled(true);
         setShowSetup(false);
         toast.success('Two-Factor Authentication enabled!');
@@ -73,7 +73,6 @@ const TwoFactorSettings = () => {
           2FA is currently <strong>{enabled ? 'enabled' : 'disabled'}</strong>
         </p>
 
-        {/* Slide Toggle */}
         <label className="relative inline-flex items-center cursor-pointer">
           <input
             type="checkbox"
@@ -85,7 +84,6 @@ const TwoFactorSettings = () => {
         </label>
       </div>
 
-      {/* Modal Overlay for QR Code */}
       {showSetup && qrCodeUrl && !enabled && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
           <div className="bg-white rounded-lg shadow-lg p-6 w-[90%] max-w-sm">

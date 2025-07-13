@@ -7,10 +7,34 @@ const mongoose = require('mongoose');
 const awsIot = require('aws-iot-device-sdk');
 const WebSocket = require('ws');
 const HourlyStats = require('./models/HourlyStatModel');
+const http = require("http");
+
+
+console.log("JWT_SECRET:", process.env.JWT_SECRET ? "Exists" : "Missing");
+console.log("MONGO_URL:", process.env.MONGO_URL ? "Exists" : "Missing");
 
 const app = express();
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like curl or Postman)
+    if (!origin) return callback(null, true);
+
+    // List of allowed exact origins
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'https://safeplus.netlify.app',
+      'https://686a95bbb955e90008219eb8--quiet-zabaione-c6e293.netlify.app'
+    ];
+
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.endsWith('.netlify.app') // Allow all Netlify deploys
+    ) {
+      callback(null, true);
+    }else {
+      callback(new Error(`CORS policy: Origin ${origin} not allowed`));
+    }
+  },
   credentials: true
 }));
 
@@ -42,16 +66,21 @@ app.post('/api/sos', (req, res) => {
   });
 });
 
-
-
-
-// Start HTTP Server
-const port = 8000;
-app.listen(port, () => {
-  console.log(`✅ Server is running on port ${port}`);
+app.get('/', (req, res) => {
+  res.send('✅ SafePlus backend is running!');
 });
 
-const wss = new WebSocket.Server({ port: 8085 });
+
+// Create shared HTTP server
+const server = http.createServer(app);
+const port = process.env.PORT || 8000;
+
+server.listen(port, () => {
+  console.log(`✅ Server + WebSocket running on port ${port}`);
+});
+
+// Attach WebSocket server to HTTP server
+const wss = new WebSocket.Server({ server });
 
 // AWS IoT Setup
 const device = awsIot.device({

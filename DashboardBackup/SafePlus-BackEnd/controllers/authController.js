@@ -67,20 +67,27 @@ const login = async (req, res) => {
     const { name, password } = req.body;
 
     console.log("Login API hit");
+    console.log("Login request for username:", name);
+
+    if (!name || !password) {
+      console.log("Missing username or password");
+      return res.status(400).json({ error: "Username and password are required" });
+    }
 
     const user = await User.findOne({ name });
     if (!user) {
-      console.log("No user found");
-      return res.json({ error: 'No User Found' });
+      console.log("No user found with name:", name);
+      return res.status(404).json({ error: 'No User Found' });
     }
 
     const match = await comparePassword(password, user.password);
     if (!match) {
-      console.log("Password mismatch");
-      return res.json({ error: 'Password does not match' });
+      console.log("Password does not match for user:", name);
+      return res.status(401).json({ error: 'Password does not match' });
     }
+
     if (user.is2FAEnabled) {
-      console.log("2FA enabled. Waiting for TOTP verification...");
+      console.log("User has 2FA enabled, sending 2FA required response for user:", name);
       return res.json({
         requires2FA: true,
         userId: user._id,
@@ -88,7 +95,7 @@ const login = async (req, res) => {
       });
     }
 
-    console.log("Credentials match. Signing token...");
+    console.log("Password matched, signing JWT for user:", name);
 
     jwt.sign(
       { email: user.email, id: user._id, name: user.name },
@@ -96,11 +103,11 @@ const login = async (req, res) => {
       {},
       async (err, token) => {
         if (err) {
-          console.error("JWT Sign error:", err);
+          console.error("JWT sign error:", err);
           return res.status(500).json({ error: "Token generation failed" });
         }
 
-        console.log("JWT token generated. Logging activity...");
+        console.log("JWT token generated successfully for user:", name);
 
         try {
           await LoginActivity.create({
@@ -109,19 +116,25 @@ const login = async (req, res) => {
             ip: ip,
             userAgent: req.headers['user-agent'],
           });
-          console.log("Login activity recorded!");
-        } catch (err) {
-          console.error("Error recording login activity:", err);
+          console.log("Login activity recorded for user:", name);
+        } catch (activityErr) {
+          console.error("Error recording login activity for user:", name, activityErr);
         }
 
-        res.cookie('token', token).json({
+        res.cookie('token', token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+          maxAge: 24 * 60 * 60 * 1000,
+        }).json({
           token,
-          username: user.name, 
+          username: user.name,
         });
+
       }
     );
   } catch (error) {
-    console.log("Unexpected error in login route:", error);
+    console.error("Unexpected error in login route:", error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -214,17 +227,23 @@ const test = (req, res) => {
   res.json('test is working');
 };
 
-const getProfile =(req,res) => {
-const {token} =req.cookies
-if (token){
-  jwt.verify(token,  process.env.JWT_SECRET, {},(err,user)=>{
-    if(err) throw err;
-    res.json(user)
-  })
-} else {
-  res.json(null)
-}
-}
+const getProfile = async (req, res) => {
+  try {
+    const { token } = req.cookies;
+    if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password"); // exclude password
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json(user);
+  } catch (err) {
+    console.error("Error in getProfile:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 // Update user profile
 const updateProfile = async (req, res) => {

@@ -1,15 +1,7 @@
 const express = require('express');
 const { test, register, login, getProfile,updateProfile, getProfilebyname, changePassword, deleteAccount, getLoginActivities, verify2FA } = require('../controllers/authController')
 const router = express.Router();
-const cors = require("cors");
 
-//middleware
-router.use(
-  cors({
-    credentials: true,
-    origin: 'http://localhost:5173'
-  })
-)
 
 router.get('/', test)
 router.post("/register", register);

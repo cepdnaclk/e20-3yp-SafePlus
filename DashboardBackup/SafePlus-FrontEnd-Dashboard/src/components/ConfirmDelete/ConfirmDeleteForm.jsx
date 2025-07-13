@@ -4,14 +4,17 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import '../RegisterWorker/RegisterWorkerForm.css'; // Reuse same styles
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const ConfirmDeleteForm = ({ onClose, worker, onDeleteSuccess }) => {
   const [name, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleDelete = async () => {
     try {
-      const res = await axios.delete(`/api/workers/${worker._id}`, {
+      const res = await axios.delete(`${API_URL}/api/workers/${worker._id}`, {
         data: { username: name, password },
+        withCredentials: true
       });
       console.log('Delete response:', res.data);
       onDeleteSuccess(worker._id);

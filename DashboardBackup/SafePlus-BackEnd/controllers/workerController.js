@@ -82,6 +82,7 @@ const deleteWorker = async (req, res) => {
   }
 };
 
+
 // assign helmet to a worker
 const assignHelmet = async (req, res) => {
   const nic = req.params.nic;

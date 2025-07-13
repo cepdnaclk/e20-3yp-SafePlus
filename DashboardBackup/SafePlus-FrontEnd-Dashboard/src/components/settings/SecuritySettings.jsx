@@ -13,7 +13,10 @@ import {
 import '../../styles/Settings.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import TwoFactorSettings from './TwoFactorSettings'; // Adjust path as needed
+import TwoFactorSettings from './TwoFactorSettings'; // Adjust path if needed
+
+// ✅ Use environment variable for API base URL
+const API_URL = import.meta.env.VITE_API_URL;
 
 const SecuritySettings = () => {
   const [loginHistory, setLoginHistory] = useState([]);
@@ -21,7 +24,7 @@ const SecuritySettings = () => {
   useEffect(() => {
     const fetchLoginActivity = async () => {
       try {
-        const res = await axios.get('/api/auth/login-activities', {
+        const res = await axios.get(`${API_URL}/api/auth/login-activities`, {
           withCredentials: true,
         });
         setLoginHistory(res.data);
