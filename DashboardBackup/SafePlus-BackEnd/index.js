@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const awsIot = require('aws-iot-device-sdk');
 const WebSocket = require('ws');
 const HourlyStats = require('./models/HourlyStatModel');
+const http = require("http");
 
 
 console.log("JWT_SECRET:", process.env.JWT_SECRET ? "Exists" : "Missing");
@@ -68,17 +69,16 @@ app.post('/api/sos', (req, res) => {
 
 
 
-// Start HTTP Server
+// Create shared HTTP server
+const server = http.createServer(app);
 const port = process.env.PORT || 8000;
-app.listen(port, () => {
-  console.log(`✅ Server is running on port ${port}`);
+
+server.listen(port, () => {
+  console.log(`✅ Server + WebSocket running on port ${port}`);
 });
 
-app.get('/', (req, res) => {
-  res.send('✅ SafePlus backend is running!');
-});
-
-const wss = new WebSocket.Server({ port: 8085 });
+// Attach WebSocket server to HTTP server
+const wss = new WebSocket.Server({ server });
 
 // AWS IoT Setup
 const device = awsIot.device({
