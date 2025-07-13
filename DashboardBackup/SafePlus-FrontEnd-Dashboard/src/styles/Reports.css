@@ -1,0 +1,21 @@
+@media print {
+  header, .button-container {
+    display: none;
+  }
+
+  .worker-details-container {
+    padding: 1rem;
+  }
+
+  .account-box {
+    page-break-inside: avoid;
+  }
+
+  .action-btn {
+    display: none;
+  }
+
+  .worker-table {
+    font-size: 12pt;
+  }
+}
