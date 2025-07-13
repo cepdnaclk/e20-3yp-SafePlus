@@ -7,34 +7,12 @@ const mongoose = require('mongoose');
 const awsIot = require('aws-iot-device-sdk');
 const WebSocket = require('ws');
 const HourlyStats = require('./models/HourlyStatModel');
-const http = require("http");
-
-
-console.log("JWT_SECRET:", process.env.JWT_SECRET ? "Exists" : "Missing");
-console.log("MONGO_URL:", process.env.MONGO_URL ? "Exists" : "Missing");
+const evaluateSensorData = require('./utils/evaluateSensorData');
+const Alert = require("./models/Alert");
 
 const app = express();
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like curl or Postman)
-    if (!origin) return callback(null, true);
-
-    // List of allowed exact origins
-    const allowedOrigins = [
-      'http://localhost:5173',
-      'https://safeplus.netlify.app',
-      'https://686a95bbb955e90008219eb8--quiet-zabaione-c6e293.netlify.app'
-    ];
-
-    if (
-      allowedOrigins.includes(origin) ||
-      origin.endsWith('.netlify.app') // Allow all Netlify deploys
-    ) {
-      callback(null, true);
-    }else {
-      callback(new Error(`CORS policy: Origin ${origin} not allowed`));
-    }
-  },
+  origin: 'http://localhost:5173',
   credentials: true
 }));
 
@@ -53,6 +31,8 @@ app.use('/api/user', require('./routes/twoFactorRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/workers', require('./routes/workerRoutes'));
 app.use('/api/workers/hourly-stats', require('./routes/MobileData'));
+app.use("/api/alerts", require("./routes/alertRoutes"));
+
 app.post('/api/sos', (req, res) => {
   const { helmetId } = req.body;
   if (!helmetId) return res.status(400).json({ error: "Helmet ID required" });
@@ -66,21 +46,16 @@ app.post('/api/sos', (req, res) => {
   });
 });
 
-app.get('/', (req, res) => {
-  res.send('✅ SafePlus backend is running!');
+const message = JSON.stringify()
+
+
+// Start HTTP Server
+const port = 8000;
+app.listen(port, () => {
+  console.log(`✅ Server is running on port ${port}`);
 });
 
-
-// Create shared HTTP server
-const server = http.createServer(app);
-const port = process.env.PORT || 8000;
-
-server.listen(port, () => {
-  console.log(`✅ Server + WebSocket running on port ${port}`);
-});
-
-// Attach WebSocket server to HTTP server
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({ port: 8085 });
 
 // AWS IoT Setup
 const device = awsIot.device({
@@ -127,11 +102,44 @@ device.on('error', function (error) {
 });
 
 device.on("message", (topic, payload) => {
-  const data = JSON.parse(payload.toString());
+  const rawData = JSON.parse(payload.toString());
+  const data = evaluateSensorData(rawData);
   const now = new Date();
   const roundedHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0, 0, 0);
   const hourValue = Math.floor(roundedHour.getTime() / (1000 * 60 * 60));
   const helmetId = data.id;
+
+    // Detect alerts
+  const alerts = [];
+
+  if (data.bpmStatus === "high") {
+    alerts.push({ type: "bpm", value: data.bpm });
+  }
+  if (data.gasStatus === "danger") {
+    alerts.push({ type: "gas", value: data.gas });
+  }
+  if (data.impactStatus === "warning") {
+    alerts.push({ type: "impact", value: data.imp });
+  }
+  if (data.tempStatus === "danger") {
+    alerts.push({ type: "temp", value: data.temp });
+  }
+  if (data.fallStatus === "detected") {
+    alerts.push({ type: "fall", value: data.fall });
+  }
+
+  // Save alerts to DB
+  alerts.forEach((alert) => {
+    const alertDoc = new Alert({
+      helmetId,
+      alertType: alert.type,
+      alertValue: alert.value,
+      alertTime: now,
+    });
+    alertDoc.save().catch((err) =>
+      console.error("❌ Failed to save alert:", err)
+    );
+  });
 
   // WebSocket broadcast
   wss.clients.forEach(client => {
@@ -177,4 +185,60 @@ device.on("message", (topic, payload) => {
     .catch(err => {
       console.error("❌ Error saving hourly stats:", err);
     });
+});
+
+
+function haversineDistance([lat1, lon1], [lat2, lon2]) {
+  const toRad = deg => (deg * Math.PI) / 180;
+  const R = 6371; 
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+app.post("/api/sos", (req, res) => {
+  const { helmetId, mode } = req.body;
+  if (!helmetId || !mode) return res.status(400).json({ error: "Missing fields" });
+
+  const topic = `helmet/alert`;
+  const message = JSON.stringify({ alert: "ALERT", helmetId });
+
+  if (mode === "worker") {
+    device.publish(topic, message, (err) => {
+      if (err) return res.status(500).json({ error: "Failed to send SOS" });
+      return res.status(200).json({ message: "SOS sent to worker" });
+    });
+  }
+
+  else if (mode === "group") {
+    const center = helmetLocationMap[helmetId];
+    if (!center) return res.status(404).json({ error: "Helmet location not found" });
+
+    const RADIUS_METERS = 20;
+    const nearby = Object.entries(helmetLocationMap)
+      .filter(([id, loc]) => {
+        if (id === helmetId) return false;
+        const dist = getDistanceMeters(center, loc);
+        return dist <= RADIUS_METERS;
+      })
+      .map(([id]) => id);
+
+    const allIds = [helmetId, ...nearby];
+
+    allIds.forEach(id => {
+      const msg = JSON.stringify({ alert: "ALERT", helmetId: id });
+      device.publish(topic, msg);
+    });
+
+    console.log(`🚨 Group SOS sent to:`, allIds);
+    res.status(200).json({ message: "Group SOS sent", helmets: allIds });
+  }
+
+  else {
+    return res.status(400).json({ error: "Invalid mode" });
+  }
 });
