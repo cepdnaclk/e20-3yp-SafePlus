@@ -151,3 +151,59 @@ device.on("message", (topic, payload) => {
       console.error("❌ Error saving hourly stats:", err);
     });
 });
+
+
+function haversineDistance([lat1, lon1], [lat2, lon2]) {
+  const toRad = deg => (deg * Math.PI) / 180;
+  const R = 6371; // Earth radius in km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+app.post("/api/sos", (req, res) => {
+  const { helmetId, mode } = req.body;
+  if (!helmetId || !mode) return res.status(400).json({ error: "Missing fields" });
+
+  const topic = `helmet/alert`;
+  const message = JSON.stringify({ alert: "ALERT", helmetId });
+
+  if (mode === "worker") {
+    device.publish(topic, message, (err) => {
+      if (err) return res.status(500).json({ error: "Failed to send SOS" });
+      return res.status(200).json({ message: "SOS sent to worker" });
+    });
+  }
+
+  else if (mode === "group") {
+    const center = helmetLocationMap[helmetId];
+    if (!center) return res.status(404).json({ error: "Helmet location not found" });
+
+    const RADIUS_METERS = 20;
+    const nearby = Object.entries(helmetLocationMap)
+      .filter(([id, loc]) => {
+        if (id === helmetId) return false;
+        const dist = getDistanceMeters(center, loc);
+        return dist <= RADIUS_METERS;
+      })
+      .map(([id]) => id);
+
+    const allIds = [helmetId, ...nearby];
+
+    allIds.forEach(id => {
+      const msg = JSON.stringify({ alert: "ALERT", helmetId: id });
+      device.publish(topic, msg);
+    });
+
+    console.log(`🚨 Group SOS sent to:`, allIds);
+    res.status(200).json({ message: "Group SOS sent", helmets: allIds });
+  }
+
+  else {
+    return res.status(400).json({ error: "Invalid mode" });
+  }
+});

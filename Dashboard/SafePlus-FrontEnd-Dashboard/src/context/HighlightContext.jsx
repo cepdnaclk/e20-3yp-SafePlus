@@ -1,17 +1,22 @@
-import React, { createContext, useContext, useState } from "react";
+// HighlightContext.js
+import { createContext, useContext, useState } from "react";
 
 const HighlightContext = createContext();
 
 export function HighlightProvider({ children }) {
   const [highlightedId, setHighlightedId] = useState(null);
+  const [highlightedGroupIds, setHighlightedGroupIds] = useState([]);
 
   return (
-    <HighlightContext.Provider value={{ highlightedId, setHighlightedId }}>
+    <HighlightContext.Provider value={{
+      highlightedId,
+      setHighlightedId,
+      highlightedGroupIds,
+      setHighlightedGroupIds
+    }}>
       {children}
     </HighlightContext.Provider>
   );
 }
 
-export function useHighlight() {
-  return useContext(HighlightContext);
-}
+export const useHighlight = () => useContext(HighlightContext);

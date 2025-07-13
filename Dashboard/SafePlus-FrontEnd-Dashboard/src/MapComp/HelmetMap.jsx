@@ -5,7 +5,8 @@ import RecenterMap from "./RecenterMap";
 import { useHighlight } from "../context/HighlightContext";  // import context hook
 
 export default function HelmetMap({ helmetLocations, zoom }) {
-  const { highlightedId } = useHighlight();
+  const { highlightedId, highlightedGroupIds } = useHighlight();
+
 
   const positions = Object.values(helmetLocations).filter(
     (loc) => Array.isArray(loc) && loc.length === 2
@@ -25,20 +26,23 @@ export default function HelmetMap({ helmetLocations, zoom }) {
   });
 
   const markers = Object.entries(helmetLocations)
-    .filter(([_, loc]) => Array.isArray(loc) && loc.length === 2)
-    .map(([id, loc]) => (
+  .filter(([_, loc]) => Array.isArray(loc) && loc.length === 2)
+  .map(([id, loc]) => {
+    const isHighlighted = id === highlightedId || highlightedGroupIds.includes(id);
+    return (
       <Marker
         key={id}
         position={loc}
-        icon={id === highlightedId ? highlightedIcon : helmetIcon}
-      > 
+        icon={isHighlighted ? highlightedIcon : helmetIcon}
+      >
         <Popup>
           Helmet ID: <strong>{id}</strong>
           <br />
           Location: {loc[0].toFixed(4)}, {loc[1].toFixed(4)}
         </Popup>
       </Marker>
-    ));
+    );
+  });
 
   return (
     <MapContainer
