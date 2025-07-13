@@ -1,4 +1,3 @@
-// File: components/SOSModal.jsx
 import "./SOSModal.css";
 
 export default function SOSModal({ onClose, onSelect }) {
