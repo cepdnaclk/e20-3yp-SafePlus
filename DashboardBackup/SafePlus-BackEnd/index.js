@@ -66,7 +66,9 @@ app.post('/api/sos', (req, res) => {
   });
 });
 
-
+app.get('/', (req, res) => {
+  res.send('✅ SafePlus backend is running!');
+});
 
 
 // Create shared HTTP server
