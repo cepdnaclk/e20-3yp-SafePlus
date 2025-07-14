@@ -128,7 +128,6 @@ device.on('error', function (error) {
 
 device.on("message", (topic, payload) => {
   const rawData = JSON.parse(payload.toString());
-  const data = evaluateSensorData(rawData);
   const now = new Date();
   const roundedHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0, 0, 0);
   const hourValue = Math.floor(roundedHour.getTime() / (1000 * 60 * 60));
