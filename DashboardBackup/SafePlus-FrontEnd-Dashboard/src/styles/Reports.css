@@ -21,7 +21,42 @@
 }
 
 .action-btn.active {
-  background-color: #f8b332; /* a deeper shade to show it's selected */
+  background-color: #f8b332;
   color: black;
   transition: all 0.3s ease;
+}
+.table-wrapper {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.alert-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background-color: white;
+}
+
+.alert-table thead th {
+  position: sticky;
+  top: 0;
+  background-color: #5c4a1f;
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  z-index: 2;
+}
+
+.alert-table td {
+  padding: 12px 16px;
+}
+
+.alert-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.alert-table tbody tr:hover {
+  background-color: #f1f1f1;
 }

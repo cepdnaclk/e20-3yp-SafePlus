@@ -3,9 +3,8 @@ import axios from "axios";
 import Header from "../components/Header/Header";
 import HelmetMap from "../MapComp/HelmetMap";
 import WorkerCard from "../components/WorkerCard/WorkerCard";
-import { HighlightProvider } from "../context/HighlightContext"; // import context provider
+import { HighlightProvider } from "../context/HighlightContext";
 
-// Get API and WebSocket URLs from environment variables
 const API_URL = import.meta.env.VITE_API_URL;
 const WS_URL = import.meta.env.VITE_WS_URL;
 

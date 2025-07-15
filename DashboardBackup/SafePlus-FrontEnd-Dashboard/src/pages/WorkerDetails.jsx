@@ -7,7 +7,6 @@ import AssignHelmetForm from '../components/AssignHelmet/AssignHelmetForm';
 import ConfirmDeleteForm from '../components/ConfirmDelete/ConfirmDeleteForm';
 import { toast } from 'react-hot-toast';
 
-// Use environment variable for API base URL
 const API_URL = import.meta.env.VITE_API_URL;
 
 const WorkerDetails = () => {
@@ -17,7 +16,7 @@ const WorkerDetails = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(15);
   const [showDeleteForm, setShowDeleteForm] = useState(false);
-  const [deleteWorker, setDeleteWorker] = useState(null); // Store the worker to be deleted
+  const [deleteWorker, setDeleteWorker] = useState(null); 
 
   const fetchWorkers = async () => {
     try {
@@ -30,7 +29,6 @@ const WorkerDetails = () => {
 
   useEffect(() => {
     fetchWorkers();
-    // eslint-disable-next-line
   }, []);
 
   const totalPages = Math.ceil(workers.length / itemsPerPage);
@@ -39,8 +37,8 @@ const WorkerDetails = () => {
   const currentWorkers = workers.slice(indexOfFirstItem, indexOfLastItem);
 
   const handleDelete = (worker) => {
-    setDeleteWorker(worker);  // Set the worker to be deleted
-    setShowDeleteForm(true);  // Show the delete confirmation modal
+    setDeleteWorker(worker);  
+    setShowDeleteForm(true);  
   };
 
   const handleDeleteSuccess = (deletedWorkerId) => {
@@ -60,7 +58,7 @@ const WorkerDetails = () => {
 
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(parseInt(e.target.value));
-    setCurrentPage(1); // Reset to page 1
+    setCurrentPage(1); 
   };
 
   return (
@@ -89,7 +87,7 @@ const WorkerDetails = () => {
           <ConfirmDeleteForm
             onClose={() => setShowDeleteForm(false)}
             worker={deleteWorker} 
-            onDeleteSuccess={handleDeleteSuccess}  // Pass the success handler here
+            onDeleteSuccess={handleDeleteSuccess}  
           />
         )}
 

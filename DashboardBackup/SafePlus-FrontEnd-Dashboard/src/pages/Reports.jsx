@@ -11,7 +11,7 @@ import {
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Reports() {
-  const [mode, setMode] = useState("worker"); // 'worker' or 'global'
+  const [mode, setMode] = useState("worker"); 
 
   const [workers, setWorkers] = useState([]);
   const [selectedWorker, setSelectedWorker] = useState(null);
@@ -161,7 +161,7 @@ function Reports() {
             {alerts.length > 0 ? (
               <>
                 <div className="table-wrapper" style={{ marginTop: "1rem" }}>
-                  <table className="worker-table">
+                  <table className="alert-table">
                     <thead>
                       <tr>
                         <th>Timestamp</th>
@@ -188,6 +188,8 @@ function Reports() {
                     </tbody>
                   </table>
                 </div>
+
+
 
                 <div style={{ marginTop: "1rem" }}>
                   <p><strong>Total Alerts:</strong> {alerts.length}</p>
