@@ -1,15 +1,16 @@
 import { useState, useRef, useEffect } from "react";
 import { useHighlight } from "../../context/HighlightContext";
 import { useNotifications } from "../../context/NotificationContext";
-import SOSModal from "../SOSModal/SOSModal";
+import SOSModal from "../SOSModal/SOSModal"; //
 import "./WorkerCard.css";
 
 export default function WorkerCard({ worker, sensorData, onClick }) {
   const [showOverlay, setShowOverlay] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [acknowledgedAlertKey, setAcknowledgedAlertKey] = useState(null);
-  const [showSOSModal, setShowSOSModal] = useState(false);
+  const [showSOSModal, setShowSOSModal] = useState(false); // ✅ new modal state
   const { setHighlightedId, setHighlightedGroupIds } = useHighlight();
+
   const cardRef = useRef(null);
   const { sendNotification } = useNotifications();
 

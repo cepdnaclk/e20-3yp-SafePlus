@@ -9,11 +9,11 @@ router.get("/", async (req, res) => {
   if (helmetId) query.helmetId = helmetId;
   //if (from) query.alertTime = { $gte: new Date(from) };
 
-  console.log("Alert query:", query);  // ✅ ADD THIS
+  console.log("Alert query:", query); 
 
   try {
     const alerts = await Alert.find(query).sort({ alertTime: -1 });
-    console.log("Found alerts:", alerts.length);  // ✅ ADD THIS
+    console.log("Found alerts:", alerts.length);
     res.json(alerts);
   } catch (err) {
     console.error("Error fetching alerts:", err);
