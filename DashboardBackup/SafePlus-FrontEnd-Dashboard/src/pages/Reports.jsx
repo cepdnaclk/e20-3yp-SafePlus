@@ -160,7 +160,7 @@ function Reports() {
             {/* Worker Alert Table */}
             {alerts.length > 0 ? (
               <>
-                <div className="table-wrapper" style={{ marginTop: "1rem" }}>
+                <div className="alert-table-wrapper" style={{ marginTop: "1rem" }}>
                   <table className="alert-table">
                     <thead>
                       <tr>
