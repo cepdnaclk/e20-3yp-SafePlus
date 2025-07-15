@@ -43,20 +43,20 @@ app.use(express.urlencoded({ extended: false }));
 mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.log("❌ MongoDB connection failed", err));
-// Routes
+
+  // Routes
 
 app.use('/api/user', require('./routes/twoFactorRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/workers', require('./routes/workerRoutes'));
 app.use('/api/workers/hourly-stats', require('./routes/MobileData'));
 app.use("/api/alerts", require("./routes/alertRoutes"));
-
 app.post('/api/sos', (req, res) => {
   const { helmetId } = req.body;
   if (!helmetId) return res.status(400).json({ error: "Helmet ID required" });
 
   const topic = `helmet/alert`;
-  const message = JSON.stringify({"alert":"ALERT"});  // <-- JSON string
+  const message = JSON.stringify({"alert":"ALERT"});
 
   device.publish(topic, message, (err) => {
     if (err) return res.status(500).json({ error: "Failed to send SOS" });
@@ -125,6 +125,7 @@ device.on("reconnect", () => {
 device.on('error', function (error) {
   console.error('❌ AWS IoT error occurred:', error);
 });
+
 
 device.on("message", (topic, payload) => {
   const data = JSON.parse(payload.toString());
