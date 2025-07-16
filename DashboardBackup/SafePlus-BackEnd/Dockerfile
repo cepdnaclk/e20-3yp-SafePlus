@@ -27,6 +27,8 @@ RUN npm ci
 # Copy application code
 COPY . .
 
+# Add this to explicitly copy the certificate directory
+COPY ./certificate ./certificate
 
 # Final stage for app image
 FROM base
