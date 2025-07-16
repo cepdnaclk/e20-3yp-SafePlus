@@ -61,8 +61,8 @@ void addNewCredential(const char* ssid, const char* password) {
 }
 
 void startAP() {
-  WiFi.softAP("Helmet_1_Setup", "12345678");
-  Serial.println("Started Access Point: HelmetSetup");
+  WiFi.softAP("Helmet1Setup", "12345678");
+  Serial.println("Started Access Point: Helmet1Setup");
   Serial.print("AP IP address: ");
   Serial.println(WiFi.softAPIP());
 }
