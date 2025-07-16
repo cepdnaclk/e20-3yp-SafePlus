@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../components/Header/Header";
-import "../styles/WorkerDetails.css";
 import "../styles/Reports.css";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -87,11 +86,11 @@ function Reports() {
   return (
     <div>
       <Header />
-      <div className="worker-details-container">
+      <div className="alert-details-container">
         <h2 className="account-heading">Reports</h2>
 
         {/* Mode Switch */}
-        <div className="button-container">
+        <div className="alert-button-container">
           <button
             className={`action-btn ${mode === "worker" ? "active" : ""}`}
             onClick={() => setMode("worker")}
@@ -121,7 +120,7 @@ function Reports() {
         ============================ */}
         {mode === "worker" && (
           <>
-            <div className="button-container">
+            <div className="alert-button-container">
               <select
                 className="action-btn"
                 value={selectedWorker?.helmetId || ""}
