@@ -82,8 +82,9 @@ app.get('/', (req, res) => {
 // Create shared HTTP server
 const server = http.createServer(app);
 const port = process.env.PORT || 8000;
+const host = '0.0.0.0'; 
 
-server.listen(port, () => {
+server.listen(port, host,() => {
   console.log(`✅ Server + WebSocket running on port ${port}`);
 });
 
