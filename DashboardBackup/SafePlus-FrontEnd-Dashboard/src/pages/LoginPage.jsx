@@ -32,7 +32,7 @@ const LoginPage = () => {
   }
 
   try {
-    const { data } = await axios.post(`${API_URL}/api/auth/login`, { name, password });
+    const { data } = await axios.post(`${API_URL}/api/auth/login`, { name, password },{ withCredentials: true });
 
     if (data.error) {
       toast.error(data.error);

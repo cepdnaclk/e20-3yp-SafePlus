@@ -11,6 +11,13 @@ const Alert = require("./models/Alert");
 const http = require("http");
 
 
+console.log("🔍 AWS ENV CHECK:");
+console.log("PRIVATE_KEY_PATH:", process.env.PRIVATE_KEY_PATH);
+console.log("CERTIFICATE_PATH:", process.env.CERTIFICATE_PATH);
+console.log("ROOT_CA_PATH:", process.env.ROOT_CA_PATH);
+console.log("AWS_IOT_ENDPOINT:", process.env.AWS_IOT_ENDPOINT);
+
+
 console.log("JWT_SECRET:", process.env.JWT_SECRET ? "Exists" : "Missing");
 console.log("MONGO_URL:", process.env.MONGO_URL ? "Exists" : "Missing");
 
@@ -33,6 +40,7 @@ app.use(cors({
   },
   credentials: true
 }));
+app.options("*", cors());
 
 app.use(requestIp.mw());
 app.use(express.json());
@@ -78,6 +86,8 @@ const port = process.env.PORT || 8000;
 server.listen(port, () => {
   console.log(`✅ Server + WebSocket running on port ${port}`);
 });
+
+
 
 // Attach WebSocket server to HTTP server
 const wss = new WebSocket.Server({ server });
