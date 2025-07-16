@@ -9,6 +9,17 @@ const WebSocket = require('ws');
 const HourlyStats = require('./models/HourlyStatModel');
 const Alert = require("./models/Alert");
 const http = require("http");
+const fs = require('fs');
+
+['PRIVATE_KEY_PATH', 'CERTIFICATE_PATH', 'ROOT_CA_PATH'].forEach((env) => {
+  const path = process.env[env];
+  console.log(`Checking file: ${env} -> ${path}`);
+  if (path && fs.existsSync(path)) {
+    console.log(`✅ File exists: ${path}`);
+  } else {
+    console.log(`❌ File NOT found: ${path}`);
+  }
+});
 
 
 console.log("🔍 AWS ENV CHECK:");
