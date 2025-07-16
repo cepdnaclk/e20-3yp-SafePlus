@@ -13,6 +13,10 @@ export default function WorkerCard({ worker, sensorData, onClick }) {
   const cardRef = useRef(null);
   const { sendNotification } = useNotifications();
 
+
+  const API_URL = import.meta.env.VITE_API_URL;
+  const WS_URL = import.meta.env.VITE_WS_URL;
+
   const hasAlert =
     sensorData &&
     (sensorData.bpmStatus === "high" ||
@@ -75,7 +79,7 @@ export default function WorkerCard({ worker, sensorData, onClick }) {
   setShowSOSModal(false);
 
   try {
-    const res = await fetch("http://localhost:8000/api/sos", {
+    const res = await fetch(`${API_URL}/api/sos`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
