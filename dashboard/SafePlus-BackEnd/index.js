@@ -72,21 +72,48 @@ wss.on("connection", (ws) => {
 
 
 device.on("connect", () => {
-    console.log("✅ Connected to AWS IoT");
+  console.log("✅ Connected to AWS IoT");
+
   device.subscribe("helmet/data", (err) => {
-    if (err) {console.error("❌ AWS subscription error:", err);}
-    else {console.log("✅ Subscribed to helmet/data topic");}
-  });
-  device.subscribe("helmet/alert", (err) => {
-    if (err) {console.error("❌ AWS subscription error:", err);}
-    else {console.log("✅ Subscribed to helmet/alert topic");}
+    if (err) console.error("❌ AWS subscription error:", err);
+    else console.log("✅ Subscribed to helmet/data topic");
   });
 
+  device.subscribe("helmet/alert", (err) => {
+    if (err) console.error("❌ AWS subscription error:", err);
+    else console.log("✅ Subscribed to helmet/alert topic");
+  });
+
+  device.subscribe("helmet/ack", (err) => {
+    if (err) console.error (err);
+    else console.log("✅ Subscribed to helmet/ack topic");
+  });
 });
+
+device.on("message", (topic, message) => {
+  try {
+    const payload = JSON.parse(message.toString());
+
+    if (topic === "helmet/data") {
+      console.log(`📥 Received from simulator → ID: ${payload.id}`);
+
+      // Send back ACK
+      const ack = { id: payload.id };
+      device.publish("helmet/ack", JSON.stringify(ack),{ qos: 1 });
+      console.log(`🔁 Sent ACK for ID: ${payload.id}`);
+    } else if (topic === "helmet/alert") {
+      console.log("📛 Alert received:", payload);
+    }
+
+  } catch (err) {
+    console.error("❌ Failed to parse message:", err.message);
+  }
+});
+
+// Error and status handlers
 device.on("error", (error) => {
   console.error("❌ AWS IoT error:", error);
-}
-);
+});
 device.on("close", () => {
   console.log("❌ AWS IoT connection closed");
 });
@@ -94,15 +121,12 @@ device.on("offline", () => {
   console.log("❌ AWS IoT device is offline");
 });
 device.on("reconnect", () => {
-  console.log("✅ AWS IoT device reconnected");});
-
-device.on('error', function (error) {
-  console.error('❌ AWS IoT error occurred:', error);
+  console.log("✅ AWS IoT device reconnected");
 });
 
 device.on("message", (topic, payload) => {
-  const rawData = JSON.parse(payload.toString());
-  const data = evaluateSensorData(rawData);
+  const data = JSON.parse(payload.toString());
+  //const data = evaluateSensorData(rawData);
   const now = new Date();
   const roundedHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0, 0, 0);
   const hourValue = Math.floor(roundedHour.getTime() / (1000 * 60 * 60));
