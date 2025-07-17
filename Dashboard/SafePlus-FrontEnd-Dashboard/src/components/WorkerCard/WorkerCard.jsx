@@ -8,7 +8,7 @@ export default function WorkerCard({ worker, sensorData, onClick }) {
   const [showOverlay, setShowOverlay] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [acknowledgedAlertKey, setAcknowledgedAlertKey] = useState(null);
-  const [showSOSModal, setShowSOSModal] = useState(false); // ✅ new modal state
+  const [showSOSModal, setShowSOSModal] = useState(false);
   const { setHighlightedId, setHighlightedGroupIds } = useHighlight();
 
   const cardRef = useRef(null);
