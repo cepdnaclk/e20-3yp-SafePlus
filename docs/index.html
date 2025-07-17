@@ -432,9 +432,104 @@
         </div>
         <img src="./images/budget.png" alt="Detailed Budget">
 
+        <!-- Hardware and Software -->
+        <div class="section-title">
+          <h2 id="hardware-and-software-designs">Hardware & Software</h2>
+          <h3>Hardware</h3>
+            <p>Our hardware design focuses on integrating embedded components for accurate data acquisition, safety, and real-time processing.</p>
+    
+              <div class="objectives-container">
+              <div class="objective-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                    </svg>
+                    <h3>Core Hardware</h3>
+                    <ul style="text-align: left; padding-left: 20px;">
+                        <li>ESP32 DevKit</li>
+                        <li>DHT22 Sensor</li>
+                        <li>MPU6050</li>
+                        <li>Heartbeat Sensor</li>
+                        <li>Gas Sensor (MQ-2/MQ-135)</li>
+                        <li>GPS Module</li>
+                    </ul>
+                </div>
+            </div>
+            <h3>Software</h3>
+            <p>Our software system is divided into embedded firmware and cloud-based backend services.</p>
+    
+            <div class="objectives-container">
+                <!-- Embedded System Card -->
+                <div class="objective-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    </svg>
+                    <h3>Embedded System</h3>
+                    <p><strong>Language:</strong> C / Arduino Framework</p>
+                    <p><strong>Functions:</strong></p>
+                    <ul style="text-align: left; padding-left: 20px;">
+                        <li>Reads sensor data periodically</li>
+                        <li>Performs data preprocessing</li>
+                        <li>Sends data via MQTT over Wi-Fi</li>
+                        <li>Handles emergency interrupts</li>
+                    </ul>
+                </div>
+        
+        <!-- Backend Platform Card -->
+        <div class="objective-card">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+            </svg>
+            <h3>Backend Platform</h3>
+            <ul style="text-align: left; padding-left: 20px;">
+                <li>Node.js + Express.js</strong></li>
+                <li>MongoDB for data storage</li>
+                <li>AWS IoT Core (MQTT Broker)</li>
+                <li>React Dashboard</li>
+                <li>WebSocket for real-time updates</li>
+            </ul>
+        </div>
+        
+        <!-- API Services Card -->
+        <div class="objective-card">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <h3>API & Services</h3>
+            <ul style="text-align: left; padding-left: 20px;">
+                <li><strong>RESTful APIs</strong> for:
+                    <ul style="padding-left: 15px;">
+                        <li>Device registration</li>
+                        <li>Alert retrieval</li>
+                        <li>User profiles</li>
+                    </ul>
+                </li>
+                <li>Real-time WebSocket stream</li>
+                <li>Authentication system</li>
+                <li>Access control</li>
+            </ul>
+        </div>
+        
+        <!-- Data Visualization Card -->
+        <div class="objective-card">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <h3>Data Visualization</h3>
+            <ul style="text-align: left; padding-left: 20px;">
+                <li>Live monitoring dashboard</li>
+                <li>Historical data analysis</li>
+                <li>Real-time alert notifications</li>
+                <li>Worker location tracking</li>
+                <li>Customizable views</li>
+            </ul>
+        </div>
+    </div>
+    <div class="line"></div>
+</div>
+
         <!-- Testing Section -->
         <div class="section-title">
-          <h2 id="testing">Testing</h2>
+          <h2 id="hardware-and-software-designs">Testing</h2>
           <div class="line"></div>
         </div>
         
