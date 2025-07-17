@@ -2,6 +2,11 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 export default function InfoCard({ title, children ,colors}) {
+  console.log('InfoCard children:', children);
+  if (typeof children === 'string') {
+  throw new Error('String passed directly as children to InfoCard — wrap it in <Text>');
+}
+
   return (
     <View style={[styles.card, { backgroundColor: colors?.[0] || 'white' }]}>
       <Text style={styles.title}>{title}</Text>

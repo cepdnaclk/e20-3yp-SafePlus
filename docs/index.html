@@ -432,9 +432,130 @@
         </div>
         <img src="./images/budget.png" alt="Detailed Budget">
 
+        <!-- Hardware and Software -->
+        <div class="section-title">
+          <h2 id="hardware-and-software-designs">Hardware & Software</h2>
+          <h3>Hardware</h3>
+            <p>Our hardware design focuses on integrating embedded components for accurate data acquisition, safety, and real-time processing.</p>
+    
+              <div class="objectives-container">
+              <div class="objective-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                    </svg>
+                    <h3>Core Hardware</h3>
+                    <ul style="text-align: left; padding-left: 20px;">
+                        <li>ESP32 DevKit</li>
+                        <li>DHT22 Sensor</li>
+                        <li>MPU6050</li>
+                        <li>Heartbeat Sensor</li>
+                        <li>Gas Sensor (MQ-2/MQ-135)</li>
+                        <li>GPS Module</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 40px;">
+              <p>The harware components are reinforced with a well structured Helmet Module
+                ,a component box designed using AutoCAD Fusion and a well structured PCB designed and 
+                manufactured by us. 
+              <div style="display: flex; gap: 20px; margin: 20px 0; align-items: center;">
+                  <div style="flex: 1;">
+                    <h5>CAD Model for the Hadrware encasing</h5>
+                    <video width="100%" controls>
+                      <source src="./images/CAD.mp4" type="video/mp4">
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                  <div style="flex: 1;">
+                    <h5>3D Model of the PCB</h5>
+                    <video width="100%" controls>
+                      <source src="./images/PCB.mp4" type="video/mp4">
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+            <h3>Software</h3>
+            <p>Our software system is divided into embedded firmware and cloud-based backend services.</p>
+    
+            <div class="objectives-container">
+                <!-- Embedded System Card -->
+                <div class="objective-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    </svg>
+                    <h3>Embedded System</h3>
+                    <p><strong>Language:</strong> C / Arduino Framework</p>
+                    <p><strong>Functions:</strong></p>
+                    <ul style="text-align: left; padding-left: 20px;">
+                        <li>Reads sensor data periodically</li>
+                        <li>Performs data preprocessing</li>
+                        <li>Sends data via MQTT over Wi-Fi</li>
+                        <li>Handles emergency interrupts</li>
+                    </ul>
+                </div>
+        
+        <!-- Backend Platform Card -->
+        <div class="objective-card">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+            </svg>
+            <h3>Backend Platform</h3>
+            <ul style="text-align: left; padding-left: 20px;">
+                <li>Node.js + Express.js</strong></li>
+                <li>MongoDB for data storage</li>
+                <li>AWS IoT Core (MQTT Broker)</li>
+                <li>React Dashboard</li>
+                <li>WebSocket for real-time updates</li>
+            </ul>
+        </div>
+        
+        <!-- API Services Card -->
+        <div class="objective-card">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <h3>API & Services</h3>
+            <ul style="text-align: left; padding-left: 20px;">
+                <li><strong>RESTful APIs</strong> for:
+                    <ul style="padding-left: 15px;">
+                        <li>Device registration</li>
+                        <li>Alert retrieval</li>
+                        <li>User profiles</li>
+                    </ul>
+                </li>
+                <li>Real-time WebSocket stream</li>
+                <li>Authentication system</li>
+                <li>Access control</li>
+            </ul>
+        </div>
+        
+        <!-- Data Visualization Card -->
+        <div class="objective-card">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <h3>Data Visualization</h3>
+            <ul style="text-align: left; padding-left: 20px;">
+                <li>Live monitoring dashboard</li>
+                <li>Historical data analysis</li>
+                <li>Real-time alert notifications</li>
+                <li>Worker location tracking</li>
+                <li>Customizable views</li>
+            </ul>
+        </div>
+    </div>
+    <div class="line"></div>
+</div>
+
         <!-- Testing Section -->
         <div class="section-title">
-          <h2 id="testing">Testing</h2>
+          <h2 id="hardware-and-software-designs">Testing</h2>
           <div class="line"></div>
         </div>
         
@@ -459,15 +580,6 @@
           </div>
         
           <div class="objective-card">
-            <!-- Field Testing Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6 1a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h3>Field Testing</h3>
-            <p>Conducted real-environment testing in simulated industrial setups for realistic performance checks.</p>
-          </div>
-        
-          <div class="objective-card">
             <!-- Performance Testing Icon -->
             <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -476,16 +588,152 @@
             <p>Measured system response time, uptime, and scalability under varying loads and stress conditions.</p>
           </div>
         </div>
-        <img src="./images/testingfirmware.png" alt="Firmware Testing">
-        <img src="./images/testingapi.png" alt="API Testing">
-        <h3>Hardware Testing</h3>
-        <img src="./images/test_hum.png" alt=humidity">
-        <img src="./images/test_temp.png" alt="temperature">
-        <h5>MQ2 Gas sensor Testing</h5>
-         <video id="introVideo" width="80%" autoplay muted controls>
-            <source src="./images/mq2.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+
+        <!-- Testing Section -->
+<div class="section-title">
+  <h2 id="testing">Testing</h2>
+  <div class="line"></div>
+</div>
+
+<div class="intro-text">
+  <p>Our comprehensive testing approach ensures all components of the Safe Plus system work reliably under various conditions. We conducted rigorous testing at every level from individual sensors to complete system integration.</p>
+</div>
+
+<!-- Firmware Testing -->
+<div class="section-title">
+  <h3>Firmware Testing</h3>
+  <div class="line" style="width: 40px;"></div>
+</div>
+
+<div style="display: flex; gap: 20px; margin-bottom: 40px; align-items: center;">
+  <div style="flex: 1;">
+    <p>We conducted extensive unit testing on the helmet's firmware to ensure reliable operation:</p>
+    <ul style="text-align: left;">
+      <li>Verified sensor data acquisition accuracy</li>
+      <li>Tested MQTT message publishing at different intervals</li>
+      <li>Validated emergency trigger thresholds</li>
+      <li>Confirmed Wi-Fi reconnection logic</li>
+      <li>Verified power management functions</li>
+    </ul>
+  </div>
+  <div style="flex: 1;">
+    <img src="./images/testingfirmware.png" alt="Firmware Testing Results" style="max-width: 100%;">
+  </div>
+</div>
+
+<!-- API Testing -->
+<div class="section-title">
+  <h3>API Testing</h3>
+  <div class="line" style="width: 40px;"></div>
+</div>
+
+<div style="display: flex; gap: 20px; margin-bottom: 40px; align-items: center;">
+  <div style="flex: 1;">
+    <img src="./images/testingapi.png" alt="API Testing Results" style="max-width: 100%;">
+  </div>
+  <div style="flex: 1;">
+    <p>Our backend API was thoroughly tested using Postman and automated scripts:</p>
+    <ul style="text-align: left;">
+      <li>Validated all REST endpoints</li>
+      <li>Tested authentication and authorization</li>
+      <li>Verified data validation rules</li>
+      <li>Confirmed proper error handling</li>
+      <li>Tested WebSocket real-time updates</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Hardware Testing -->
+<div class="section-title">
+  <h3>Hardware Testing</h3>
+  <div class="line" style="width: 40px;"></div>
+</div>
+
+<div style="margin-bottom: 40px;">
+  <p>Each hardware component was tested under controlled conditions to verify specifications:</p>
+  
+  <div style="display: flex; gap: 20px; margin: 20px 0;">
+    <div style="flex: 1;">
+      <img src="./images/test_hum.png" alt="Humidity Sensor Testing">
+      <p style="text-align: center;">Humidity Sensor Calibration</p>
+    </div>
+    <div style="flex: 1;">
+      <img src="./images/test_temp.png" alt="Temperature Sensor Testing">
+      <p style="text-align: center;">Temperature Sensor Validation</p>
+    </div>
+  </div>
+  
+  <p>Additional hardware tests included power consumption measurements, signal integrity checks, and enclosure durability testing.</p>
+</div>
+
+<!-- Sensor Testing -->
+<div class="section-title">
+  <h3>Sensor Testing</h3>
+  <div class="line" style="width: 40px;"></div>
+</div>
+
+<div style="margin-bottom: 40px;">
+  <p>Each sensor was tested individually and in combination with other components:</p>
+  
+  <div style="display: flex; gap: 20px; margin: 20px 0; align-items: center;">
+    <div style="flex: 1;">
+      <h5>MQ2 Gas Sensor Testing</h5>
+      <video width="100%" controls>
+        <source src="./images/mq2.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <p>Verified response to various gas concentrations and threshold detection accuracy.</p>
+    </div>
+    <div style="flex: 1;">
+      <h5>MPU6050 Fall Detection Testing</h5>
+      <video height="75%" controls>
+        <source src="./images/fall.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <p>Validated impact detection sensitivity and false-positive prevention.</p>
+    </div>
+  </div>
+  
+  <p>Additional sensor tests included GPS location accuracy verification and heart rate sensor reliability under motion.</p>
+</div>
+
+<!-- End-to-End Testing -->
+<div class="section-title">
+  <h3>End-to-End Testing</h3>
+  <div class="line" style="width: 40px;"></div>
+</div>
+
+<div style="margin-bottom: 40px;">
+  <p>The complete system was tested in simulated real-world conditions:</p>
+  
+  <div style="display: flex; gap: 20px; margin: 20px 0;">
+    <div style="flex: 1; background: #222; padding: 20px; border-radius: 8px;">
+      <h4>Alert delay testing</h4>
+      <p>Simulated fall detection with automatic alert generation and supervisor notification.
+        SOS alerts were manually sent by the device to the dashboard. 
+      </p>
+      <p><strong>Result:</strong> Alert received within 1.3 seconds average</p>
+    </div>
+    <div style="flex: 1; background: #222; padding: 20px; border-radius: 8px;">
+      <h4>Load Testing</h4>
+      <p>A simulator was created to simulate multiple devices to check the system's response to heavy load. Backend reaching was monitored using ACKs.</p>
+      <p><strong>Result:</strong> ~99% data transmission reliability for 1000 devices</p>
+    </div>
+  </div>
+  <video width="50%" controls>
+    <source src="./images/load_test.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  
+  <div style="background: #222; padding: 20px; border-radius: 8px; margin-top: 20px;">
+    <h4>Performance Metrics</h4>
+    <ul style="text-align: left;">
+      <li>Average system latency: ~0.8 seconds</li>
+      <li>Battery life under load: 9 hours</li>
+      <li>Data transmission success rate: ~99%</li>
+    </ul>
+  </div>
+</div>
 
 
 

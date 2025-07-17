@@ -45,65 +45,65 @@ export default function DailySummaryScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content}>
-        <InfoCard title="Today's Summary"  isSafe={true}>
+        <InfoCard title="Today's Summary" colors={['#ffffff']} >
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>📅 Date: </Text>
-            <Text>{todayStr}</Text>
+            {todayStr}
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>🪖 Helmet ID: </Text>
-            <Text>{user?.helmetID || 'Not assigned'}</Text>
+            {user?.helmetID || 'Not assigned'}
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>⏰ Working Hours: </Text>
-            <Text>{todaySummary.workingHours} hours</Text>
+            {todaySummary.workingHours} hours
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>⚠️ Emergencies: </Text>
-            <Text>{todaySummary.totalImpact > 0 ? 'Yes' : 'No'}</Text>
+            {todaySummary.totalImpact > 0 ? 'Yes' : 'No'}
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>🪖 Head Impacts: </Text>
-            <Text>{todaySummary.totalImpact}</Text>
+            {todaySummary.totalImpact}
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>💨 Gas Alerts: </Text>
-            <Text>{todaySummary.totalGas}</Text>
+            {todaySummary.totalGas}
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>🚑 Medical Situations: </Text>
-            <Text>{todaySummary.totalMedicalSituations}</Text>
+            {todaySummary.totalMedicalSituations}
           </Text>
         </InfoCard>
 
-        <InfoCard title="Yesterday's Summary" colors={['#fef6e4']} isSafe={true}>
+        <InfoCard title="Yesterday's Summary" colors={['#fef6e4']} >
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>📅 Date: </Text>
-            <Text>{yesterdayStr}</Text>
+            {yesterdayStr}
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>🪖 Helmet ID: </Text>
-            <Text>{user?.helmetID || 'Not assigned'}</Text>
+            {user?.helmetID || 'Not assigned'}
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>⏰ Working Hours: </Text>
-            <Text>{yesterdaySummary.workingHours} hours</Text>
+            {yesterdaySummary.workingHours} hours
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>⚠️ Emergencies: </Text>
-            <Text>{yesterdaySummary.totalImpact > 0 ? 'Yes' : 'No'}</Text>
+            {yesterdaySummary.totalImpact > 0 ? 'Yes' : 'No'}
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>🪖 Head Impacts: </Text>
-            <Text>{yesterdaySummary.totalImpact}</Text>
+            {yesterdaySummary.totalImpact}
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>💨 Gas Alerts: </Text>
-            <Text>{yesterdaySummary.totalGas}</Text>
+            {yesterdaySummary.totalGas}
           </Text>
           <Text style={{ marginBottom: 10 }}>
             <Text style={{ fontWeight: 'bold' }}>🚑 Medical Situations: </Text>
-            <Text>{yesterdaySummary.totalMedicalSituations}</Text>
+            {yesterdaySummary.totalMedicalSituations}
           </Text>
         </InfoCard>
       </ScrollView>

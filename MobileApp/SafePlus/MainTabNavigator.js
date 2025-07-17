@@ -6,7 +6,7 @@ import DailySummaryScreen from './screens/DailySummaryScreen';
 import GraphsScreen from './screens/GraphsScreen';
 import RecommendedHabitsScreen from './screens/RecommendedHabitsScreen';
 import UserAccountScreen from './screens/UserAccountScreen';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 import { UserContext } from './context/UserContext';
 
 
@@ -47,7 +47,7 @@ export default function MainTabNavigator() {
         component={HomeScreen}
         options={{
           ...headerOptions('Home'),
-          tabBarIcon: ({ color, size }) => <Icon name="home-outline" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" color={color} size={size} />,
         }}
       />
       <Tab.Screen
@@ -55,7 +55,7 @@ export default function MainTabNavigator() {
         component={DailySummaryScreen}
         options={{
           ...headerOptions('Daily Summary'),
-          tabBarIcon: ({ color, size }) => <Icon name="clipboard-outline" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="clipboard-outline" color={color} size={size} />,
         }}
       />
       <Tab.Screen
@@ -63,7 +63,7 @@ export default function MainTabNavigator() {
         component={GraphsScreen}
         options={{
           ...headerOptions('Statistics'),
-          tabBarIcon: ({ color, size }) => <Icon name="bar-chart-outline" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="bar-chart-outline" color={color} size={size} />,
         }}
       />
       <Tab.Screen
@@ -71,7 +71,7 @@ export default function MainTabNavigator() {
         component={RecommendedHabitsScreen}
         options={{
           ...headerOptions('Notification'),
-          tabBarIcon: ({ color, size }) => <Icon name="notifications-outline" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="notifications-outline" color={color} size={size} />,
           tabBarBadge: unread && notifications.length > 0 ? notifications.length : undefined,
           tabBarBadgeStyle: { backgroundColor: 'red', color: 'white' },
         }}
@@ -81,7 +81,7 @@ export default function MainTabNavigator() {
         component={UserAccountScreen}
         options={{
           ...headerOptions('User Profile'),
-          tabBarIcon: ({ color, size }) => <Icon name="person-outline" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" color={color} size={size} />,
         }}
       />
     </Tab.Navigator>

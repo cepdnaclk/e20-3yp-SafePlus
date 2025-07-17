@@ -24,8 +24,9 @@ function RootNavigator() {
 }
 
 export default function App() {
+  console.log('App.js loaded');
+
   return (
-    console.log('App.js loaded'),
     <UserProvider>
       <RootNavigator />
     </UserProvider>

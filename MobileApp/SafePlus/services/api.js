@@ -1,5 +1,5 @@
 
-const BASE_URL = 'http://10.30.8.182:8000/api/workers'; // replace with your IP
+const BASE_URL = 'https://safeplus-backend.fly.dev/api/workers'; // replace with your IP
 
 
 
@@ -11,9 +11,11 @@ export const login = async ({ email, password }) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
+    console.log('Login response:', response);
 
     const data =  await response.json();
     if (!response.ok) throw new Error(data.message || 'Login failed');
+    //await AsyncStorage.setItem('userData', JSON.stringify(data));
     return data;
   } catch (error) {
     console.error('Login error:', error);

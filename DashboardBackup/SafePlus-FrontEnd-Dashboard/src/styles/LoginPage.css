@@ -1,0 +1,56 @@
+/* Background container */
+.login-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url("/assets/bg.jpg");
+  background-size: cover;
+  background-position: center;
+  font-family: sans-serif;
+
+}
+
+/* Login box */
+.login-box {
+  background: rgba(244, 243, 243, 0.6);
+  padding: 2rem;
+  border-radius: 20px;
+  border: 2px solid #BDBDBD;
+  backdrop-filter: blur(10px);
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Title */
+.login-title {
+  font-size: 1.5rem;
+  color: #361717;
+}
+
+/* Form styling */
+.login-form {
+  width: 100%;
+}
+
+/* Forgot password link */
+.forgot-password {
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  color: #361717;
+}
+
+/* Buttons */
+.login-button {
+  background-color: #F1C35E !important;
+  color: black !important;
+  width: 100%;
+}
+
+.signup-button {
+  background-color: #E7D4AB !important;
+  color: black !important;
+  width: 100%;
+}
