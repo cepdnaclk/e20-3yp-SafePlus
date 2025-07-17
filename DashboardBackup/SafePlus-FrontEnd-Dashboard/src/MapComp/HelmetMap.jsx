@@ -43,7 +43,7 @@ export default function HelmetMap({ helmetLocations, zoom }) {
   return (
     <MapContainer
       center={defaultCenter}
-      zoom={zoom}
+      zoom={20}
       style={{ height: "80vh", width: "100%" }}
     >
       <TileLayer
