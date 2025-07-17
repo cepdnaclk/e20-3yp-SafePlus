@@ -180,4 +180,44 @@
 .sos-button:hover {
   background-color: darkred;
 }
+.worker-card {
+  position: relative; /* Required for positioning inner absolute elements */
+  background: #f5f0e6;
+  border-radius: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px 20px;
+  width: 200px;
+  height: 325px;
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+  transition: transform 0.2s ease;
+  overflow: hidden; /* optional */
+}
 
+.battery-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 10;
+}
+
+.battery-indicator img {
+  width: 16px;
+  height: 16px;
+}
+
+.battery-indicator.ok {
+  color: green;
+}
+
+.battery-indicator.low {
+  color: red;
+}

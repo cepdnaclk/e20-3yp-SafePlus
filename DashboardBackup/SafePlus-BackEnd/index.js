@@ -156,22 +156,29 @@ device.on("message", (topic, payload) => {
   const hourValue = Math.floor(roundedHour.getTime() / (1000 * 60 * 60));
   const helmetId = data.id;
 
-    // Detect alerts
+  //status values
+  data.bpmStatus = data.bpm > 120 ? "high" : "normal";
+  data.gasStatus = ["CO", "LPG", "Smoke"].includes(data.typ) ? "danger" : "safe";
+  data.impactStatus = ["critical", "moderate", "severe", "mild"].includes(data.imp) ? "warning" : "none";
+  data.tempStatus = data.temp > 37 ? "danger" : "normal";
+  data.fallStatus = data.fall === "true" ? "detected" : "none";
+  
+  // Detect alerts
   const alerts = [];
 
-  if (data.bpmStatus === "high") {
+  if (bpmStatus === "high") {
     alerts.push({ type: "bpm", value: data.bpm });
   }
-  if (data.gasStatus === "danger") {
+  if (gasStatus === "danger") {
     alerts.push({ type: "gas", value: data.gas });
   }
-  if (data.impactStatus === "warning") {
+  if (impactStatus === "warning") {
     alerts.push({ type: "impact", value: data.imp });
   }
-  if (data.tempStatus === "danger") {
+  if (tempStatus === "danger") {
     alerts.push({ type: "temp", value: data.temp });
   }
-  if (data.fallStatus === "detected") {
+  if (fallStatus === "detected") {
     alerts.push({ type: "fall", value: data.fall });
   }
 
