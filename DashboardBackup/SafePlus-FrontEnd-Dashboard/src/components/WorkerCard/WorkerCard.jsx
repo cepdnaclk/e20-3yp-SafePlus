@@ -20,7 +20,7 @@ export default function WorkerCard({ worker, sensorData, onClick }) {
       sensorData.impactStatus === "warning" ||
       sensorData.tempStatus === "danger" ||
       sensorData.fallStatus === "detected" ||
-      sensorData.btn);
+      sensorData.btn );
 
   const currentAlertKey = hasAlert
     ? `${worker.id}-${sensorData?.bpmStatus}-${sensorData?.gasStatus}-${sensorData?.impactStatus}-${sensorData?.tempStatus}`
