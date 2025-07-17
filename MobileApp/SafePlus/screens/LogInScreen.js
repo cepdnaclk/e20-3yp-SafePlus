@@ -11,6 +11,8 @@ import {
 import styles from '../styles/LogInScreen';
 import { login, changePassword } from '../services/api';
 import { UserContext } from '../context/UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaView, StatusBar } from 'react-native';
 
 export default function LoginScreen() {
   console.log('LoginScreen rendered');
@@ -61,14 +63,17 @@ export default function LoginScreen() {
           setChangePasswordModelVisible(true);
         }else {
           console.log('Navigating to Home with user data:', data);
+          await AsyncStorage.setItem('userData', JSON.stringify(data));
           setUser(data);
-          //navigation.replace('MainTabs'); 
         }
+        
       } else {
         alert('Login failed. Email or password is incorrect.');
       }
     } catch (err) {
       console.error('Login failed:', err);
+      alert('Login failed. Please check your connection and try again.');
+
     }
   };
 
@@ -89,6 +94,7 @@ export default function LoginScreen() {
       setChangePasswordModelVisible(false);
       setMustChangePassword(false);
       console.log('Password change success:', data);
+      await AsyncStorage.setItem('userData', JSON.stringify(data));
       setUser(data);
       //navigation.replace('MainTabs');
             } 
@@ -102,16 +108,20 @@ export default function LoginScreen() {
     setChangePasswordModelVisible(false);
     setMustChangePassword(false);
     // Navigate to home or main screen
-    setUser(data);
+    setUser(userData);
     //navigation.replace('MainTabs'); 
   };
 
   return (
+    
+      
     <ImageBackground
       source={require('../assets/background2.jpg')}
       style={styles.background}
       resizeMode="cover"
     >
+      <SafeAreaView style={styles.safeArea}>
+      <StatusBar backgroundColor="black" barStyle="light-content" />
       <View style={styles.fullScreenOverlay} />
       <View style={styles.contentContainer}>
         {showMainContent && (
@@ -149,7 +159,7 @@ export default function LoginScreen() {
             </View>
 
             <TextInput
-              style={styles.input}
+              style={[styles.input , {color:'black'} ]}
               placeholder="Email"
               placeholderTextColor="#999"
               value={loginEmail}
@@ -157,7 +167,7 @@ export default function LoginScreen() {
               autoCapitalize="none"
             />
             <TextInput
-              style={styles.input}
+              style={[styles.input , {color:'black'} ]}
               placeholder="Password"
               placeholderTextColor="#999"
               secureTextEntry
@@ -165,13 +175,6 @@ export default function LoginScreen() {
               onChangeText={setLoginPassword}
             />
 
-            <TouchableOpacity style={styles.googleButton}>
-              <Image
-                source={require('../assets/google_logo.jpeg')}
-                style={styles.icon}
-              />
-              <Text style={styles.googleText}>Continue with Google</Text>
-            </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.authButton}
@@ -244,6 +247,8 @@ export default function LoginScreen() {
           </View>
         </View>
       </Modal>
+      </SafeAreaView>
     </ImageBackground>
+ 
   );
 }
