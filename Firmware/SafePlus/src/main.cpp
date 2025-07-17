@@ -32,7 +32,7 @@ static bool fallAlertActive = false;
 static bool impactAlertActive = false;
 static unsigned long fallAlertStartTime = 0;
 static unsigned long impactAlertStartTime = 0;
-static const unsigned long ALERT_DURATION = 5000;  // 5 seconds
+static const unsigned long ALERT_DURATION = 10000;  // 10 seconds
 static const unsigned long ALERT_PUBLISH_INTERVAL = 500;  // Publish every 500ms during alert
 static unsigned long lastAlertPublish = 0;
 
@@ -403,7 +403,7 @@ String collectSensorDataAsJson(bool& buttonPressed, bool& impactDetected, bool& 
             "\"status\":\"%s\""
         "}"
         "}",
-        helmetID, data.temperature, data.humidity, accMag, gyroMag, bpm,
+        helmetID, data.temperature, data.humidity, bpm,
         data.latitude, data.longitude, data.gasPPM, data.gasType.c_str(),
         buttonPressed ? "true" : "false", impact.severity.c_str(),
         fallDetected ? "true" : "false",

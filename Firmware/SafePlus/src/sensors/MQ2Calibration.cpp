@@ -311,7 +311,7 @@ String detectGasType(float lpgPPM, float coPPM, float smokePPM) {
     
     if (maxPPM == lpgPPM && lpgPPM > 100.0) {
         return "LPG";
-    } else if (maxPPM == coPPM && coPPM > 35.0) {
+    } else if (maxPPM == coPPM && coPPM > 50.0) {
         return "CO";
     } else if (maxPPM == smokePPM && smokePPM > 300.0) {
         return "Smoke";
