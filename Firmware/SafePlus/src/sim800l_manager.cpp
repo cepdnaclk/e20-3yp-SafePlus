@@ -3,7 +3,7 @@
 #define SIM800_TX 17
 #define SIM800_RX 16
 #define SIM800_RST 5
-#define SIM800_PWR_PIN 26
+#define SIM800_PWR_PIN 27
 
 HardwareSerial sim800(2);
 bool simInitialized = false;
@@ -16,7 +16,7 @@ void sim800PowerOn() {
 }
 
 void sim800PowerOff() {
-    digitalWrite(SIM800_PWR_PIN, LOW);
+    digitalWrite(SIM800_PWR_PIN, HIGH);
     delay(500);
     simInitialized = false;
 }
