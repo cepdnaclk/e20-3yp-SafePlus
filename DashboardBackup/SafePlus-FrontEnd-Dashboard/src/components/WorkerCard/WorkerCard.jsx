@@ -137,14 +137,15 @@ export default function WorkerCard({ worker, sensorData, onClick }) {
           </p>
         </div>
 
-        <div
-          className={`battery-indicator ${
-          sensorData?.bat !== undefined && sensorData.bat < 20 ? "low" : "ok"
-          }`}
-        >
-    <img src="/icons/battery.png" alt="Battery" />
-    <span>{sensorData?.bat !== undefined ? `${sensorData.bat}%` : "N/A"}</span>
-  </div>
+        <div className={`battery-indicator ${sensorData?.battery?.percentage < 20 ? "low" : "ok"}`}>
+        <img src="/icons/battery.png" alt="Battery" />
+          <span>
+            {sensorData?.battery?.percentage != null
+              ? `${sensorData.battery.percentage}%`
+              : "N/A"}
+          </span>
+        </div>
+
 
         {sensorData ? (
           <div className="sensor-icons">
