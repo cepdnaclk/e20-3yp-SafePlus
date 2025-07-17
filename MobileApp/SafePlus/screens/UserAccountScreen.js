@@ -1,11 +1,20 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, TextInput, Alert, SafeAreaView, Image } from 'react-native';
+import React, { useState, useContext } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  Alert,
+  SafeAreaView,
+  Image,
+} from 'react-native';
 import styles from '../styles/UserAccountScreen.js';
 import { UserContext } from '../context/UserContext.js';
 import { changePassword } from '../services/api.js';
 
 export default function UserAccountScreen() {
-  const { user, setUser } = React.useContext(UserContext);
+  const { user, logout } = useContext(UserContext); // ✅ Use logout from context
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -13,7 +22,7 @@ export default function UserAccountScreen() {
 
   // Function to handle password change
   const handleChangePassword = () => {
-    console.log('Attempting to change password for user:', user.userId);
+    console.log('Attempting to change password for user:', user?.userId);
     if (!oldPassword || !newPassword || !confirmPassword) {
       Alert.alert('Error', 'Please fill all fields.');
       return;
@@ -36,46 +45,60 @@ export default function UserAccountScreen() {
       });
   };
 
-  // Function to handle logout
+  // Ask before logging out
   const handleLogout = () => {
-    Alert.alert(
-      'Log Out',
-      'Are you sure you want to log out?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Log Out', style: 'destructive', onPress: () => setUser(null) }
-      ]
-    );
+    Alert.alert('Log Out', 'Are you sure you want to log out?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Log Out',
+        style: 'destructive',
+        onPress: () => {
+          logout(); // ✅ Call logout from UserContext
+        },
+      },
+    ]);
   };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: '#fef6e4', flex: 1 }]}>
       <View style={[styles.container, { paddingTop: 24 }]}>
-        {/* User Avatar */}
+        {/* Avatar */}
         <View style={{ alignItems: 'center', marginBottom: 16 }}>
           <Image
             source={require('../assets/user_avatar.png')}
-            style={{ width: 80, height: 80, borderRadius: 40, marginBottom: 8, backgroundColor: '#FFD966' }}
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 40,
+              marginBottom: 8,
+              backgroundColor: '#FFD966',
+            }}
             resizeMode="cover"
           />
           <Text style={[styles.title, { color: '#5d4b1f', fontSize: 22 }]}>User Account</Text>
         </View>
 
-        {/* User Info Card */}
-        <View style={{
-          backgroundColor: '#fff',
-          borderRadius: 12,
-          padding: 18,
-          marginBottom: 18,
-          elevation: 3,
-          shadowColor: '#000',
-          shadowOpacity: 0.07,
-          shadowRadius: 4,
-        }}>
+        {/* User Info */}
+        <View
+          style={{
+            backgroundColor: '#fff',
+            borderRadius: 12,
+            padding: 18,
+            marginBottom: 18,
+            elevation: 3,
+            shadowColor: '#000',
+            shadowOpacity: 0.07,
+            shadowRadius: 4,
+          }}
+        >
           <Text style={[styles.email, { color: '#333', fontWeight: 'bold' }]}>Name:</Text>
-          <Text style={[styles.email, { color: '#5d4b1f', marginBottom: 8 }]}>{user?.username || 'Unknown'}</Text>
+          <Text style={[styles.email, { color: '#5d4b1f', marginBottom: 8 }]}>
+            {user?.username || 'Unknown'}
+          </Text>
           <Text style={[styles.email, { color: '#333', fontWeight: 'bold' }]}>Email:</Text>
-          <Text style={[styles.email, { color: '#5d4b1f', marginBottom: 8 }]}>{user?.email || 'Not available'}</Text>
+          <Text style={[styles.email, { color: '#5d4b1f', marginBottom: 8 }]}>
+            {user?.email || 'Not available'}
+          </Text>
           <Text style={[styles.helmetNo, { color: '#333', fontWeight: 'bold' }]}>
             Helmet Currently Using:
           </Text>
@@ -85,7 +108,7 @@ export default function UserAccountScreen() {
         {/* Divider */}
         <View style={{ height: 1, backgroundColor: '#e0cfa9', marginVertical: 8 }} />
 
-        {/* Actions */}
+        {/* Change Password Button */}
         <TouchableOpacity
           style={[styles.button, { marginBottom: 8 }]}
           onPress={() => setShowPasswordModal(true)}
@@ -94,6 +117,7 @@ export default function UserAccountScreen() {
           <Text style={{ color: '#333', fontWeight: 'bold' }}>Change Password</Text>
         </TouchableOpacity>
 
+        {/* Logout Button */}
         <TouchableOpacity
           style={[styles.button, { backgroundColor: '#FFC000', marginTop: 8 }]}
           onPress={handleLogout}
@@ -136,7 +160,9 @@ export default function UserAccountScreen() {
                 onChangeText={setConfirmPassword}
                 placeholderTextColor="#999"
               />
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
+              <View
+                style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}
+              >
                 <TouchableOpacity
                   style={[styles.button, { flex: 1, marginRight: 8 }]}
                   onPress={handleChangePassword}
