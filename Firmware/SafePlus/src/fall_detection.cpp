@@ -1,5 +1,8 @@
 #include "fall_detection.h"
 #include <math.h>
+#include "config_manager.h" // dynamic threshold profiles
+
+// Fall detection fusion (IMU + High-G + altitude + context) with state machine.
 
 // ESP32 optimized constants
 static const float GRAVITY = 9.81;
@@ -16,11 +19,8 @@ static const float heightFallThreshold = 0.20;  // meters - reduced for sensitiv
 static unsigned long lastFallDetection = 0;
 static const unsigned long FALL_COOLDOWN = 5000;  // 5 seconds between detections
 
-// Enhanced thresholds for better detection
-static const float FALL_THRESHOLD_LOWER = 0.3;   // Lower threshold for fall detection
-static const float FALL_THRESHOLD_UPPER = 2.5;   // Upper threshold for impact
-static const float ORIENTATION_THRESHOLD = 45.0; // degrees - reduced for sensitivity
-static const float INACTIVITY_THRESHOLD = 0.5;   // g-force for inactivity
+// Thresholds now provided by ConfigProfile (see config_manager)
+// Retained names in code logic but values resolved at runtime.
 
 // Motion stability analysis
 static float motionBuffer[5] = {1.0, 1.0, 1.0, 1.0, 1.0};
@@ -28,6 +28,11 @@ static int motionIndex = 0;
 static unsigned long lastMotionTime = 0;
 
 bool FallStateMachine::processFallDetection(bool fallIndicators[10], float impactConfidence) {
+    // State machine processes boolean feature indicators + impact confidence:
+    // NORMAL      : Watch for minimum trigger set
+    // PRE_FALL    : Require confirmation pattern within timeout
+    // FALL_DETECTED: Transition marker (one-loop) -> POST_FALL_ANALYSIS
+    // POST_FALL_ANALYSIS: Recovery window then back to NORMAL
     unsigned long currentTime = millis();
     int activeIndicators = 0;
     
@@ -37,7 +42,7 @@ bool FallStateMachine::processFallDetection(bool fallIndicators[10], float impac
 
     switch (currentStage) {
         case NORMAL:
-            if (activeIndicators >= 2 && impactConfidence > 0.25) {  // Reduced thresholds
+            if (activeIndicators >= 2 && impactConfidence > 0.25) {  // initial pre-fall trigger (demo sensitive)
                 currentStage = PRE_FALL;
                 stageStartTime = currentTime;
                 confirmationCounter = 0;
@@ -45,7 +50,7 @@ bool FallStateMachine::processFallDetection(bool fallIndicators[10], float impac
             break;
 
         case PRE_FALL:
-            if (activeIndicators >= 4 && impactConfidence > 0.5) {  // Reduced thresholds
+            if (activeIndicators >= 4 && impactConfidence > 0.5) {  // confirmation stage
                 confirmationCounter++;
                 if (confirmationCounter >= 1) {  // Reduced confirmation requirement
                     currentStage = FALL_DETECTED;
@@ -132,6 +137,10 @@ void ActivityClassifier::updateActivityPattern(float activity) {
 
 // Enhanced Impact Analysis with better thresholds
 ImpactAnalysis analyzeCombinedImpact(const SensorData& data, float h3lis_ax, float h3lis_ay, float h3lis_az) {
+    // Combines both accelerometer sources:
+    //   1. Direct magnitude thresholds (sensor-specific)
+    //   2. Weighted fusion for sub-threshold events
+    //   3. Direction & angle classification for context reporting
     ImpactAnalysis result;
     
     // Normalize MPU data
@@ -144,11 +153,12 @@ ImpactAnalysis analyzeCombinedImpact(const SensorData& data, float h3lis_ax, flo
     float h3lisMagnitude = sqrt(h3lis_ax*h3lis_ax + h3lis_ay*h3lis_ay + h3lis_az*h3lis_az);
     
     // Intelligent sensor fusion with lowered thresholds
-    if (h3lisMagnitude > 2.5 && data.h3lisValid) {  // Reduced from 4.0
+    const ConfigProfile& cfg = getActiveConfig();
+    if (h3lisMagnitude > cfg.fall.combinedImpactH3 && data.h3lisValid) {
         result.combinedMagnitude = h3lisMagnitude;
         result.confidence = 0.9;
         result.isValidImpact = true;
-    } else if (mpuMagnitude > 1.8 && data.mpuValid) {  // Reduced from 2.5
+    } else if (mpuMagnitude > cfg.fall.combinedImpactMPU && data.mpuValid) {
         result.combinedMagnitude = mpuMagnitude;
         result.confidence = (h3lisMagnitude > 1.0 && data.h3lisValid) ? 0.8 : 0.6;
         result.isValidImpact = (h3lisMagnitude > 0.8 && data.h3lisValid);
@@ -158,7 +168,21 @@ ImpactAnalysis analyzeCombinedImpact(const SensorData& data, float h3lis_ax, flo
         float h3lisWeight = data.h3lisValid ? 0.3 : 0.0;
         result.combinedMagnitude = (mpuMagnitude * mpuWeight) + (h3lisMagnitude * h3lisWeight);
         result.confidence = 0.4;
-        result.isValidImpact = (result.combinedMagnitude > 0.9);  // Reduced from 1.2
+    result.isValidImpact = (result.combinedMagnitude > (cfg.fall.combinedImpactMPU * 0.5f));
+    }
+
+    // MICRO IMPACT PATH (Demo mode only): detect very small spikes as 'mild'
+    if (getActiveConfig().mode == DetectionMode::DEMO && !result.isValidImpact) {
+        // Use raw magnitudes to sense quick tap impulses below normal thresholds
+        float microMag = max(h3lisMagnitude, mpuMagnitude);
+        // Heuristic window: between 0.55g and current mild threshold
+        float mildBand = getActiveConfig().severity.mild;
+        if (microMag >= 0.55f && microMag < mildBand) {
+            result.combinedMagnitude = microMag;
+            result.confidence = 0.3f; // lower confidence (tiny tap)
+            result.isValidImpact = true;
+            // Direction best-effort (choose dominant axis from available sensor)
+        }
     }
     
     // Direction analysis using the more sensitive sensor
@@ -193,15 +217,20 @@ ImpactAnalysis analyzeCombinedImpact(const SensorData& data, float h3lis_ax, flo
     
     // Severity classification with adjusted thresholds
     result.severity = getImpactSeverity(result.combinedMagnitude);
+    // Upgrade micro detections to at least 'mild' label for exhibition clarity
+    if (getActiveConfig().mode == DetectionMode::DEMO && result.isValidImpact && result.severity == "no") {
+        result.severity = "mild";
+    }
     
     return result;
 }
 
 String getImpactSeverity(float magnitude) {
-    if (magnitude >= 8.0) return "critical";   // Reduced from 15.0
-    if (magnitude >= 5.0) return "severe";     // Reduced from 10.0
-    if (magnitude >= 3.0) return "moderate";   // Reduced from 6.0
-    if (magnitude >= 1.5) return "mild";       // Reduced from 3.0
+    const ConfigProfile& cfg = getActiveConfig();
+    if (magnitude >= cfg.severity.critical) return "critical";
+    if (magnitude >= cfg.severity.severe)   return "severe";
+    if (magnitude >= cfg.severity.moderate) return "moderate";
+    if (magnitude >= cfg.severity.mild)     return "mild";
     return "no";
 }
 
@@ -226,7 +255,7 @@ bool smartFallDetectionWithAltitude(const SensorData& data, float h3lis_ax, floa
                                    GyroHistory& gyroHist, AccelHistory& accHist, 
                                    FallStateMachine& fallSM, AdaptiveThresholds& thresholds,
                                    ConstructionContext& context, ActivityClassifier& classifier) {
-    // Check cooldown period
+
     if (millis() - lastFallDetection < FALL_COOLDOWN) {
         return false;
     }
@@ -303,25 +332,26 @@ bool smartFallDetectionWithAltitude(const SensorData& data, float h3lis_ax, floa
     bool fallDetected = false;
     
     // Method 1: Altitude-based fall detection
-    if (altitudeChange > 0.15 && altitudeRate > 0.3) {  // Reduced thresholds
+    const ConfigProfile& cfg = getActiveConfig();
+    if (altitudeChange > cfg.fall.altitudeDrop && altitudeRate > 0.3f) {
         fallDetected = true;
         Serial.printf("Fall detected - Altitude drop: %.2fm at %.2fm/s\n", altitudeChange, altitudeRate);
     }
     
     // Method 2: Combined altitude + acceleration
-    if (altitudeChange > 0.10 && (mpuMagnitude > 1.6 || h3lisMagnitude > 2.0)) {
+    if (altitudeChange > (cfg.fall.altitudeDrop * 0.8f) && (mpuMagnitude > cfg.fall.combinedImpactMPU || h3lisMagnitude > cfg.fall.combinedImpactH3)) {
         fallDetected = true;
         Serial.println("Fall detected - Altitude + impact!");
     }
     
     // Method 3: High impact detection
-    if (mpuMagnitude > 2.0 || h3lisMagnitude > 2.5) {
+    if (mpuMagnitude > cfg.fall.impactG || h3lisMagnitude > cfg.fall.combinedImpactH3) {
         fallDetected = true;
         Serial.println("Fall detected - High impact!");
     }
     
     // Method 4: Low gravity + altitude change
-    if (mpuMagnitude < 0.4 && altitudeChange > 0.08) {
+    if (mpuMagnitude < cfg.fall.fallLowerG && altitudeChange > cfg.fall.altitudeDropFree) {
         fallDetected = true;
         Serial.println("Fall detected - Free fall + altitude!");
     }
@@ -329,7 +359,7 @@ bool smartFallDetectionWithAltitude(const SensorData& data, float h3lis_ax, floa
     // Method 5: Sudden rotation + impact
     static float lastGyroMag = 0;
     float gyroChange = abs(gyroMagnitude - lastGyroMag);
-    if (gyroChange > 25.0 && mpuMagnitude > 1.2) {  // Reduced thresholds
+    if (gyroChange > cfg.fall.rotationDelta && mpuMagnitude > (cfg.fall.combinedImpactMPU * 0.75f)) {
         fallDetected = true;
         Serial.println("Fall detected - Sudden rotation + impact!");
     }

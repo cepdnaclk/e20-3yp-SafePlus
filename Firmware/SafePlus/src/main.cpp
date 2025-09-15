@@ -5,6 +5,10 @@
 #include "aws_manager.h"
 #include "fall_detection.h"
 #include "sim800l_manager.h"
+#include "config_manager.h"
+#include "MPU6050Calibration.h"
+#include "H3LISCalibration.h"
+#include "MQ2Calibration.h"
 
 GyroHistory gyroHistory;
 AccelHistory accHistory;
@@ -26,6 +30,8 @@ const char* helmetID = "Helmet_1";
 unsigned long lastTimePublish = 0;
 unsigned long publishThreshold = 2000;
 bool usingSIM800L = false;
+// Active detection mode (default DEMO for exhibition). Switch to PRODUCTION for field use.
+static DetectionMode requestedMode = DetectionMode::DEMO;
 
 // **FALL/IMPACT ALERT DURATION VARIABLES**
 static bool fallAlertActive = false;
@@ -49,6 +55,72 @@ static unsigned long lastBatteryCheck = 0;
 static int lastBatteryPercentage = 100;
 static float lastBatteryVoltage = 4.2;
 static String lastBatteryStatus = "Excellent";
+
+// ------------------------ Optional Forced Calibration -----------------------
+void optionalForceCalibrationPrompt() {
+    Serial.println();
+    Serial.println("--- Calibration Control ---");
+    Serial.println("Press 'y' then Enter within 30s to FORCE new calibration (MPU + H3LIS + MQ2).");
+    Serial.println("Otherwise existing stored calibration values will be used.");
+    Serial.println("Waiting (30s)...");
+
+    const unsigned long WINDOW = 30000UL;
+    unsigned long start = millis();
+    bool requested = false;
+    int lastSecond = -1;
+    while (millis() - start < WINDOW) {
+        int remaining = (int)((WINDOW - (millis() - start)) / 1000UL);
+        if (remaining != lastSecond && remaining % 5 == 0) { // print every 5s
+            Serial.printf("%d s left...\n", remaining);
+            lastSecond = remaining;
+        }
+        if (Serial.available()) {
+            char c = Serial.read();
+            if (c == 'y' || c == 'Y') {
+                requested = true;
+                break;
+            }
+        }
+        delay(50);
+    }
+
+    if (!requested) {
+        Serial.println("Calibration prompt timeout.");
+        // If any calibration was missing, initSensors() already performed it.
+        return;
+    }
+
+    Serial.println("Forcing recalibration now... keep helmet still.");
+    delay(500);
+
+    // MPU6050
+    clearMPUCalibration();
+    if (calibrateMPUTiltedSensor()) {
+        Serial.println("MPU6050 recalibrated.");
+    } else {
+        Serial.println("MPU6050 recalibration FAILED (keeping defaults).");
+    }
+
+    // H3LIS High-G sensor
+    clearH3lisCalibration();
+    if (calibrateH3lisSensorAutomatic()) {
+        Serial.println("H3LIS automatic recalibration done.");
+    } else {
+        Serial.println("H3LIS recalibration FAILED (using raw readings).");
+    }
+
+    // MQ2 Gas sensor (attempt advanced, fallback basic)
+    Serial.println("Recalibrating MQ2 sensor (advanced)...");
+    if (!calibrateMQ2Advanced()) {
+        Serial.println("Advanced MQ2 calibration failed, trying basic...");
+        if (!calibrateMQ2Basic()) {
+            Serial.println("Basic MQ2 calibration failed (keeping previous / default).");
+        }
+    }
+
+    Serial.println("Forced calibration sequence complete.");
+    Serial.println();
+}
 
 // ------------------------ Utility Functions (MOVED UP) -----------------------
 void sosPattern() {
@@ -503,6 +575,11 @@ void setup() {
     Serial.begin(115200);
     Serial.println("ESP32 Construction Helmet Safety System Starting...");
 
+    // Initialize dynamic configuration (demo vs production thresholds)
+    initConfig(requestedMode);
+    Serial.print("Detection Mode: ");
+    Serial.println(modeString());
+
     pinMode(BUZZER_PIN, OUTPUT);
     pinMode(BUTTON_PIN, INPUT_PULLUP);
     pinMode(MQ2_POWER_PIN, OUTPUT);
@@ -517,6 +594,8 @@ void setup() {
     wifiInit();
     awsInit();
     initSensors();
+    // Offer user a 30s chance to force a fresh calibration after sensors init
+    optionalForceCalibrationPrompt();
     client.setCallback(callback);
     initHeartRateSensor();
     server.begin();

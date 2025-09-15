@@ -1,3 +1,4 @@
+// Sensor aggregation: IMU, High-G, MQ2, GPS, BMP280, simulated DHT22, heart rate.
 #include "sensors.h"
 #include "MAX30105.h"
 #include "heartRate.h"
@@ -208,6 +209,8 @@ void updateSimulatedTempHumidity() {
 }
 
 void initSensors() {
+    // NOTE: Order matters—bus init, then IMU (baseline for motion gating),
+    // then GPS (long lock time), then high-G sensor, gas, environmental, altitude.
     Wire.begin(21, 22);
 
     // MPU6050
@@ -243,7 +246,7 @@ void initSensors() {
     Serial.println("GPS may take 30-60 seconds to get first fix...");
 
     // H3LIS200DL
-    while (!h3lis.begin()) {
+    while (!h3lis.begin()) { // Retry until available (blocking but ensures presence)
         Serial.println("H3LIS200DL failed, retrying...");
         delay(500);
     }
