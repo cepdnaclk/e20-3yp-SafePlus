@@ -29,5 +29,8 @@
         "email": "isurunawinne@eng.pdn.ac.lk"
     }
     ],
-    "tags": ["Web", "MobileApp","Hardware","Smart Safety Helmet","Safety Helmet","3yp","Embeded System"]
+    "tags": ["Web", "MobileApp","Hardware","Smart Safety Helmet","Safety Helmet","3yp","Embeded System"],
+    "image": "docs/images/cover.jpg",
+    "thumbnail": "docs/images/cover.jpg"
+    
 }
